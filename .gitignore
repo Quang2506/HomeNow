@@ -1,0 +1,41 @@
+
+# Visual Studio cache
+.vs/
+
+# Build outputs
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Dd]ebug/
+[Rr]elease/
+[Bb]uild/
+[Pp]ublish/
+[Tt]emp/
+
+# User-specific files
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+
+# Resharper / Rider / VS Code
+_ReSharper*/
+*.DotSettings.user
+.idea/
+.vscode/
+
+# NuGet
+*.nupkg
+# NuGet packages (đối với projects dùng packages.config)
+**/packages/*
+!**/packages/build/
+!**/packages/repositories.config
+
+# IIS / web
+App_Data/*
+*.db
+*.log
+
+# Secrets (đừng commit)
+appsettings.*.Development.json
+appsettings.Local.json

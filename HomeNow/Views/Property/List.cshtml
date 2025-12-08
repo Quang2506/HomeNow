@@ -1,0 +1,129 @@
+﻿@model IEnumerable<HomeNow.Controllers.PropertyController.PropertyListViewModel>
+
+@{
+    ViewBag.Title = "Danh sách nhà";
+    var lang = (string)ViewBag.Lang ?? "vi";
+}
+
+<h2>Danh sách nhà</h2>
+
+<div class="property-list">
+    @foreach (var p in Model)
+    {
+        <div class="property-item">
+            <!-- CHỈ IMAGE LÀ LINK TỚI VR -->
+            <a href="@Url.Action("Vr", "Property", new { id = p.Id, lang = lang })"
+               class="img-link"
+               target="_blank">
+               
+                <div class="img">
+                    <img src="@Url.Content(p.CoverImageUrl ?? "~/Content/properties/noimage.png")" />
+                    @if (p.IsVrAvailable)
+                    {
+                        <span class="vr-tag">VR</span>
+                    }
+                </div>
+            </a>
+
+            <!-- Phần info & price vẫn là div bình thường -->
+            <div class="info">
+                <div class="title">@p.Title</div>
+                <div class="sub">@p.District · @p.AreaName · @p.CommunityName</div>
+                <div class="detail">
+                    @p.AreaM2 m² · @p.Orientation · @p.RoomType
+                </div>
+            </div>
+
+            <div class="price">
+                <span class="p">@p.Price</span>
+                <span class="unit">@p.PriceUnit</span>
+            </div>
+        </div>
+    }
+
+</div>
+
+<style>
+    .property-list {
+        width: 900px;
+        margin: 0 auto;
+    }
+
+    .property-item {
+        display: flex;
+        padding: 12px;
+        margin-bottom: 10px;
+        background: #fff;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #333;
+        box-shadow: 0 2px 6px rgba(0,0,0,.1);
+    }
+
+        .property-item:hover {
+            background: #f5f5f5;
+        }
+
+    .img {
+        width: 160px;
+        height: 120px;
+        position: relative;
+    }
+
+        .img img {
+            width: 160px;
+            height: 120px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+
+    .vr-tag {
+        position: absolute;
+        bottom: 6px;
+        left: 6px;
+        background: #00c853;
+        color: #fff;
+        padding: 2px 5px;
+        font-size: 12px;
+        border-radius: 4px;
+    }
+
+    .info {
+        flex: 1;
+        padding: 0 12px;
+    }
+
+    .title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .sub {
+        color: #999;
+        font-size: 13px;
+    }
+
+    .detail {
+        font-size: 13px;
+        margin-top: 5px;
+        color: #666;
+    }
+
+    .price {
+        width: 120px;
+        text-align: right;
+        font-size: 18px;
+        color: #ff5722;
+    }
+
+        .price .unit {
+            font-size: 12px;
+            color: #888;
+        }
+
+    .img-link {
+        text-decoration: none;
+        color: inherit;
+    }
+</style>
