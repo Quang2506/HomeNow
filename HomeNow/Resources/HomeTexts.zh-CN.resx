@@ -165,4 +165,111 @@
   <data name="NavPostListing" xml:space="preserve">
     <value>发布信息</value>
   </data>
+  <data name="Meta_PageTitle" xml:space="preserve">
+    <value>房东发房 - NhaNow（预览）</value>
+  </data>
+  <data name="Meta_HtmlTitle" xml:space="preserve">
+    <value>NhàNow - 提升您的房产展示
+</value>
+  </data>
+  <data name="Brand_Name" xml:space="preserve">
+    <value>NhàNow
+</value>
+  </data>
+  <data name="Brand_City" xml:space="preserve">
+    <value>河内
+</value>
+  </data>
+  <data name="Menu_Rent" xml:space="preserve">
+    <value>租房
+</value>
+  </data>
+  <data name="Menu_Buy" xml:space="preserve">
+    <value>买房
+</value>
+  </data>
+  <data name="Menu_Post" xml:space="preserve">
+    <value>发布房源
+</value>
+  </data>
+  <data name="Hero_Title" xml:space="preserve">
+    <value>用 VR 科技提升您的房源展示
+</value>
+  </data>
+  <data name="Hero_Subtitle" xml:space="preserve">
+    <value>我们负责拍摄、营销和带看，您只需坐等收租。
+</value>
+  </data>
+  <data name="Hero_CTA" xml:space="preserve">
+    <value>免费预约咨询
+</value>
+  </data>
+  <data name="Features_Title" xml:space="preserve">
+    <value>为什么选择 NhàNow？
+</value>
+  </data>
+  <data name="Feature_360" xml:space="preserve">
+    <value>专业 360° 全景图片
+</value>
+  </data>
+  <data name="Feature_Reach" xml:space="preserve">
+    <value>最大化触达优质租客
+</value>
+  </data>
+  <data name="Feature_TimeSaving" xml:space="preserve">
+    <value>为您节省大量管理时间
+</value>
+  </data>
+  <data name="Process_Title" xml:space="preserve">
+    <value>简单高效的合作流程
+</value>
+  </data>
+  <data name="Process_Step1" xml:space="preserve">
+    <value>1. 提交需求
+</value>
+  </data>
+  <data name="Process_Step2" xml:space="preserve">
+    <value>2. 媒体团队上门拍摄
+</value>
+  </data>
+  <data name="Process_Step3" xml:space="preserve">
+    <value>3. NhàNow 安排带看
+</value>
+  </data>
+  <data name="Process_Step4" xml:space="preserve">
+    <value>4. 成交并收款
+</value>
+  </data>
+  <data name="Contact_Title" xml:space="preserve">
+    <value>注册与联系
+</value>
+  </data>
+  <data name="Form_Header" xml:space="preserve">
+    <value>留下您的登记信息
+</value>
+  </data>
+  <data name="Form_FullNamePlaceholder" xml:space="preserve">
+    <value>姓名
+</value>
+  </data>
+  <data name="Form_PhonePlaceholder" xml:space="preserve">
+    <value>电话号码
+</value>
+  </data>
+  <data name="Form_AddressPlaceholder" xml:space="preserve">
+    <value>房产地址
+</value>
+  </data>
+  <data name="Form_OptionMedia" xml:space="preserve">
+    <value>媒体拍摄套餐
+</value>
+  </data>
+  <data name="Form_OptionManage" xml:space="preserve">
+    <value>代管服务套餐
+</value>
+  </data>
+  <data name="Form_Submit" xml:space="preserve">
+    <value>立即提交需求
+</value>
+  </data>
 </root>

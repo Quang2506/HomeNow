@@ -1,0 +1,39 @@
+﻿@* Popup đăng nhập dùng chung mọi trang *@
+<div id="loginOverlay" class="login-overlay" style="display:none;">
+    <div class="login-modal">
+        <span class="login-close" id="btnCloseLogin">&times;</span>
+        <div class="login-modal-title">Đăng nhập</div>
+
+        <div id="loginError" class="login-error-text"></div>
+
+        <form id="loginForm" method="post" action="@Url.Action("Login", "Account")">
+            @Html.AntiForgeryToken()
+            @* ReturnUrl sẽ được JS set = url hiện tại *@
+            <input type="hidden" name="ReturnUrl" id="loginReturnUrl" />
+
+            <div class="login-form-group">
+                <label for="LoginName">Email / Số điện thoại</label>
+                <input type="text" name="LoginName" id="LoginName" />
+            </div>
+
+            <div class="login-form-group">
+                <label for="Password">Mật khẩu</label>
+                <input type="password" name="Password" id="Password" />
+            </div>
+
+            <div class="login-remember">
+                <label>
+                    <input type="checkbox" name="RememberMe" value="true" />
+                    Ghi nhớ đăng nhập
+                </label>
+            </div>
+
+            <button type="submit" class="login-btn-submit">Đăng nhập</button>
+        </form>
+
+        <div class="login-footer-text">
+            Chưa có tài khoản?
+            <a href="@Url.Action("Register", "Account")">Đăng ký ngay</a>
+        </div>
+    </div>
+</div>

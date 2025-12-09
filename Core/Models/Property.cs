@@ -11,7 +11,7 @@ namespace Core.Models
         public int Id { get; set; }
 
         [Column("title")]
-        public string Title { get; set; }                // Tiêu đề gốc (thường tiếng Trung)
+        public string Title { get; set; }                // Tiêu đề gốc 
 
         [Column("property_type")]
         public string PropertyType { get; set; }        // Loại nhà: apartment / room...

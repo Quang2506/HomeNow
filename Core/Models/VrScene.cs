@@ -16,7 +16,7 @@ namespace Core.Models
         public string SceneKey { get; set; }        // living, hallway, kitchen...
 
         [Column("title")]
-        public string Title { get; set; }           // Tên phòng mặc định (gốc)
+        public string Title { get; set; }           
 
         [Column("panorama_url")]
         public string PanoramaUrl { get; set; }

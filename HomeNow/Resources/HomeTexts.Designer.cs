@@ -70,11 +70,181 @@ namespace HomeNow.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Hà Nội
+        ///.
+        /// </summary>
+        public static string Brand_City {
+            get {
+                return ResourceManager.GetString("Brand_City", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NhàNow
+        ///.
+        /// </summary>
+        public static string Brand_Name {
+            get {
+                return ResourceManager.GetString("Brand_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Đà Nẵng.
         /// </summary>
         public static string CityName {
             get {
                 return ResourceManager.GetString("CityName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Khu vực Đăng ký &amp; Liên hệ
+        ///.
+        /// </summary>
+        public static string Contact_Title {
+            get {
+                return ResourceManager.GetString("Contact_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hình ảnh 360° Chuyên nghiệp
+        ///.
+        /// </summary>
+        public static string Feature_360 {
+            get {
+                return ResourceManager.GetString("Feature_360", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tiếp cận tối đa Khách thuê
+        ///.
+        /// </summary>
+        public static string Feature_Reach {
+            get {
+                return ResourceManager.GetString("Feature_Reach", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tiết kiệm thời gian Quản lý
+        ///.
+        /// </summary>
+        public static string Feature_TimeSaving {
+            get {
+                return ResourceManager.GetString("Feature_TimeSaving", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tại sao chọn NhàNow?
+        ///.
+        /// </summary>
+        public static string Features_Title {
+            get {
+                return ResourceManager.GetString("Features_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Địa chỉ BĐS
+        ///.
+        /// </summary>
+        public static string Form_AddressPlaceholder {
+            get {
+                return ResourceManager.GetString("Form_AddressPlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Họ và Tên
+        ///.
+        /// </summary>
+        public static string Form_FullNamePlaceholder {
+            get {
+                return ResourceManager.GetString("Form_FullNamePlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Để lại thông tin đăng ký
+        ///.
+        /// </summary>
+        public static string Form_Header {
+            get {
+                return ResourceManager.GetString("Form_Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gói Quản lý
+        ///.
+        /// </summary>
+        public static string Form_OptionManage {
+            get {
+                return ResourceManager.GetString("Form_OptionManage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gói Media
+        ///.
+        /// </summary>
+        public static string Form_OptionMedia {
+            get {
+                return ResourceManager.GetString("Form_OptionMedia", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Số điện thoại
+        ///.
+        /// </summary>
+        public static string Form_PhonePlaceholder {
+            get {
+                return ResourceManager.GetString("Form_PhonePlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gửi yêu cầu ngay
+        ///.
+        /// </summary>
+        public static string Form_Submit {
+            get {
+                return ResourceManager.GetString("Form_Submit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ĐĂNG KÝ TƯ VẤN MIỄN PHÍ
+        ///.
+        /// </summary>
+        public static string Hero_CTA {
+            get {
+                return ResourceManager.GetString("Hero_CTA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Chúng tôi lo hình ảnh, marketing và dẫn khách. Bạn chỉ việc nhận tiền.
+        ///.
+        /// </summary>
+        public static string Hero_Subtitle {
+            get {
+                return ResourceManager.GetString("Hero_Subtitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nâng tầm Bất động sản của bạn với Công nghệ VR
+        ///.
+        /// </summary>
+        public static string Hero_Title {
+            get {
+                return ResourceManager.GetString("Hero_Title", resourceCulture);
             }
         }
         
@@ -115,6 +285,54 @@ namespace HomeNow.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Mua nhà
+        ///.
+        /// </summary>
+        public static string Menu_Buy {
+            get {
+                return ResourceManager.GetString("Menu_Buy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đăng tin
+        ///.
+        /// </summary>
+        public static string Menu_Post {
+            get {
+                return ResourceManager.GetString("Menu_Post", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Thuê nhà
+        ///.
+        /// </summary>
+        public static string Menu_Rent {
+            get {
+                return ResourceManager.GetString("Menu_Rent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NhàNow - Nâng tầm Bất động sản.
+        /// </summary>
+        public static string Meta_HtmlTitle {
+            get {
+                return ResourceManager.GetString("Meta_HtmlTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đăng tin chủ nhà - NhàNow (Preview.
+        /// </summary>
+        public static string Meta_PageTitle {
+            get {
+                return ResourceManager.GetString("Meta_PageTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bán Nhà.
         /// </summary>
         public static string NavBuy {
@@ -138,6 +356,56 @@ namespace HomeNow.Resources {
         public static string NavRent {
             get {
                 return ResourceManager.GetString("NavRent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 1. Gửi yêu cầu
+        ///.
+        /// </summary>
+        public static string Process_Step1 {
+            get {
+                return ResourceManager.GetString("Process_Step1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 2. Đội ngũ Media đến
+        ///.
+        /// </summary>
+        public static string Process_Step2 {
+            get {
+                return ResourceManager.GetString("Process_Step2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 3. NhàNow dẫn khách
+        ///.
+        /// </summary>
+        public static string Process_Step3 {
+            get {
+                return ResourceManager.GetString("Process_Step3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 4. Chốt &amp; Nhận tiền
+        ///.
+        /// </summary>
+        public static string Process_Step4 {
+            get {
+                return ResourceManager.GetString("Process_Step4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Quy trình hợp tác đơn giản
+        ///.
+        /// </summary>
+        public static string Process_Title {
+            get {
+                return ResourceManager.GetString("Process_Title", resourceCulture);
             }
         }
         

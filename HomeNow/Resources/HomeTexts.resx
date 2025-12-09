@@ -171,4 +171,110 @@
   <data name="NavPostListing" xml:space="preserve">
     <value>Đăng tin</value>
   </data>
+  <data name="Meta_PageTitle" xml:space="preserve">
+    <value>Đăng tin chủ nhà - NhàNow (Preview</value>
+  </data>
+  <data name="Meta_HtmlTitle" xml:space="preserve">
+    <value>NhàNow - Nâng tầm Bất động sản</value>
+  </data>
+  <data name="Brand_Name" xml:space="preserve">
+    <value>NhàNow
+</value>
+  </data>
+  <data name="Brand_City" xml:space="preserve">
+    <value>Hà Nội
+</value>
+  </data>
+  <data name="Menu_Rent" xml:space="preserve">
+    <value>Thuê nhà
+</value>
+  </data>
+  <data name="Menu_Buy" xml:space="preserve">
+    <value>Mua nhà
+</value>
+  </data>
+  <data name="Menu_Post" xml:space="preserve">
+    <value>Đăng tin
+</value>
+  </data>
+  <data name="Hero_Title" xml:space="preserve">
+    <value>Nâng tầm Bất động sản của bạn với Công nghệ VR
+</value>
+  </data>
+  <data name="Hero_Subtitle" xml:space="preserve">
+    <value>Chúng tôi lo hình ảnh, marketing và dẫn khách. Bạn chỉ việc nhận tiền.
+</value>
+  </data>
+  <data name="Hero_CTA" xml:space="preserve">
+    <value>ĐĂNG KÝ TƯ VẤN MIỄN PHÍ
+</value>
+  </data>
+  <data name="Features_Title" xml:space="preserve">
+    <value>Tại sao chọn NhàNow?
+</value>
+  </data>
+  <data name="Feature_360" xml:space="preserve">
+    <value>Hình ảnh 360° Chuyên nghiệp
+</value>
+  </data>
+  <data name="Feature_Reach" xml:space="preserve">
+    <value>Tiếp cận tối đa Khách thuê
+</value>
+  </data>
+  <data name="Feature_TimeSaving" xml:space="preserve">
+    <value>Tiết kiệm thời gian Quản lý
+</value>
+  </data>
+  <data name="Process_Title" xml:space="preserve">
+    <value>Quy trình hợp tác đơn giản
+</value>
+  </data>
+  <data name="Process_Step1" xml:space="preserve">
+    <value>1. Gửi yêu cầu
+</value>
+  </data>
+  <data name="Process_Step2" xml:space="preserve">
+    <value>2. Đội ngũ Media đến
+</value>
+  </data>
+  <data name="Process_Step3" xml:space="preserve">
+    <value>3. NhàNow dẫn khách
+</value>
+  </data>
+  <data name="Process_Step4" xml:space="preserve">
+    <value>4. Chốt &amp; Nhận tiền
+</value>
+  </data>
+  <data name="Contact_Title" xml:space="preserve">
+    <value>Khu vực Đăng ký &amp; Liên hệ
+</value>
+  </data>
+  <data name="Form_Header" xml:space="preserve">
+    <value>Để lại thông tin đăng ký
+</value>
+  </data>
+  <data name="Form_FullNamePlaceholder" xml:space="preserve">
+    <value>Họ và Tên
+</value>
+  </data>
+  <data name="Form_PhonePlaceholder" xml:space="preserve">
+    <value>Số điện thoại
+</value>
+  </data>
+  <data name="Form_AddressPlaceholder" xml:space="preserve">
+    <value>Địa chỉ BĐS
+</value>
+  </data>
+  <data name="Form_OptionMedia" xml:space="preserve">
+    <value>Gói Media
+</value>
+  </data>
+  <data name="Form_OptionManage" xml:space="preserve">
+    <value>Gói Quản lý
+</value>
+  </data>
+  <data name="Form_Submit" xml:space="preserve">
+    <value>Gửi yêu cầu ngay
+</value>
+  </data>
 </root>

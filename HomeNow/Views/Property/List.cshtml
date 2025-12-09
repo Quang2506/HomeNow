@@ -1,52 +1,228 @@
-﻿@model IEnumerable<HomeNow.Controllers.PropertyController.PropertyListViewModel>
-
+﻿@model IEnumerable<HomeNow.ViewModels.PropertyListViewModel>
+@using HomeNow.Resources
 @{
     ViewBag.Title = "Danh sách nhà";
     var lang = (string)ViewBag.Lang ?? "vi";
+    var currentLang = System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
 }
 
-<h2>Danh sách nhà</h2>
+<div class="Property_list">
+    <div class="home-hero-shell">
 
-<div class="property-list">
-    @foreach (var p in Model)
-    {
-        <div class="property-item">
-            <!-- CHỈ IMAGE LÀ LINK TỚI VR -->
-            <a href="@Url.Action("Vr", "Property", new { id = p.Id, lang = lang })"
-               class="img-link"
-               target="_blank">
-               
-                <div class="img">
-                    <img src="@Url.Content(p.CoverImageUrl ?? "~/Content/properties/noimage.png")" />
-                    @if (p.IsVrAvailable)
-                    {
-                        <span class="vr-tag">VR</span>
-                    }
+        <!-- HEADER -->
+        <div class="home-hero-header">
+
+            <!-- LEFT -->
+            <a class="home-header-left-box" href="@Url.Action("index", "Home")">
+                <div class="home-logo-icon"></div>
+
+                <div class="home-header-left">
+                    <div class="home-header-left-top">
+                        <span>@HomeTexts.Brand_Name</span>
+                    </div>
+                    <div class="home-header-left-tagline">
+                        <i class="fa-solid fa-location-dot"></i> @HomeTexts.Brand_City
+                    </div>
                 </div>
             </a>
 
-            <!-- Phần info & price vẫn là div bình thường -->
-            <div class="info">
-                <div class="title">@p.Title</div>
-                <div class="sub">@p.District · @p.AreaName · @p.CommunityName</div>
-                <div class="detail">
-                    @p.AreaM2 m² · @p.Orientation · @p.RoomType
+            <!-- RIGHT -->
+            <div class="home-header-right-box">
+
+                <div class="home-header-right-top">
+                    <a href="#" class="hidden-xs">@HomeTexts.Menu_Rent</a>
+                    <span class="hidden-xs">|</span>
+                    <a href="#" class="hidden-xs">@HomeTexts.Menu_Buy</a>
+                    <a href="#" class="nav-post">@HomeTexts.Menu_Post</a>
+                </div>
+
+                <div class="home-header-right-bottom">
+                    <a class="@(currentLang.StartsWith("vi")?"lang-active":"")"
+                       href="@Url.Action("Set","Language",new { lang="vi-VN", returnUrl=Request.RawUrl })">VI</a> |
+                    <a class="@(currentLang.StartsWith("en")?"lang-active":"")"
+                       href="@Url.Action("Set","Language",new { lang="en-US", returnUrl=Request.RawUrl })">EN</a> |
+                    <a class="@(currentLang.StartsWith("zh")?"lang-active":"")"
+                       href="@Url.Action("Set","Language",new { lang="zh-CN", returnUrl=Request.RawUrl })">中文</a>
                 </div>
             </div>
-
-            <div class="price">
-                <span class="p">@p.Price</span>
-                <span class="unit">@p.PriceUnit</span>
-            </div>
         </div>
-    }
+
+        <!-- HERO TEXT -->
+        <!--<div class="home-hero-main">
+            <h1 class="home-main-title">@HomeTexts.Hero_Title</h1>
+            <p class="home-sub-title">@HomeTexts.Hero_Subtitle</p>
+
+            <a href="#register" class="btn-hero-action">@HomeTexts.Hero_CTA</a>
+        </div>-->
+
+    </div>
+
+
+
+
+    <div class="property-list">
+        @foreach (var p in Model)
+        {
+            <div class="property-item">
+                <!-- CHỈ IMAGE LÀ LINK TỚI VR -->
+                <a href="@Url.Action("Vr", "Property", new { id = p.Id, lang = lang })"
+                   class="img-link"
+                   target="_blank">
+
+                    <div class="img">
+                        <img src="@Url.Content(p.CoverImageUrl ?? "~/Content/properties/noimage.png")" />
+                        @if (p.IsVrAvailable)
+                        {
+                            <span class="vr-tag">VR</span>
+                        }
+                    </div>
+                </a>
+
+                <!-- Phần info & price vẫn là div bình thường -->
+                <div class="info">
+                    <div class="title">@p.Title</div>
+                    <div class="sub">@p.District · @p.AreaName · @p.CommunityName</div>
+                    <div class="detail">
+                        @p.AreaM2 m² · @p.Orientation · @p.RoomType
+                    </div>
+                </div>
+
+                <div class="price">
+                    <span class="p">@p.Price</span>
+                    <span class="unit">@p.PriceUnit</span>
+                </div>
+            </div>
+        }
+
+    </div>
 
 </div>
-
 <style>
+    a {
+        text-decoration: none;
+        /* color: inherit;*/
+    }
+
+    .home-header-right-bottom {
+        font-size: 0.75rem;
+        opacity: .9;
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .nav-post {
+        margin-left: 1rem;
+        padding: 0.4rem 1.2rem;
+        border-radius: 999px;
+        background: #00b56b;
+        font-weight: 700;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+        .nav-post:hover {
+            background: #00a15f;
+        }
+
+    .home-header-right-top {
+        font-size: clamp(0.9rem, 1.4vw, 1rem);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+
+        .home-header-right-top a {
+            color: #fff;
+            margin: 0 0.5rem;
+            font-weight: 500;
+        }
+
+            .home-header-right-top a:hover {
+                text-decoration: underline;
+            }
+
+    .home-header-right-box {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .home-header-left-tagline {
+        font-size: 0.8rem;
+        opacity: .9;
+        margin-top: 0.15rem;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .home-header-left-top {
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+        font-size: clamp(1.2rem, 2vw, 1.6rem);
+        font-weight: 700;
+    }
+
+    .home-header-left {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .home-logo-icon {
+        width: 2rem;
+        height: 1.6rem;
+        border: 0.15rem solid #fff;
+        border-radius: 0.4rem;
+        position: relative;
+    }
+
+        .home-logo-icon::after {
+            content: "";
+            position: absolute;
+            left: 20%;
+            bottom: 20%;
+            width: 55%;
+            height: 45%;
+            border-top: 0.15rem solid #fff;
+            border-left: 0.15rem solid #fff;
+            transform: skewX(-15deg);
+        }
+
+    .home-header-left-box {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .home-hero-shell {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        /* max-width: 1200px;*/
+        margin: 0 auto;
+        /*padding: 1%;*/
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        /*min-height: 36vh;*/
+    }
+
+    .home-hero-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1%;
+        background: rgba(0, 0, 0, 0.45);
+        position: fixed;
+        width: 100%;
+        height: 9vh;
+        top: 1px;
+    }
+
     .property-list {
         width: 900px;
         margin: 0 auto;
+        margin-top: 10vh
     }
 
     .property-item {

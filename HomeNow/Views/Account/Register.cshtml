@@ -1,0 +1,64 @@
+﻿@model HomeNow.ViewModels.RegisterViewModel
+
+@{
+    ViewBag.Title = "Đăng ký tài khoản";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div style="
+    max-width: 420px;
+    margin: 60px auto;
+    padding: 24px;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 12px 30px rgba(15,23,42,0.12);
+">
+    <h2 style="text-align:center; margin-bottom:16px;">Đăng ký tài khoản</h2>
+
+    <p style="text-align:center; font-size:0.9rem; color:#6b7280;">
+        Nhập số điện thoại và mật khẩu để tạo tài khoản mới.
+    </p>
+
+    @using (Html.BeginForm("Register", "Account", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-group" style="margin-top:16px;">
+            @Html.LabelFor(m => m.PhoneNumber)
+            @Html.TextBoxFor(
+                m => m.PhoneNumber,
+                new { @class = "form-control", placeholder = "Ví dụ: 0912345678" }
+            )
+            @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.Password)
+            @Html.PasswordFor(
+                m => m.Password,
+                new { @class = "form-control", placeholder = "Tối thiểu 6 ký tự" }
+            )
+            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.ConfirmPassword)
+            @Html.PasswordFor(
+                m => m.ConfirmPassword,
+                new { @class = "form-control", placeholder = "Nhập lại mật khẩu" }
+            )
+            @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
+        </div>
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <button type="submit" class="btn btn-primary" style="width:100%; margin-top:16px;">
+            Tạo tài khoản
+        </button>
+    }
+
+    <div style="margin-top:12px; font-size:0.85rem; text-align:center; color:#4b5563;">
+        Đã có tài khoản?
+        <a href="javascript:void(0)" class="js-open-login">Mở popup đăng nhập</a>
+    </div>
+</div>

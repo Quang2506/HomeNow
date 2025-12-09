@@ -1,4 +1,5 @@
 ﻿@using HomeNow.Resources
+@model Core.Models.HomeIndexViewModel
 
 @{
     ViewBag.Title = "Home - NhàNow";
@@ -8,530 +9,267 @@
     var totalListings = 182;
 }
 
-<style>
-    /* -------- KHUNG 0: nền full width -------- */
-    .home-hero {
-        position: relative;
-        width: 100%;
-        min-height: 75vh;
-        background: url('/Assets/Banner.jpg') center center no-repeat;
-        background-size: cover;
-        color: #fff;
-    }
-
-    .home-hero::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.45);
-    }
-
-    /* -------- KHUNG 1: khung nội dung giữa ảnh -------- */
-    .home-hero-shell {
-        position: relative;
-        z-index: 1;
-        width: 90%;
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 3% 4% 6%;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        box-sizing: border-box;
-    }
-
-    /* -------- KHUNG 2: HEADER (thanh trên) -------- */
-    .home-hero-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 4%;
-    }
-
-    /* KHỐI TRÁI: logo + city + tagline */
-    .home-header-left-box {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .home-logo-icon {
-        width: 2rem;
-        height: 1.6rem;
-        border: 0.15rem solid #fff;
-        border-radius: 0.4rem;
-        position: relative;
-        box-sizing: border-box;
-    }
-
-    .home-logo-icon::after {
-        content: "";
-        position: absolute;
-        left: 20%;
-        bottom: 20%;
-        width: 55%;
-        height: 45%;
-        border-top: 0.15rem solid #fff;
-        border-left: 0.15rem solid #fff;
-        transform: skewX(-15deg);
-        box-sizing: border-box;
-    }
-
-    .home-header-left {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-
-    .home-header-left-top {
-        display: flex;
-        align-items: baseline;
-        gap: 0.5rem;
-        font-size: clamp(1.2rem, 2vw, 1.6rem);
-        font-weight: 700;
-    }
-
-    .home-location {
-        font-size: 0.9rem;
-        opacity: .9;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.25rem;
-    }
-
-    .home-header-left-tagline {
-        font-size: 0.8rem;
-        opacity: .8;
-        margin-top: 0.15rem;
-    }
-
-    /* KHỐI PHẢI: Thuê/Bán/Đăng tin + login + ngôn ngữ */
-    .home-header-right-box {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        text-align: right;
-    }
-
-    .home-header-right-top {
-        font-size: clamp(0.9rem, 1.4vw, 1rem);
-        margin-bottom: 0.3rem;
-    }
-
-    .home-header-right-top a {
-        color: #fff;
-        text-decoration: none;
-        margin: 0 0.3rem;
-    }
-
-    .home-header-right-top a:hover {
-        text-decoration: underline;
-    }
-
-    .home-header-right-top .nav-post {
-        margin-left: 1rem;
-        padding: 0.3rem 1.1rem;
-        border-radius: 999px;
-        background: #00b56b;
-        font-weight: 600;
-        display: inline-block;
-    }
-
-    .home-header-right-top .nav-post:hover {
-        background: #00a15f;
-        text-decoration: none;
-    }
-
-    .home-header-right-bottom {
-        font-size: 0.75rem;
-        opacity: .9;
-        display: flex;
-        align-items: center;
-        gap: 0.3rem;
-    }
-
-    .home-header-right-bottom a {
-        color: #fff;
-        text-decoration: none;
-        margin: 0 0.2rem;
-    }
-
-    .home-header-right-bottom a:hover {
-        text-decoration: underline;
-    }
-
-    .lang-active {
-        font-weight: 700;
-        text-decoration: underline;
-    }
-
-    /* -------- KHUNG 3: MAIN (title + tab + search) -------- */
-    .home-hero-main {
-        width: 100%;
-        max-width: 900px;
-        margin: 0 auto;
-    }
-
-    .home-main-text {
-        margin-bottom: 2%;
-    }
-
-    .home-main-title {
-        font-size: clamp(1.8rem, 4.5vw, 2.2rem);
-        font-weight: 700;
-        margin-bottom: 1%;
-        text-align: center;
-    }
-
-    .home-sub-title {
-        font-size: clamp(1rem, 2vw, 1.25rem);
-        text-align: center;
-    }
-
-    .home-main-tabs {
-        margin-top: 3%;
-        margin-bottom: 1.5%;
-    }
-
-    .home-tabs {
-        display: flex;
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        gap: 6%;
-        font-size: clamp(0.9rem, 1.6vw, 1rem);
-    }
-
-    .home-tabs li {
-        cursor: pointer;
-        opacity: .8;
-        white-space: nowrap;
-    }
-
-    .home-tabs li.active {
-        font-weight: 700;
-        opacity: 1;
-    }
-
-    .home-main-search {
-        margin-top: 7%;
-    }
-
-    .home-search-box {
-        background: #fff;
-        border-radius: 0.25rem;
-        display: flex;
-        align-items: stretch;
-        overflow: hidden;
-        width: 85%;
-        box-shadow: 0 1.2rem 2rem rgba(0, 0, 0, 0.25);
-        box-sizing: border-box;
-        height: 46px;
-        margin: auto;
-    }
-
-    .home-search-box input[type="text"] {
-        border: none;
-        padding: 1.2rem 1.4rem;
-        flex: 1;
-        font-size: 1rem;
-        outline: none;
-        min-width: 0;
-    }
-
-    .home-search-location {
-        display: flex;
-        align-items: center;
-        padding: 0 1.4rem;
-        border-left: 1px solid #eee;
-        font-size: 0.9rem;
-        color: #666;
-        background: #fafafa;
-        white-space: nowrap;
-    }
-
-    .home-search-btn {
-        background: #00b56b;
-        border: none;
-        color: #fff;
-        padding: 0 2.2rem;
-        font-size: 1.1rem;
-        font-weight: 600;
-        cursor: pointer;
-        white-space: nowrap;
-    }
-
-    .home-search-btn:hover {
-        background: #00a15f;
-    }
-
-    /* -------- KHUNG 4: FOOTER nhỏ dưới cùng -------- */
-    .home-hero-footer {
-        font-size: 0.75rem;
-        opacity: .8;
-        margin-top: 3%;
-    }
-
-    /* ========== MOBILE / TABLET ========== */
-    @@media (max-width: 768px) {
-        /* khung tổng: cho cao hơn chút và bớt padding */
-        .home-hero {
-            
-        }
-
-        .home-hero-shell {
-            width: 100%;
-            max-width: 100%;
-            padding: 20px 10px 30px;
-        }
-
-        /* logo + tên + city nhỏ lại */
-        .home-header-left-top {
-            font-size: 18px;
-        }
-
-        .home-location {
-            font-size: 0.9rem;
-            opacity: .9;
-            /* display: inline-flex; */
-            /* align-items: center; */
-            /* gap: 0.25rem; */
-        }
-
-        .home-header-left-tagline {
-            font-size: 11px;
-        }
-
-        /* menu bên phải nhỏ lại */
-        .home-header-right-top {
-            font-size: 13px;
-        }
-
-            .home-header-right-top .nav-post {
-                padding: 4px 12px;
-            }
-
-        .home-header-right-bottom {
-            font-size: 10px;
-        }
-
-        /* tiêu đề chính + phụ nhỏ lại */
-        .home-main-title {
-            font-size: 25px;
-            line-height: 1.25;
-            width: 75%;
-            margin: auto;
-            margin-top: 7%;
-            text-align: center;
-        }
-
-        .home-sub-title {
-            font-size: 13px;
-            padding: 1%;
-            text-align: center;
-        }
-
-        /* tab: cho nhỏ chữ + được xuống dòng để không tràn ngang */
-        .home-tabs {
-            font-size: 13px;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        /* ô search: thu nhỏ chữ & padding */
-        .home-search-box {
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
-        }
-
-        input[type="text"] {
-            font-size: 0.7rem !important;
-            padding: 12px 12px;
-            height: 35px;
-        }
-
-        .home-search-location {
-            font-size: 12px;
-            padding: 0 12px;
-        }
-
-        .home-search-btn {
-            font-size: 15px;
-            padding: 0 20px;
-        }
-
-        /* dòng note dưới cùng nhỏ lại */
-        .home-hero-footer {
-            font-size: 10px;
-        }
-    }
-
-    /* màn rất nhỏ ≤ 480px: co thêm chút nữa */
-    @@media (max-width: 480px) {
-        .home-main-title {
-            font-size: 17px;
-            line-height: 1.25;
-            width: 90%;
-            margin: auto;
-            margin-top: 7%;
-            text-align: center;
-        }
 
 
-        .home-sub-title {
-            font-size: 11px;
-            padding: 1%;
-            text-align: center;
-        }
+<!DOCTYPE html>
+<html lang="@currentLang">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@HomeTexts.Meta_HtmlTitle</title>
 
-        .home-tabs {
-            font-size: 12px;
-            gap: 8px;
-        }
+    <link rel="stylesheet" href="~/Content/style/Home/index.css">
+    
 
-        .home-header-right-top {
-            font-size: 12px;
-        }
+</head>
 
-        .home-header-right-bottom {
-            font-size: 9px;
-        }
-
-        .home-search-box {
-            background: #fff;
-            border-radius: 0.25rem;
-            display: flex;
-            align-items: stretch;
-            overflow: hidden;
-            width: 75%;
-            box-shadow: 0 1.2rem 2rem rgba(0, 0, 0, 0.25);
-            box-sizing: border-box;
-            margin:auto
-        }
-
-
-        .home-search-btn {
-            font-size: 12px;
-            padding: 0 20px;
-            width: 65px;
-            text-align: center;
-        }
-    }
-</style>
-
-
-<div class="home-hero">
-    <!-- KHUNG 1: bao toàn bộ nội dung giữa -->
-    <div class="home-hero-shell">
-
-        <!-- KHUNG 2: HEADER -->
-        <div class="home-hero-header">
-            <!-- KHỐI TRÁI: logo + city + tagline -->
-            <div class="home-header-left-box">
-                <div class="home-logo-icon"></div>
-                <div class="home-header-left">
-                    <div class="home-header-left-top">
-                        <span>NhàNow</span>
-                        @*<span class="home-location">
+    <body>
+    <div class="home-hero">
+        <div class="home-hero-shell">
+            <!-- HEADER -->
+            <div class="home-hero-header">
+                <!-- Logo + city -->
+                <div class="home-header-left-box">
+                    <div class="home-logo-icon"></div>
+                    <div class="home-header-left">
+                        <div class="home-header-left-top">
+                            <span>NhàNow</span>
+                        </div>
+                        <div class="home-header-left-tagline">
                             <svg viewBox="0 0 24 24"
                                  width="16" height="16"
-                                 fill="currentColor"
-                                 class="home-location-icon">
+                                 fill="currentColor">
                                 <path d="M12 2.5C8.96 2.5 6.5 4.96 6.5 8c0 3.74 3.39 7.47 4.96 9.15.29.31.77.31 1.06 0C14.11 15.47 17.5 11.74 17.5 8c0-3.04-2.46-5.5-5.5-5.5zm0 6.5A2 2 0 1 1 12 5a2 2 0 0 1 0 4z" />
-                            </svg>@HomeTexts.CityName
-                        </span>*@
+                            </svg>
+                            @HomeTexts.CityName
+                        </div>
                     </div>
-                    <div class="home-header-left-tagline">
-                        @*@HomeTexts.LogoTagline*@
-                        <svg viewBox="0 0 24 24"
-                             width="16" height="16"
-                             fill="currentColor"
-                             class="home-location-icon">
-                            <path d="M12 2.5C8.96 2.5 6.5 4.96 6.5 8c0 3.74 3.39 7.47 4.96 9.15.29.31.77.31 1.06 0C14.11 15.47 17.5 11.74 17.5 8c0-3.04-2.46-5.5-5.5-5.5zm0 6.5A2 2 0 1 1 12 5a2 2 0 0 1 0 4z" />
-                        </svg>@HomeTexts.CityName
+                </div>
+
+                <!-- Menu phải -->
+                <div class="home-header-right-box">
+                    <div class="home-header-right-top">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            var name = Session["CurrentUserName"] as string ?? "Tài khoản";
+
+                            <span class="hidden-xs">@name</span>
+                            <span class="hidden-xs">|</span>
+                            <a href="@Url.Action("Favorites", "Property")" class="hidden-xs">
+                                Bất động sản yêu thích
+                            </a>
+                            <span class="hidden-xs">|</span>
+                            <a href="@Url.Action("Logout", "Account")" class="hidden-xs">
+                                Đăng xuất
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="javascript:void(0)" class="hidden-xs js-open-login">Đăng nhập</a>
+                            <span class="hidden-xs">|</span>
+                            <a href="@Url.Action("Favorites", "Property")" class="hidden-xs">
+                                Bất động sản yêu thích
+                            </a>
+                        }
+
+                        <a href="@Url.Action("Request", "Landlord")" class="nav-post">
+                            @HomeTexts.Menu_Post
+                        </a>
+                    </div>
+
+                    <div class="home-header-right-bottom">
+                        <a href="@Url.Action("Set", "Language", new { lang = "vi-VN", returnUrl = Request.RawUrl })"
+                           class="@(currentLang.StartsWith("vi") ? "lang-active" : "")">
+                            VI
+                        </a>
+                        |
+                        <a href="@Url.Action("Set", "Language", new { lang = "en-US", returnUrl = Request.RawUrl })"
+                           class="@(currentLang.StartsWith("en") ? "lang-active" : "")">
+                            EN
+                        </a>
+                        |
+                        <a href="@Url.Action("Set", "Language", new { lang = "zh-CN", returnUrl = Request.RawUrl })"
+                           class="@(currentLang.StartsWith("zh") ? "lang-active" : "")">
+                            中文
+                        </a>
                     </div>
                 </div>
             </div>
 
-            <!-- KHỐI PHẢI: Thuê/Bán/Đăng tin (trên) + Login/Language (dưới) -->
-            <div class="home-header-right-box">
-                <!-- Dòng trên -->
-                <div class="home-header-right-top">
-                    <a href="#">@HomeTexts.NavRent</a>
-                    <span>|</span>
-                    <a href="#">@HomeTexts.NavBuy</a>
-                    <a href="@Url.Action("Request", "Landlord")" class="nav-post">@HomeTexts.NavPostListing</a>
+            <!-- MAIN + SEARCH -->
+            <div class="home-hero-main">
+                <div class="home-main-text">
+                    <div class="home-main-title">
+                        @HomeTexts.MainTitle
+                    </div>
+                    <div class="home-sub-title">
+                        @string.Format(HomeTexts.SubTitle, totalListings)
+                    </div>
                 </div>
 
-                <!-- Dòng dưới -->
-                <div class="home-header-right-bottom">
-                    @*<span>👤</span>
-                        <a href="#">@HomeTexts.Login</a> /
-                        <a href="#">@HomeTexts.Register</a>
+                <div class="home-main-search">
+                    @using (Html.BeginForm("Index", "Home", FormMethod.Get, new { @class = "home-search-form" }))
+                    {
+                        var currentType = string.IsNullOrEmpty(Model.TransactionType) ? "rent" : Model.TransactionType;
 
-                        <span style="margin:0 6px;">|</span>*@
+                        <div class="home-search-wrapper">
+                            <div class="home-search-tabs-row">
+                                <div class="home-search-tabs">
+                                    <button type="button"
+                                            class="home-search-tab-btn @(currentType == "rent" ? "active" : "")"
+                                            data-value="rent">
+                                        Thuê nhà
+                                    </button>
+                                    <button type="button"
+                                            class="home-search-tab-btn @(currentType == "buy" ? "active" : "")"
+                                            data-value="buy">
+                                        Mua nhà
+                                    </button>
+                                </div>
+                            </div>
 
-                    <a href="@Url.Action("Set", "Language", new { lang = "vi-VN", returnUrl = Request.RawUrl })"
-                       class="@(currentLang.StartsWith("vi") ? "lang-active" : "")">
-                        VI
-                    </a>
-                    |
-                    <a href="@Url.Action("Set", "Language", new { lang = "en-US", returnUrl = Request.RawUrl })"
-                       class="@(currentLang.StartsWith("en") ? "lang-active" : "")">
-                        EN
-                    </a>
-                    |
-                    <a href="@Url.Action("Set", "Language", new { lang = "zh-CN", returnUrl = Request.RawUrl })"
-                       class="@(currentLang.StartsWith("zh") ? "lang-active" : "")">
-                        中文
-                    </a>
+                            <input type="hidden" name="transactionType" id="transactionTypeInput" value="@currentType" />
+
+                            <div class="home-search-row">
+                                <input type="text"
+                                       name="keyword"
+                                       value="@Model.Keyword"
+                                       placeholder="Khu vực, tên đường, dự án..." />
+
+                                <select name="priceRange">
+                                    <option value="">Tất cả mốc giá</option>
+                                    <option value="0-10" @(Model.PriceRange == "0-10" ? "selected" : "")>Dưới 10 triệu / 1 tỷ</option>
+                                    <option value="10-20" @(Model.PriceRange == "10-20" ? "selected" : "")>10 - 20 triệu / 1-3 tỷ</option>
+                                    <option value="20-999" @(Model.PriceRange == "20-999" ? "selected" : "")>Trên 20 triệu / 3 tỷ</option>
+                                </select>
+
+                                <select name="propertyType">
+                                    <option value="">Loại nhà</option>
+                                    <option value="apartment" @(Model.PropertyType == "apartment" ? "selected" : "")>Căn hộ</option>
+                                    <option value="house" @(Model.PropertyType == "house" ? "selected" : "")>Nhà phố</option>
+                                    <option value="villa" @(Model.PropertyType == "villa" ? "selected" : "")>Biệt thự</option>
+                                </select>
+
+                                <button type="submit" class="home-search-btn-new">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                </button>
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
-
-        <!-- KHUNG 3: MAIN -->
-        <div class="home-hero-main">
-            <!-- khung con: title + subtitle -->
-            <div class="home-main-text">
-                <div class="home-main-title">
-                    @HomeTexts.MainTitle
-                </div>
-                <div class="home-sub-title">
-                    @string.Format(HomeTexts.SubTitle, totalListings)
-                </div>
-            </div>
-
-            <!-- khung con: tabs -->
-            @*<div class="home-main-tabs">
-                <ul class="home-tabs">
-                    <li class="active">@HomeTexts.TabFindRoom</li>
-                    <li>@HomeTexts.TabFindApartment</li>
-                    <li>@HomeTexts.TabFindArea</li>
-                </ul>
-            </div>*@
-
-            <!-- khung con: search trắng -->
-            <div class="home-main-search">
-                @using (Html.BeginForm("Index", "Property", FormMethod.Get, new { @class = "home-search-box" }))
-                {
-                    <input type="text"
-                           name="keyword"
-                           placeholder="@HomeTexts.SearchPlaceholder" />
-
-                    @*<div class="home-search-location">
-                        <span class="glyphicon glyphicon-map-marker"></span>
-                        <span style="margin-left:6px;">@HomeTexts.MapLabel</span>
-                    </div>*@
-
-                    <button type="submit" class="home-search-btn">
-                        @HomeTexts.SearchButton
-                    </button>
-                }
-            </div>
-        </div>
-
-        <!-- KHUNG 4: FOOTER nhỏ dưới cùng -->
-        @*<div class="home-hero-footer">
-            @HomeTexts.BottomNote
-        </div>*@
     </div>
-</div>
+
+
+    <div class="home-body-container">
+        @if (Model.HasSearch)
+        {
+            <div class="home-section-header">
+                <h2>Kết quả tìm kiếm</h2>
+            </div>
+
+            if (Model.SearchResults != null && Model.SearchResults.Any())
+            {
+                <div class="property-grid">
+                    @foreach (var item in Model.SearchResults)
+                    {
+                        <div class="property-card">
+                            <img src="@item.ThumbnailUrl" alt="@item.Title" />
+                            <div class="property-card-body">
+                                <div class="property-card-title">@item.Title</div>
+                                <div class="property-card-address">@item.Address</div>
+                                <div class="property-card-meta">
+                                    <span>@item.Bed PN · @item.Bath WC</span>
+                                    <span>@item.Area m²</span>
+                                </div>
+                                <div class="property-card-price">@item.PriceLabel</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p>Không tìm thấy căn phù hợp, bạn thử thay đổi điều kiện tìm kiếm nhé.</p>
+            }
+        }
+        else
+        {
+            <!-- Các căn cho thuê nổi bật -->
+            <section style="margin-bottom:24px;">
+                <div class="home-section-header">
+                    <h2>Các căn cho thuê nổi bật</h2>
+                    <a href="@Url.Action("List", "Property", new { mode = "rent" })">xem thêm</a>
+                </div>
+
+                <div class="property-grid">
+                    @foreach (var item in Model.FeaturedRent)
+                    {
+                        <div class="property-card">
+                            <img src="@item.ThumbnailUrl" alt="@item.Title" />
+                            <div class="property-card-body">
+                                <div class="property-card-title">@item.Title</div>
+                                <div class="property-card-address">@item.Address</div>
+                                <div class="property-card-meta">
+                                    <span>@item.Bed PN · @item.Bath WC</span>
+                                    <span>@item.Area m²</span>
+                                </div>
+                                <div class="property-card-price">@item.PriceLabel</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </section>
+
+            <!-- Các căn bán nổi bật -->
+            <section>
+                <div class="home-section-header">
+                    <h2>Các căn bán nổi bật</h2>
+                    <a href="@Url.Action("List", "Property", new { mode = "buy" })">xem thêm</a>
+                </div>
+
+                <div class="property-grid">
+                    @foreach (var item in Model.FeaturedSale)
+                    {
+                        <div class="property-card">
+                            <img src="@item.ThumbnailUrl" alt="@item.Title" />
+                            <div class="property-card-body">
+                                <div class="property-card-title">@item.Title</div>
+                                <div class="property-card-address">@item.Address</div>
+                                <div class="property-card-meta">
+                                    <span>@item.Bed PN · @item.Bath WC</span>
+                                    <span>@item.Area m²</span>
+                                </div>
+                                <div class="property-card-price">@item.PriceLabel</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </section>
+        }
+    </div>
+</body>
+</html>
+
+
+
+@section Scripts {
+    <script>
+        // toggle Thuê / Mua
+        (function () {
+            var buttons = document.querySelectorAll(".home-search-tab-btn");
+            var hiddenInput = document.getElementById("transactionTypeInput");
+
+            buttons.forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    var val = this.getAttribute("data-value");
+                    hiddenInput.value = val;
+
+                    buttons.forEach(function (b) { b.classList.remove("active"); });
+                    this.classList.add("active");
+                });
+            });
+        })();
+    </script>
+}

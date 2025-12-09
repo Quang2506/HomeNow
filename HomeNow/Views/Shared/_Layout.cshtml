@@ -1,27 +1,371 @@
-﻿<!DOCTYPE html>
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - My ASP.NET Application</title>
+
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
+    <link rel="stylesheet" href="~/Content/font-awesome/all.min.css" />
 
-  
+    <style>
+        /* ====== LOGIN POPUP DÙNG CHUNG ====== */
+        .login-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15,23,42,0.65);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
 
+        .login-modal {
+            width: 360px;
+            max-width: 90%;
+            background: rgba(255,255,255,0.98);
+            border-radius: 16px;
+            padding: 24px 24px 20px;
+            box-shadow: 0 20px 40px rgba(15,23,42,0.35);
+            position: relative;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .login-modal-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .login-close {
+            position: absolute;
+            right: 14px;
+            top: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            color: #6b7280;
+        }
+
+        .login-form-group {
+            margin-bottom: 12px;
+        }
+
+            .login-form-group label {
+                display: block;
+                font-size: 0.85rem;
+                margin-bottom: 4px;
+                color: #4b5563;
+            }
+
+            .login-form-group input[type="text"],
+            .login-form-group input[type="password"] {
+                width: 100%;
+                height: 38px;
+                border-radius: 8px;
+                border: 1px solid #d1d5db;
+                padding: 6px 10px;
+                font-size: 0.9rem;
+            }
+
+        .login-remember {
+            margin: 6px 0 12px;
+            font-size: 0.85rem;
+            color: #4b5563;
+        }
+
+            .login-remember input {
+                margin-right: 4px;
+            }
+
+        .login-btn-submit {
+            width: 100%;
+            height: 40px;
+            border-radius: 999px;
+            border: none;
+            background: #2563eb;
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .login-error-text {
+            font-size: 0.8rem;
+            color: #ef4444;
+            margin-bottom: 4px;
+            min-height: 16px;
+        }
+
+        .login-footer-text {
+            margin-top: 10px;
+            font-size: 0.8rem;
+            text-align: center;
+            color: #6b7280;
+        }
+
+            .login-footer-text a {
+                color: #2563eb;
+                text-decoration: none;
+            }
+
+                .login-footer-text a:hover {
+                    text-decoration: underline;
+                }
+    </style>
 </head>
 <body>
 
     @RenderBody()
+
     <hr />
     <footer>
         <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
     </footer>
 
+    <!-- LOGIN / REGISTER POPUP DÙNG CHUNG CHO MỌI TRANG -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-modal">
+            <span class="login-close" id="btnCloseLogin">&times;</span>
+            <div class="login-modal-title" id="loginModalTitle">Đăng nhập</div>
+
+            <div id="loginError" class="login-error-text"></div>
+            <div id="registerError" class="login-error-text" style="display:none;"></div>
+
+            <!-- FORM ĐĂNG NHẬP -->
+            <form id="loginForm" method="post" action="@Url.Action("Login", "Account")">
+                @Html.AntiForgeryToken()
+                <!-- returnUrl mặc định = URL hiện tại -->
+                <input type="hidden" name="ReturnUrl" id="loginReturnUrl" />
+
+                <div class="login-form-group">
+                    <label for="LoginName">Email / Số điện thoại</label>
+                    <input type="text" name="LoginName" id="LoginName" />
+                </div>
+
+                <div class="login-form-group">
+                    <label for="Password">Mật khẩu</label>
+                    <input type="password" name="Password" id="Password" />
+                </div>
+
+                <div class="login-remember">
+                    <label>
+                        <input type="checkbox" name="RememberMe" value="true" />
+                        Ghi nhớ đăng nhập
+                    </label>
+                </div>
+
+                <button type="submit" class="login-btn-submit">Đăng nhập</button>
+
+                <div class="login-footer-text">
+                    Chưa có tài khoản?
+                    <a href="javascript:void(0)" id="linkOpenRegister">Đăng ký ngay</a>
+                </div>
+            </form>
+
+            <!-- FORM ĐĂNG KÝ (SĐT) -->
+            <form id="registerForm" method="post" action="@Url.Action("Register", "Account")" style="display:none;">
+                @Html.AntiForgeryToken()
+
+                <div class="login-form-group">
+                    <label for="RegisterPhone">Số điện thoại</label>
+                    <input type="text" name="PhoneNumber" id="RegisterPhone" />
+                </div>
+
+                <div class="login-form-group">
+                    <label for="RegisterPassword">Mật khẩu</label>
+                    <input type="password" name="Password" id="RegisterPassword" />
+                </div>
+
+                <div class="login-form-group">
+                    <label for="RegisterConfirm">Xác nhận mật khẩu</label>
+                    <input type="password" name="ConfirmPassword" id="RegisterConfirm" />
+                </div>
+
+                <button type="submit" class="login-btn-submit">Tạo tài khoản</button>
+
+                <div class="login-footer-text">
+                    Đã có tài khoản?
+                    <a href="javascript:void(0)" id="linkOpenLogin">Đăng nhập</a>
+                </div>
+            </form>
+
+        </div>
+    </div>
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
-   
-    @RenderSection("scripts", required: false)
+
+    <!-- JS LOGIN + REGISTER DÙNG CHUNG -->
+    <script>
+        (function () {
+            var overlay = document.getElementById('loginOverlay');
+            var btnClose = document.getElementById('btnCloseLogin');
+
+            var loginForm = document.getElementById('loginForm');
+            var registerForm = document.getElementById('registerForm');
+
+            var loginError = document.getElementById('loginError');
+            var registerError = document.getElementById('registerError');
+            var returnInput = document.getElementById('loginReturnUrl');
+            var title = document.getElementById('loginModalTitle');
+
+            var linkOpenRegister = document.getElementById('linkOpenRegister');
+            var linkOpenLogin = document.getElementById('linkOpenLogin');
+
+            if (!overlay || !loginForm) return;
+
+            function switchToLogin() {
+                title.textContent = 'Đăng nhập';
+                loginForm.style.display = 'block';
+                registerForm.style.display = 'none';
+                loginError.style.display = 'block';
+                registerError.style.display = 'none';
+                loginError.textContent = '';
+            }
+
+            function switchToRegister() {
+                title.textContent = 'Đăng ký';
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+                loginError.style.display = 'none';
+                registerError.style.display = 'block';
+                registerError.textContent = '';
+
+                var rp = document.getElementById('RegisterPhone');
+                if (rp) rp.focus();
+            }
+
+            function openLogin(returnUrl) {
+                overlay.style.display = 'flex';
+                switchToLogin();
+
+                if (returnInput) {
+                    returnInput.value = returnUrl || (window.location.pathname + window.location.search);
+                }
+
+                var ln = document.getElementById('LoginName');
+                if (ln) ln.focus();
+            }
+
+            function closeLogin() {
+                overlay.style.display = 'none';
+            }
+
+            // cho view khác có thể gọi nếu muốn
+            window.loginModal = {
+                open: openLogin,
+                close: closeLogin
+            };
+
+            if (btnClose) {
+                btnClose.addEventListener('click', function () {
+                    closeLogin();
+                });
+            }
+
+            overlay.addEventListener('click', function (e) {
+                if (e.target === overlay) {
+                    closeLogin();
+                }
+            });
+
+            // Bắt tất cả link có class js-open-login (ở Home, List,...)
+            document.addEventListener('click', function (e) {
+                var target = e.target;
+                if (target.classList && target.classList.contains('js-open-login')) {
+                    e.preventDefault();
+                    openLogin(window.location.pathname + window.location.search);
+                }
+            });
+
+            // Mở form đăng ký trong popup
+            if (linkOpenRegister) {
+                linkOpenRegister.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    switchToRegister();
+                });
+            }
+
+            // Quay lại form đăng nhập
+            if (linkOpenLogin) {
+                linkOpenLogin.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    switchToLogin();
+                });
+            }
+
+            // Submit LOGIN bằng AJAX
+            loginForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                var formData = new FormData(loginForm);
+
+                fetch(loginForm.getAttribute('action'), {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                    .then(function (res) {
+                        if (!res.ok) throw new Error('http ' + res.status);
+                        return res.json();
+                    })
+                    .then(function (data) {
+                        if (data && data.success) {
+                            window.location.reload();
+                        } else {
+                            loginError.textContent = data && data.message
+                                ? data.message
+                                : 'Đăng nhập thất bại.';
+                        }
+                    })
+                    .catch(function () {
+                        loginError.textContent = 'Không thể kết nối máy chủ.';
+                    });
+            });
+
+            // Submit REGISTER bằng AJAX
+            registerForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                var formData = new FormData(registerForm);
+
+                fetch(registerForm.getAttribute('action'), {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                    .then(function (res) {
+                        if (!res.ok) throw new Error('http ' + res.status);
+                        return res.json();
+                    })
+                    .then(function (data) {
+                        if (data && data.success) {
+                            window.location.reload();
+                        } else {
+                            registerError.textContent = data && data.message
+                                ? data.message
+                                : 'Đăng ký thất bại.';
+                        }
+                    })
+                    .catch(function () {
+                        registerError.textContent = 'Không thể kết nối máy chủ.';
+                    });
+            });
+        })();
+    </script>
+
+    @RenderSection("Scripts", required: false)
 </body>
 </html>
