@@ -1,108 +1,119 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Core.Models;
+using Core.ViewModels;
+using Data;
+using Services.Implementations;
+using Services.Interfaces;
 using System.Linq;
-using System.Web;
+using System.Threading.Tasks;
 using System.Web.Mvc;
-using Core.Models;
-
-
 
 namespace HomeNow.Controllers
 {
     public class HomeController : Controller
     {
-        public ActionResult Index(string transactionType, string keyword, string priceRange, string propertyType)
+        private readonly IPropertyService _propertyService;
+
+        public HomeController()
+        {
+            _propertyService = new PropertyService();
+        }
+
+        public async Task<ActionResult> Index(
+            string transactionType,
+            int? cityId,
+            string priceRange,
+            string propertyType,
+            string keyword)
         {
             var vm = new HomeIndexViewModel
             {
                 TransactionType = string.IsNullOrEmpty(transactionType) ? "rent" : transactionType,
-                Keyword = keyword,
+                CityId = cityId,
                 PriceRange = priceRange,
-                PropertyType = propertyType
+                PropertyType = propertyType,
+                Keyword = keyword,
             };
 
-            // ---- DUMMY DATA: sau này bạn thay bằng query DB / PropertyService ----
-            var allRent = new List<PropertyCard>
-    {
-        new PropertyCard {
-            Id = 1,
-            Title = "Căn hộ 2PN full nội thất",
-            Address = "Bình Thạnh, TP.HCM",
-            ThumbnailUrl = "/Assets/house_rent_1.jpg",
-            Price = 18, PriceLabel = "18 triệu/tháng",
-            Bed = 2, Bath = 2, Area = 80
-        },
-        new PropertyCard {
-            Id = 2,
-            Title = "Studio view sông",
-            Address = "Quận 2, TP.HCM",
-            ThumbnailUrl = "/Assets/house_rent_2.jpg",
-            Price = 10, PriceLabel = "10 triệu/tháng",
-            Bed = 1, Bath = 1, Area = 35
-        }
-    };
+            // --------- Lấy danh sách city từ DB ----------
+            using (var db = new AppDbContext())
+            {
+                var uiLang = System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
+                var lang = uiLang.Length >= 2 ? uiLang.Substring(0, 2).ToLower() : "vi";
 
-            var allSale = new List<PropertyCard>
-    {
-        new PropertyCard {
-            Id = 3,
-            Title = "Nhà phố 3 tầng, sân thượng",
-            Address = "Quận 7, TP.HCM",
-            ThumbnailUrl = "/Assets/house_sale_1.jpg",
-            Price = 6.5m, PriceLabel = "6.5 tỷ",
-            Bed = 4, Bath = 3, Area = 120
-        },
-        new PropertyCard {
-            Id = 4,
-            Title = "Căn hộ 3PN cao cấp",
-            Address = "Thủ Đức, TP.HCM",
-            ThumbnailUrl = "/Assets/house_sale_2.jpg",
-            Price = 5.2m, PriceLabel = "5.2 tỷ",
-            Bed = 3, Bath = 2, Area = 95
-        }
-    };
-            // -----------------------------------------------------
+                var cities = db.Cities
+                    .Where(c => c.IsActive)
+                    .OrderBy(c => c.DisplayOrder)
+                    .ToList();
 
-            var hasFilter = !string.IsNullOrWhiteSpace(keyword)
+                vm.Cities = cities.Select(c => new CityDropDownItem
+                {
+                    CityId = c.CityId,
+                    Name =
+                        lang == "en" ? (c.NameEn ?? c.NameVi) :
+                        lang == "zh" ? (c.NameZh ?? c.NameVi) :
+                        c.NameVi,
+                    BackgroundUrl = c.BackgroundUrl
+                }).ToList();
+            }
+
+            // --------- Gọi search hoặc featured như bạn đang làm ----------
+            var uiLang2 = System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
+            var langCode = uiLang2.Length >= 2 ? uiLang2.Substring(0, 2).ToLower() : "vi";
+
+            var hasSearch = !string.IsNullOrWhiteSpace(keyword)
+                            || cityId.HasValue
                             || !string.IsNullOrWhiteSpace(priceRange)
                             || !string.IsNullOrWhiteSpace(propertyType);
 
-            if (!hasFilter)
+            vm.HasSearch = hasSearch;
+
+            if (hasSearch)
             {
-                vm.HasSearch = false;
-                vm.FeaturedRent = allRent;
-                vm.FeaturedSale = allSale;
+                var list = await _propertyService.SearchAsync(
+                    langCode,
+                    vm.TransactionType,
+                    vm.CityId,
+                    vm.PriceRange,
+                    vm.PropertyType,
+                    vm.Keyword);
+
+                vm.SearchResults = list.Select(ToHomeItem).ToList();
             }
             else
             {
-                vm.HasSearch = true;
-                var list = allRent.Concat(allSale).AsQueryable();
+                var rentList = await _propertyService.SearchAsync(
+                    langCode, "rent", null, null, null, null);
+                var saleList = await _propertyService.SearchAsync(
+                    langCode, "sale", null, null, null, null);
 
-                if (!string.IsNullOrWhiteSpace(keyword))
-                {
-                    var lower = keyword.ToLower();
-                    list = list.Where(x =>
-                        x.Title.ToLower().Contains(lower) ||
-                        x.Address.ToLower().Contains(lower));
-                }
+                vm.FeaturedRent = rentList
+                    .Take(6)
+                    .Select(ToHomeItem)
+                    .ToList();
 
-                if (!string.IsNullOrWhiteSpace(priceRange))
-                {
-                    var parts = priceRange.Split('-');
-                    if (parts.Length == 2
-                        && decimal.TryParse(parts[0], out var min)
-                        && decimal.TryParse(parts[1], out var max))
-                    {
-                        list = list.Where(x => x.Price >= min && x.Price <= max);
-                    }
-                }
-
-                // propertyType (demo, chưa filter thật)
-                vm.SearchResults = list.ToList();
+                vm.FeaturedSale = saleList
+                    .Take(6)
+                    .Select(ToHomeItem)
+                    .ToList();
             }
 
             return View(vm);
         }
 
+        private PropertyListItemViewModel ToHomeItem(PropertyListViewModel x)
+        {
+            return new PropertyListItemViewModel
+            {
+                PropertyId = x.Id,
+                Title = x.Title,
+                Address = x.Address,
+                Price = x.Price ?? 0,
+                PriceLabel = x.Price.HasValue ? $"{x.Price:N0}" : "",
+                Area = (float)(x.AreaM2 ?? 0),
+                Bed = null,
+                Bath = null,
+                ThumbnailUrl = x.CoverImageUrl
+            };
+        }
     }
 }

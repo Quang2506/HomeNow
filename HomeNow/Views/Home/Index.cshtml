@@ -7,256 +7,265 @@
 
     var currentLang = System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
     var totalListings = 182;
+    var currentType = string.IsNullOrEmpty(Model.TransactionType) ? "rent" : Model.TransactionType;
 }
 
+<link rel="stylesheet" href="~/Content/style/Home/index.css" />
 
-
-<!DOCTYPE html>
-<html lang="@currentLang">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@HomeTexts.Meta_HtmlTitle</title>
-
-    <link rel="stylesheet" href="~/Content/style/Home/index.css">
-    
-
-</head>
-
-    <body>
-    <div class="home-hero">
-        <div class="home-hero-shell">
-            <!-- HEADER -->
-            <div class="home-hero-header">
-                <!-- Logo + city -->
-                <div class="home-header-left-box">
-                    <div class="home-logo-icon"></div>
-                    <div class="home-header-left">
-                        <div class="home-header-left-top">
-                            <span>NhàNow</span>
-                        </div>
-                        <div class="home-header-left-tagline">
-                            <svg viewBox="0 0 24 24"
-                                 width="16" height="16"
-                                 fill="currentColor">
-                                <path d="M12 2.5C8.96 2.5 6.5 4.96 6.5 8c0 3.74 3.39 7.47 4.96 9.15.29.31.77.31 1.06 0C14.11 15.47 17.5 11.74 17.5 8c0-3.04-2.46-5.5-5.5-5.5zm0 6.5A2 2 0 1 1 12 5a2 2 0 0 1 0 4z" />
-                            </svg>
-                            @HomeTexts.CityName
-                        </div>
+<div class="home-hero">
+    <div class="home-hero-shell">
+        <!-- HEADER -->
+        <div class="home-hero-header">
+            <!-- Logo + city -->
+            <div class="home-header-left-box">
+                <div class="home-logo-icon"></div>
+                <div class="home-header-left">
+                    <div class="home-header-left-top">
+                        <span>NhàNow</span>
                     </div>
-                </div>
-
-                <!-- Menu phải -->
-                <div class="home-header-right-box">
-                    <div class="home-header-right-top">
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            var name = Session["CurrentUserName"] as string ?? "Tài khoản";
-
-                            <span class="hidden-xs">@name</span>
-                            <span class="hidden-xs">|</span>
-                            <a href="@Url.Action("Favorites", "Property")" class="hidden-xs">
-                                Bất động sản yêu thích
-                            </a>
-                            <span class="hidden-xs">|</span>
-                            <a href="@Url.Action("Logout", "Account")" class="hidden-xs">
-                                Đăng xuất
-                            </a>
-                        }
-                        else
-                        {
-                            <a href="javascript:void(0)" class="hidden-xs js-open-login">Đăng nhập</a>
-                            <span class="hidden-xs">|</span>
-                            <a href="@Url.Action("Favorites", "Property")" class="hidden-xs">
-                                Bất động sản yêu thích
-                            </a>
-                        }
-
-                        <a href="@Url.Action("Request", "Landlord")" class="nav-post">
-                            @HomeTexts.Menu_Post
-                        </a>
-                    </div>
-
-                    <div class="home-header-right-bottom">
-                        <a href="@Url.Action("Set", "Language", new { lang = "vi-VN", returnUrl = Request.RawUrl })"
-                           class="@(currentLang.StartsWith("vi") ? "lang-active" : "")">
-                            VI
-                        </a>
-                        |
-                        <a href="@Url.Action("Set", "Language", new { lang = "en-US", returnUrl = Request.RawUrl })"
-                           class="@(currentLang.StartsWith("en") ? "lang-active" : "")">
-                            EN
-                        </a>
-                        |
-                        <a href="@Url.Action("Set", "Language", new { lang = "zh-CN", returnUrl = Request.RawUrl })"
-                           class="@(currentLang.StartsWith("zh") ? "lang-active" : "")">
-                            中文
-                        </a>
+                    <div class="home-header-left-tagline">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                            <path d="M12 2.5C8.96 2.5 6.5 4.96 6.5 8c0 3.74 3.39 7.47 4.96 9.15.29.31.77.31 1.06 0C14.11 15.47 17.5 11.74 17.5 8c0-3.04-2.46-5.5-5.5-5.5zm0 6.5A2 2 0 1 1 12 5a2 2 0 0 1 0 4z" />
+                        </svg>
+                        @HomeTexts.CityName
                     </div>
                 </div>
             </div>
 
-            <!-- MAIN + SEARCH -->
-            <div class="home-hero-main">
-                <div class="home-main-text">
-                    <div class="home-main-title">
-                        @HomeTexts.MainTitle
-                    </div>
-                    <div class="home-sub-title">
-                        @string.Format(HomeTexts.SubTitle, totalListings)
-                    </div>
+            <!-- Menu phải -->
+            <div class="home-header-right-box">
+                <div class="home-header-right-top">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        var name = Session["CurrentUserName"] as string ?? "Tài khoản";
+
+                        <a href="@Url.Action("Favorites", "Property")" class="hidden-xs">
+                            <i class="fa-solid fa-heart"></i>
+                        </a>
+                        <span class="hidden-xs">
+                            <i class="fa-solid fa-user"></i> @name
+                        </span>
+                        <a href="@Url.Action("Logout", "Account")" class="hidden-xs">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a href="@Url.Action("Favorites", "Property")" class="hidden-xs">
+                            <i class="fa-solid fa-heart"></i>
+                        </a>
+
+                        <a href="javascript:void(0)" class="hidden-xs js-open-login">Đăng nhập</a>
+                    }
+
+                    <a href="@Url.Action("Request", "Landlord")" class="nav-post">
+                        @HomeTexts.Menu_Post
+                    </a>
                 </div>
 
-                <div class="home-main-search">
-                    @using (Html.BeginForm("Index", "Home", FormMethod.Get, new { @class = "home-search-form" }))
-                    {
-                        var currentType = string.IsNullOrEmpty(Model.TransactionType) ? "rent" : Model.TransactionType;
+                <div class="home-header-right-bottom">
+                    <a href="@Url.Action("Set", "Language", new { lang = "vi-VN", returnUrl = Request.RawUrl })"
+                       class="@(currentLang.StartsWith("vi") ? "lang-active" : "")">
+                        VI
+                    </a>
+                    |
+                    <a href="@Url.Action("Set", "Language", new { lang = "en-US", returnUrl = Request.RawUrl })"
+                       class="@(currentLang.StartsWith("en") ? "lang-active" : "")">
+                        EN
+                    </a>
+                    |
+                    <a href="@Url.Action("Set", "Language", new { lang = "zh-CN", returnUrl = Request.RawUrl })"
+                       class="@(currentLang.StartsWith("zh") ? "lang-active" : "")">
+                        中文
+                    </a>
+                </div>
+            </div>
+        </div>
 
-                        <div class="home-search-wrapper">
-                            <div class="home-search-tabs-row">
-                                <div class="home-search-tabs">
-                                    <button type="button"
-                                            class="home-search-tab-btn @(currentType == "rent" ? "active" : "")"
-                                            data-value="rent">
-                                        Thuê nhà
-                                    </button>
-                                    <button type="button"
-                                            class="home-search-tab-btn @(currentType == "buy" ? "active" : "")"
-                                            data-value="buy">
-                                        Mua nhà
-                                    </button>
-                                </div>
+        <!-- MAIN + SEARCH -->
+        <div class="home-hero-main">
+            <div class="home-main-text">
+                <div class="home-main-title">
+                    @HomeTexts.MainTitle
+                </div>
+                <div class="home-sub-title">
+                    @string.Format(HomeTexts.SubTitle, totalListings)
+                </div>
+            </div>
+
+            <div class="home-main-search">
+                @using (Html.BeginForm("Index", "Home", FormMethod.Get, new { @class = "home-search-form" }))
+                {
+                    <div class="home-search-wrapper">
+                        <!-- HÀNG TRÊN: Thuê/Mua + ô nhập + nút kính lúp -->
+                        <div class="home-search-top">
+                            <div class="home-search-tabs">
+                                <button type="button"
+                                        class="home-search-tab-btn @(currentType == "rent" ? "active" : "")"
+                                        data-value="rent">
+                                    Thuê nhà
+                                </button>
+                                <button type="button"
+                                        class="home-search-tab-btn @(currentType == "sale" ? "active" : "")"
+                                        data-value="sale">
+                                    Mua nhà
+                                </button>
                             </div>
 
-                            <input type="hidden" name="transactionType" id="transactionTypeInput" value="@currentType" />
-
-                            <div class="home-search-row">
+                            <div class="home-search-input-wrap">
                                 <input type="text"
                                        name="keyword"
                                        value="@Model.Keyword"
-                                       placeholder="Khu vực, tên đường, dự án..." />
+                                       placeholder="Nhập vị trí chi tiết: đường, xã, phường..." />
+                            </div>
 
-                                <select name="priceRange">
-                                    <option value="">Tất cả mốc giá</option>
+                            <button type="submit" class="home-search-btn-main">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </button>
+                        </div>
+
+                        <!-- giữ transactionType -->
+                        <input type="hidden" name="transactionType"
+                               id="transactionTypeInput"
+                               value="@currentType" />
+
+                        <!-- HÀNG DƯỚI: 3 filter -->
+                        <div class="home-search-bottom">
+                            <!-- THÀNH PHỐ: lấy động từ Model.Cities -->
+                            <div class="home-search-filter">
+                                <select id="citySelect" name="cityId" class="home-search-filter-select">
+                                    <option value="">Thành phố</option>
+
+                                    @if (Model.Cities != null)
+                                    {
+                                        foreach (var c in Model.Cities)
+                                        {
+                                            <option value="@c.CityId"
+                                                    data-bg="@c.BackgroundUrl"
+                                                    @(Model.CityId == c.CityId ? "selected" : "")>
+                                                @c.Name
+                                            </option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="home-search-filter">
+                                <select name="priceRange" class="home-search-filter-select">
+                                    <option value="">Mốc giá</option>
                                     <option value="0-10" @(Model.PriceRange == "0-10" ? "selected" : "")>Dưới 10 triệu / 1 tỷ</option>
                                     <option value="10-20" @(Model.PriceRange == "10-20" ? "selected" : "")>10 - 20 triệu / 1-3 tỷ</option>
                                     <option value="20-999" @(Model.PriceRange == "20-999" ? "selected" : "")>Trên 20 triệu / 3 tỷ</option>
                                 </select>
+                            </div>
 
-                                <select name="propertyType">
+                            <div class="home-search-filter">
+                                <select name="propertyType" class="home-search-filter-select">
                                     <option value="">Loại nhà</option>
                                     <option value="apartment" @(Model.PropertyType == "apartment" ? "selected" : "")>Căn hộ</option>
                                     <option value="house" @(Model.PropertyType == "house" ? "selected" : "")>Nhà phố</option>
                                     <option value="villa" @(Model.PropertyType == "villa" ? "selected" : "")>Biệt thự</option>
                                 </select>
-
-                                <button type="submit" class="home-search-btn-new">
-                                    <i class="fa-solid fa-magnifying-glass"></i>
-                                </button>
                             </div>
                         </div>
-                    }
-                </div>
+                    </div>
+                }
             </div>
         </div>
     </div>
+</div>
 
+<div class="home-body-container">
+    @if (Model.HasSearch)
+    {
+        <div class="home-section-header">
+            <h2>Kết quả tìm kiếm</h2>
+        </div>
 
-    <div class="home-body-container">
-        @if (Model.HasSearch)
+        if (Model.SearchResults != null && Model.SearchResults.Any())
         {
-            <div class="home-section-header">
-                <h2>Kết quả tìm kiếm</h2>
-            </div>
-
-            if (Model.SearchResults != null && Model.SearchResults.Any())
-            {
-                <div class="property-grid">
-                    @foreach (var item in Model.SearchResults)
-                    {
-                        <div class="property-card">
-                            <img src="@item.ThumbnailUrl" alt="@item.Title" />
-                            <div class="property-card-body">
-                                <div class="property-card-title">@item.Title</div>
-                                <div class="property-card-address">@item.Address</div>
-                                <div class="property-card-meta">
-                                    <span>@item.Bed PN · @item.Bath WC</span>
-                                    <span>@item.Area m²</span>
-                                </div>
-                                <div class="property-card-price">@item.PriceLabel</div>
+            <div class="property-grid">
+                @foreach (var item in Model.SearchResults)
+                {
+                    <div class="property-card">
+                        <img src="@item.ThumbnailUrl" alt="@item.Title" />
+                        <div class="property-card-body">
+                            <div class="property-card-title">@item.Title</div>
+                            <div class="property-card-address">@item.Address</div>
+                            <div class="property-card-meta">
+                                <span>@item.Bed PN · @item.Bath WC</span>
+                                <span>@item.Area m²</span>
                             </div>
+                            <div class="property-card-price">@item.PriceLabel</div>
                         </div>
-                    }
-                </div>
-            }
-            else
-            {
-                <p>Không tìm thấy căn phù hợp, bạn thử thay đổi điều kiện tìm kiếm nhé.</p>
-            }
+                    </div>
+                }
+            </div>
         }
         else
         {
-            <!-- Các căn cho thuê nổi bật -->
-            <section style="margin-bottom:24px;">
-                <div class="home-section-header">
-                    <h2>Các căn cho thuê nổi bật</h2>
-                    <a href="@Url.Action("List", "Property", new { mode = "rent" })">xem thêm</a>
-                </div>
-
-                <div class="property-grid">
-                    @foreach (var item in Model.FeaturedRent)
-                    {
-                        <div class="property-card">
-                            <img src="@item.ThumbnailUrl" alt="@item.Title" />
-                            <div class="property-card-body">
-                                <div class="property-card-title">@item.Title</div>
-                                <div class="property-card-address">@item.Address</div>
-                                <div class="property-card-meta">
-                                    <span>@item.Bed PN · @item.Bath WC</span>
-                                    <span>@item.Area m²</span>
-                                </div>
-                                <div class="property-card-price">@item.PriceLabel</div>
-                            </div>
-                        </div>
-                    }
-                </div>
-            </section>
-
-            <!-- Các căn bán nổi bật -->
-            <section>
-                <div class="home-section-header">
-                    <h2>Các căn bán nổi bật</h2>
-                    <a href="@Url.Action("List", "Property", new { mode = "buy" })">xem thêm</a>
-                </div>
-
-                <div class="property-grid">
-                    @foreach (var item in Model.FeaturedSale)
-                    {
-                        <div class="property-card">
-                            <img src="@item.ThumbnailUrl" alt="@item.Title" />
-                            <div class="property-card-body">
-                                <div class="property-card-title">@item.Title</div>
-                                <div class="property-card-address">@item.Address</div>
-                                <div class="property-card-meta">
-                                    <span>@item.Bed PN · @item.Bath WC</span>
-                                    <span>@item.Area m²</span>
-                                </div>
-                                <div class="property-card-price">@item.PriceLabel</div>
-                            </div>
-                        </div>
-                    }
-                </div>
-            </section>
+            <p>Không tìm thấy căn phù hợp, bạn thử thay đổi điều kiện tìm kiếm nhé.</p>
         }
-    </div>
-</body>
-</html>
+    }
+    else
+    {
+        <!-- Các căn cho thuê nổi bật -->
+        <section style="margin-bottom:24px;">
+            <div class="home-section-header">
+                <h2>Các căn cho thuê nổi bật</h2>
+                <a href="@Url.Action("List", "Property", new { mode = "rent" })">xem thêm</a>
+            </div>
 
+            <div class="property-grid">
+                @foreach (var item in Model.FeaturedRent)
+                {
+                    <div class="property-card">
+                        <img src="@item.ThumbnailUrl" alt="@item.Title" />
+                        <div class="property-card-body">
+                            <div class="property-card-title">@item.Title</div>
+                            <div class="property-card-address">@item.Address</div>
+                            <div class="property-card-meta">
+                                <span>@item.Bed PN · @item.Bath WC</span>
+                                <span>@item.Area m²</span>
+                            </div>
+                            <div class="property-card-price">@item.PriceLabel</div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
 
+        <!-- Các căn bán nổi bật -->
+        <section>
+            <div class="home-section-header">
+                <h2>Các căn bán nổi bật</h2>
+                <a href="@Url.Action("List", "Property", new { mode = "buy" })">xem thêm</a>
+            </div>
+
+            <div class="property-grid">
+                @foreach (var item in Model.FeaturedSale)
+                {
+                    <div class="property-card">
+                        <img src="@item.ThumbnailUrl" alt="@item.Title" />
+                        <div class="property-card-body">
+                            <div class="property-card-title">@item.Title</div>
+                            <div class="property-card-address">@item.Address</div>
+                            <div class="property-card-meta">
+                                <span>@item.Bed PN · @item.Bath WC</span>
+                                <span>@item.Area m²</span>
+                            </div>
+                            <div class="property-card-price">@item.PriceLabel</div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+    }
+</div>
 
 @section Scripts {
     <script>
-        // toggle Thuê / Mua
+        // ===== Toggle Thuê / Mua =====
         (function () {
             var buttons = document.querySelectorAll(".home-search-tab-btn");
             var hiddenInput = document.getElementById("transactionTypeInput");
@@ -270,6 +279,30 @@
                     this.classList.add("active");
                 });
             });
+        })();
+
+        // ===== Đổi background theo thành phố (background_url từ DB) =====
+        (function () {
+            var hero = document.querySelector(".home-hero");
+            var citySelect = document.getElementById("citySelect");
+            if (!hero || !citySelect) return;
+
+            function applyCityBackground() {
+                var opt = citySelect.options[citySelect.selectedIndex];
+                if (!opt) return;
+
+                var bg = opt.getAttribute("data-bg");
+                if (bg && bg.length > 0) {
+                    hero.style.backgroundImage = "url('" + bg + "')";
+                } else {
+                    // bỏ inline style để quay về background mặc định trong CSS
+                    hero.style.backgroundImage = "";
+                }
+            }
+
+            citySelect.addEventListener("change", applyCityBackground);
+            // áp dụng sẵn trạng thái ban đầu (khi đã chọn city từ query string)
+            applyCityBackground();
         })();
     </script>
 }

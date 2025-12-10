@@ -1,4 +1,4 @@
-﻿namespace HomeNow.ViewModels
+﻿namespace Core.ViewModels
 {
     public class PropertyListViewModel
     {
@@ -18,7 +18,6 @@
 
         public bool IsVrAvailable { get; set; }
 
-        // dùng cho chức năng Yêu thích
         public bool IsFavorite { get; set; }
     }
 }

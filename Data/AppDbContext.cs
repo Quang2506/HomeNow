@@ -19,7 +19,7 @@ namespace Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<UserFavoriteProperty> UserFavoriteProperties { get; set; }
-
+        public DbSet<City> Cities { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

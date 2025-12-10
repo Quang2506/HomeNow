@@ -1,10 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Core.Models
 {
     [Table("property_translations", Schema = "public")]
     public class PropertyTranslation
     {
+        [Key]
         [Column("id")]
         public int Id { get; set; }
 
@@ -12,7 +14,7 @@ namespace Core.Models
         public int PropertyId { get; set; }
 
         [Column("lang_code")]
-        public string LangCode { get; set; }        // vi, en, zh
+        public string LangCode { get; set; }   // "vi", "en", "zh"...
 
         [Column("title")]
         public string Title { get; set; }
@@ -20,20 +22,11 @@ namespace Core.Models
         [Column("display_title")]
         public string DisplayTitle { get; set; }
 
-        [Column("address")]
-        public string Address { get; set; }
+        [Column("description")]
+        public string Description { get; set; }
 
-        [Column("district")]
-        public string District { get; set; }
-
-        [Column("city")]
-        public string City { get; set; }
-
-        [Column("area_name")]
-        public string AreaName { get; set; }
-
-        [Column("community_name")]
-        public string CommunityName { get; set; }
+        [Column("address_line")]
+        public string AddressLine { get; set; }
 
         [Column("room_type")]
         public string RoomType { get; set; }
@@ -41,6 +34,8 @@ namespace Core.Models
         [Column("orientation")]
         public string Orientation { get; set; }
 
+        // FK về Property (logic thôi, không cần constraint trong DB)
+        [ForeignKey("PropertyId")]
         public virtual Property Property { get; set; }
     }
 }

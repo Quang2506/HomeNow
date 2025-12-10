@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Core.Models
@@ -7,64 +8,106 @@ namespace Core.Models
     [Table("properties", Schema = "public")]
     public class Property
     {
-        [Column("id")]
-        public int Id { get; set; }
+        [Key]
+        [Column("property_id")]
+        public int PropertyId { get; set; }
+
+        [Column("owner_id")]
+        public int? OwnerId { get; set; }
+
+        [Column("city_id")]
+        public int? CityId { get; set; }
+
+        [Column("ward_id")]
+        public int? WardId { get; set; }
+
+        [Column("project_id")]
+        public int? ProjectId { get; set; }
 
         [Column("title")]
-        public string Title { get; set; }                // Tiêu đề gốc 
+        public string Title { get; set; }
 
+        [Column("description")]
+        public string Description { get; set; }
+
+        /// <summary>
+        /// Nhu cầu: "rent" / "sale"
+        /// </summary>
+        [Column("listing_type")]
+        public string ListingType { get; set; }
+
+        /// <summary>
+        /// apartment / house / villa / office / studio ...
+        /// </summary>
         [Column("property_type")]
-        public string PropertyType { get; set; }        // Loại nhà: apartment / room...
+        public string PropertyType { get; set; }
 
-        [Column("price_per_month")]
-        public decimal? PricePerMonth { get; set; }     // Giá thuê theo tháng
+        /// <summary>
+        /// Giá (VNĐ): nếu là thuê → giá thuê/tháng; nếu là bán → giá bán.
+        /// </summary>
+        [Column("price")]
+        public decimal? Price { get; set; }
 
-        [Column("area_m2")]
-        public decimal? AreaM2 { get; set; }            // Diện tích m2
+        /// <summary>
+        /// Diện tích (m2)
+        /// </summary>
+        [Column("area_sqm")]
+        public float? AreaSqm { get; set; }
 
-        [Column("address")]
-        public string Address { get; set; }             // Địa chỉ đầy đủ
+        [Column("bedroom_count")]
+        public int? BedroomCount { get; set; }
 
-        [Column("district")]
-        public string District { get; set; }            // Quận
+        [Column("bathroom_count")]
+        public int? BathroomCount { get; set; }
 
-        [Column("city")]
-        public string City { get; set; }                // Thành phố
+        [Column("living_room")]
+        public int? LivingRoom { get; set; }
 
-        [Column("room_type")]
-        public string RoomType { get; set; }            // Bố cục: 1 phòng ngủ...
+        [Column("kitchen")]
+        public int? Kitchen { get; set; }
+
+        /// <summary>
+        /// Địa chỉ chi tiết (số nhà, tên đường, ngõ...)
+        /// </summary>
+        [Column("address_line")]
+        public string AddressLine { get; set; }
+
+        /// <summary>
+        /// draft / published / rented / sold / hidden
+        /// </summary>
+        [Column("status")]
+        public string Status { get; set; }
+
+        /// <summary>
+        /// Số thứ tự nổi bật (càng lớn càng nổi)
+        /// </summary>
+        [Column("is_featured")]
+        public int? IsFeatured { get; set; }
 
         [Column("is_vr_available")]
-        public bool IsVrAvailable { get; set; }         // Nhà có VR không?
-
-        [Column("status")]
-        public string Status { get; set; }              // Trạng thái (available / rented)
+        public bool? IsVrAvailable { get; set; }
 
         [Column("cover_image_url")]
-        public string CoverImageUrl { get; set; }       // Ảnh cover
-
-        [Column("area_name")]
-        public string AreaName { get; set; }            // Khu vực nhỏ
-
-        [Column("community_name")]
-        public string CommunityName { get; set; }       // Tên khu dân cư
-
-        [Column("orientation")]
-        public string Orientation { get; set; }         // Hướng nhà
-
-        [Column("price_unit")]
-        public string PriceUnit { get; set; }           // 元/月
-
-        [Column("display_title")]
-        public string DisplayTitle { get; set; }        // Tiêu đề hiển thị
+        public string CoverImageUrl { get; set; }
 
         [Column("created_at")]
         public DateTime? CreatedAt { get; set; }
 
-        // Các bản dịch liên quan (VI/EN/ZH)
+        [Column("updated_at")]
+        public DateTime? UpdatedAt { get; set; }
+
+        [Column("created_uid")]
+        public string CreatedUid { get; set; }
+
+        [Column("updated_uid")]
+        public string UpdatedUid { get; set; }
+
+        // ====== Navigation ======
+
+        // Đa ngôn ngữ (bảng property_translations bạn đang có)
         public virtual ICollection<PropertyTranslation> Translations { get; set; }
 
-        // Danh sách các phòng VR thuộc nhà này
+        // VR scene các phòng thuộc căn này
         public virtual ICollection<VrScene> Scenes { get; set; }
     }
 }

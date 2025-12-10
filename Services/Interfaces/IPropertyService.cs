@@ -1,25 +1,20 @@
 ﻿using Core.Models;
+using Core.ViewModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace HomeNow.Services.Interfaces
+namespace Services.Interfaces
 {
     public interface IPropertyService
     {
-        // ====== CÁC HÀM CŨ CỦA BẠN (NẾU CÓ) ĐỂ NGUYÊN Ở TRÊN ======
-        // ví dụ:
-        // Task<Property> GetByIdAsync(int id);
+        Task<List<PropertyListViewModel>> SearchAsync(
+            string langCode,
+            string listingType,
+            int? cityId,
+            string priceRange,
+            string propertyType,
+            string keyword);
 
-        // ====== HÀM MỚI DÙNG CHO MÀN DANH SÁCH NHÀ ======
-
-        /// <summary>
-        /// Lấy danh sách nhà (chưa map sang ViewModel), kèm theo bản dịch.
-        /// </summary>
-        Task<IList<Property>> GetAllWithTranslationsAsync();
-
-        /// <summary>
-        /// Lấy thông tin 1 nhà (cần cho màn VR).
-        /// </summary>
         Task<Property> GetByIdAsync(int id);
     }
 }

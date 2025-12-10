@@ -51,12 +51,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Implementations\CityService.cs" />
     <Compile Include="Implementations\FavoriteService.cs" />
     <Compile Include="Implementations\LandlordRequestService.cs" />
     <Compile Include="Implementations\PropertyService.cs" />
     <Compile Include="Implementations\UserService.cs" />
     <Compile Include="Implementations\ViewingRequestService.cs" />
     <Compile Include="Implementations\VrService.cs" />
+    <Compile Include="Interfaces\ICityService.cs" />
     <Compile Include="Interfaces\IFavoriteService.cs" />
     <Compile Include="Interfaces\ILandlordRequestService.cs" />
     <Compile Include="Interfaces\IPropertyService.cs" />
