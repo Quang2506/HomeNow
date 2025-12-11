@@ -383,39 +383,68 @@
         <div class="home-hero-shell">
 
             <!-- HEADER -->
-            <div  class="home-hero-header">
-
-                <!-- LEFT -->
-                <a class="home-header-left-box"  href="@Url.Action("index", "Home")">
+            <div class="home-hero-header">
+                <!-- Logo + city -->
+                <a href=@Url.Action("index", "Home") class="home-header-left-box" >
                     <div class="home-logo-icon"></div>
-
                     <div class="home-header-left">
                         <div class="home-header-left-top">
-                            <span>@HomeTexts.Brand_Name</span>
+                            <span>NhàNow</span>
                         </div>
                         <div class="home-header-left-tagline">
-                            <i class="fa-solid fa-location-dot"></i> @HomeTexts.Brand_City
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                <path d="M12 2.5C8.96 2.5 6.5 4.96 6.5 8c0 3.74 3.39 7.47 4.96 9.15.29.31.77.31 1.06 0C14.11 15.47 17.5 11.74 17.5 8c0-3.04-2.46-5.5-5.5-5.5zm0 6.5A2 2 0 1 1 12 5a2 2 0 0 1 0 4z" />
+                            </svg>
+                            @HomeTexts.CityName
                         </div>
                     </div>
                 </a>
 
-                <!-- RIGHT -->
+                <!-- Menu phải -->
                 <div class="home-header-right-box">
-
                     <div class="home-header-right-top">
-                        <a href="#" class="hidden-xs">@HomeTexts.Menu_Rent</a>
-                        <span class="hidden-xs">|</span>
-                        <a href="#" class="hidden-xs">@HomeTexts.Menu_Buy</a>
-                        <a href="#" class="nav-post">@HomeTexts.Menu_Post</a>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            var name = Session["CurrentUserName"] as string ?? "Tài khoản";
+
+                            <a href="@Url.Action("Favorites", "Property")" class="hidden-xs">
+                                <i class="fa-solid fa-heart"></i>
+                            </a>
+                            <span class="hidden-xs">
+                                <i class="fa-solid fa-user"></i> @name
+                            </span>
+                            <a href="@Url.Action("Logout", "Account")" class="hidden-xs">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("Favorites", "Property")" class="hidden-xs">
+                                <i class="fa-solid fa-heart"></i>
+                            </a>
+                            <a href="javascript:void(0)" class="hidden-xs js-open-login">Đăng nhập</a>
+                        }
+
+                        <a href="@Url.Action("Request", "Landlord")" class="nav-post">
+                            @HomeTexts.Menu_Post
+                        </a>
                     </div>
 
                     <div class="home-header-right-bottom">
-                        <a class="@(currentLang.StartsWith("vi")?"lang-active":"")"
-                           href="@Url.Action("Set","Language",new { lang="vi-VN", returnUrl=Request.RawUrl })">VI</a> |
-                        <a class="@(currentLang.StartsWith("en")?"lang-active":"")"
-                           href="@Url.Action("Set","Language",new { lang="en-US", returnUrl=Request.RawUrl })">EN</a> |
-                        <a class="@(currentLang.StartsWith("zh")?"lang-active":"")"
-                           href="@Url.Action("Set","Language",new { lang="zh-CN", returnUrl=Request.RawUrl })">中文</a>
+                        <a href="@Url.Action("Set", "Language", new { lang = "vi-VN", returnUrl = Request.RawUrl })"
+                           class="@(currentLang.StartsWith("vi") ? "lang-active" : "")">
+                            VI
+                        </a>
+                        |
+                        <a href="@Url.Action("Set", "Language", new { lang = "en-US", returnUrl = Request.RawUrl })"
+                           class="@(currentLang.StartsWith("en") ? "lang-active" : "")">
+                            EN
+                        </a>
+                        |
+                        <a href="@Url.Action("Set", "Language", new { lang = "zh-CN", returnUrl = Request.RawUrl })"
+                           class="@(currentLang.StartsWith("zh") ? "lang-active" : "")">
+                            中文
+                        </a>
                     </div>
                 </div>
             </div>

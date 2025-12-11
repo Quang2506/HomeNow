@@ -2,7 +2,6 @@
 using Core.ViewModels;
 using Data;
 using Services.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -13,12 +12,12 @@ namespace Services.Implementations
     public class PropertyService : IPropertyService
     {
         public async Task<List<PropertyListViewModel>> SearchAsync(
-           string langCode,
-           string listingType,
-           int? cityId,
-           string priceRange,
-           string propertyType,
-           string keyword)
+            string langCode,
+            string listingType,
+            int? cityId,
+            string priceRange,
+            string propertyType,
+            string keyword)
         {
             using (var db = new AppDbContext())
             {
@@ -33,7 +32,7 @@ namespace Services.Implementations
                     where p.Status == "published"
                     select new { p, tr };
 
-                // --- Thuê / Mua ---
+                // --- Thuê / Bán ---
                 if (!string.IsNullOrWhiteSpace(listingType))
                     query = query.Where(x => x.p.ListingType == listingType);
 
@@ -45,29 +44,45 @@ namespace Services.Implementations
                 if (!string.IsNullOrWhiteSpace(propertyType))
                     query = query.Where(x => x.p.PropertyType == propertyType);
 
-                // --- Từ khóa: tìm trong title + address_line ---
+                // --- Từ khoá ---
                 if (!string.IsNullOrWhiteSpace(keyword))
                 {
+                    var kw = keyword.Trim().ToLower();
+
                     query = query.Where(x =>
-                        ((x.tr.Title ?? x.p.Title).Contains(keyword)) ||
-                        ((x.tr.AddressLine ?? x.p.AddressLine).Contains(keyword)));
+                        ((x.tr.Title ?? x.p.Title).ToLower().Contains(kw)) ||
+                        ((x.tr.AddressLine ?? x.p.AddressLine).ToLower().Contains(kw)));
                 }
 
                 // --- Khoảng giá ---
-                decimal? minPrice = null, maxPrice = null;
+                // --- Khoảng giá: lấy từ bảng price_filters theo Code ---
+                decimal? minPrice = null;
+                decimal? maxPrice = null;
+
                 if (!string.IsNullOrEmpty(priceRange))
                 {
-                    var parts = priceRange.Split('-');
-                    if (parts.Length == 2)
+                    // priceRange chính là Code trong bảng price_filters
+                    var pf = db.PriceFilters
+                               .Where(f => f.IsActive && f.Code == priceRange)
+                               .Select(f => new { f.MinPrice, f.MaxPrice })
+                               .FirstOrDefault();
+
+                    if (pf != null)
                     {
-                        if (decimal.TryParse(parts[0], out var min)) minPrice = min;
-                        if (decimal.TryParse(parts[1], out var max)) maxPrice = max;
+                        minPrice = pf.MinPrice;
+                        maxPrice = pf.MaxPrice;
                     }
                 }
+
                 if (minPrice.HasValue)
+                {
                     query = query.Where(x => x.p.Price >= minPrice.Value);
+                }
                 if (maxPrice.HasValue)
+                {
                     query = query.Where(x => x.p.Price <= maxPrice.Value);
+                }
+
 
                 // 1) Lấy dữ liệu thô từ DB
                 var raw = await query
@@ -85,24 +100,27 @@ namespace Services.Implementations
                         {
                             Id = p.PropertyId,
 
-                            // ưu tiên bản dịch
-                            Title = tr?.DisplayTitle ?? tr?.Title ?? p.Title,
-                            Address = tr?.AddressLine ?? p.AddressLine,
+                            // Ưu tiên bản dịch
+                            Title = tr != null && !string.IsNullOrEmpty(tr.DisplayTitle)
+                                        ? tr.DisplayTitle
+                                        : (tr != null && !string.IsNullOrEmpty(tr.Title)
+                                            ? tr.Title
+                                            : p.Title),
+                            Address = tr != null && !string.IsNullOrEmpty(tr.AddressLine)
+                                        ? tr.AddressLine
+                                        : p.AddressLine,
 
-                            RoomType = tr?.RoomType,
-                            Orientation = tr?.Orientation,
-
-                            // hiện chưa có cột trong DB → để null
                             AreaName = null,
                             CommunityName = null,
                             District = null,
 
+                            RoomType = tr?.RoomType,
+                            Orientation = tr?.Orientation,
+
                             CoverImageUrl = p.CoverImageUrl,
                             Price = p.Price,
                             PriceUnit = null,
-                            AreaM2 = p.AreaSqm.HasValue
-                                ? (decimal?)p.AreaSqm.Value
-                                : null,
+                            AreaM2 = p.AreaSqm.HasValue ? (decimal?)p.AreaSqm.Value : null,
 
                             IsVrAvailable = p.IsVrAvailable ?? false,
                             IsFavorite = false

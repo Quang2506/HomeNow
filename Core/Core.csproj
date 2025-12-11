@@ -48,8 +48,10 @@
     <Compile Include="Models\City.cs" />
     <Compile Include="Models\HomeIndexViewModel.cs" />
     <Compile Include="Models\LandlordRequest.cs" />
+    <Compile Include="Models\PriceFilter.cs" />
     <Compile Include="Models\Property.cs" />
     <Compile Include="Models\PropertyTranslation.cs" />
+    <Compile Include="Models\PropertyType.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\UserFavoriteProperty.cs" />
     <Compile Include="Models\ViewingRequest.cs" />

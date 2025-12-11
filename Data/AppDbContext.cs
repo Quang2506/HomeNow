@@ -20,6 +20,8 @@ namespace Data
         public DbSet<User> Users { get; set; }
         public DbSet<UserFavoriteProperty> UserFavoriteProperties { get; set; }
         public DbSet<City> Cities { get; set; }
+        public DbSet<PriceFilter> PriceFilters { get; set; }
+        public DbSet<PropertyType> PropertyTypes { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

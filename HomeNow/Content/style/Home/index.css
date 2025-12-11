@@ -5,7 +5,7 @@
 .home-hero {
     position: relative;
     width: 100%;
-    min-height: 75vh;
+    /*min-height: 75vh;*/
     background: url('/Assets/Banner.jpg') center center no-repeat;
     background-size: cover;
     color: #fff;
@@ -361,8 +361,8 @@
 
 .property-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(4, minmax(0, 1fr)); /* 4 cột trên desktop */
+    gap: 24px;
 }
 
 .property-card {
@@ -372,6 +372,7 @@
     box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
     display: flex;
     flex-direction: column;
+    width: 100%;
 }
 
     .property-card img {
@@ -492,6 +493,9 @@
 
     .home-search-tabs {
         max-width: 50%;
+    }
+    .property-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)); /* 2 cột */
     }
 }
 
