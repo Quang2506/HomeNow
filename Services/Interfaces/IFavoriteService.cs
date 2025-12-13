@@ -1,8 +1,13 @@
-﻿namespace HomeNow.Services.Interfaces
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Core.Models;   // RẤT QUAN TRỌNG: dùng PropertyListItemViewModel bên Core.Models
+
+namespace Services.Interfaces
 {
     public interface IFavoriteService
     {
-        System.Collections.Generic.List<int> GetFavorites(int userId);
-        void Toggle(int userId, int propertyId);
+        Task<List<PropertyListItemViewModel>> GetFavoritesAsync(int userId, string langCode);
+
+        Task<bool> ToggleFavoriteAsync(int userId, int propertyId);
     }
 }

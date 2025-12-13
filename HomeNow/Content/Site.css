@@ -100,3 +100,10 @@ p, li {
     font-weight: 900;
     src: url('fonts/roboto-v50-latin_vietnamese-900.woff2') format('woff2'), url('fonts/roboto-v30-vietnamese_latin-900.woff') format('woff');
 }
+
+a {
+    text-decoration: none !important;
+    color: white !important;
+    /* color: var(--bs-link-color); */
+    /* text-decoration: underline; */
+}

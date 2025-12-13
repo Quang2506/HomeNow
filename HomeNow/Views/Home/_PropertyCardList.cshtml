@@ -1,0 +1,27 @@
+@model IEnumerable<Core.Models.PropertyListItemViewModel>
+@{
+    Layout = null;
+}
+
+@foreach (var item in Model)
+{
+    <div class="property-card">
+        <div class="property-card-fav js-fav-toggle @(item.IsFavorite ? "is-fav" : "")"
+             data-id="@item.PropertyId">
+            <i class="fa-solid fa-heart"></i>
+        </div>
+
+        <img src="@item.ThumbnailUrl" alt="@item.Title" />
+        <div class="property-card-body">
+            <div class="property-card-title">@item.Title</div>
+            <div class="property-card-address">@item.Address</div>
+            <div class="property-card-meta">
+                <span>@(item.Bed ?? 0) PN · @(item.Bath ?? 0) WC</span>
+                <span>@item.Area m²</span>
+            </div>
+            <div class="property-card-price">
+                @item.PriceLabel VND
+            </div>
+        </div>
+    </div>
+}

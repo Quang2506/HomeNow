@@ -122,7 +122,7 @@
         margin-left: 1rem;
         padding: 0.3rem 1.1rem;
         border-radius: 999px;
-        background: #00b56b;
+        background: #00B1FE;
         font-weight: 600;
         display: inline-block;
     }
@@ -306,7 +306,8 @@
     border: none;
     background: transparent;
     height: 26px;
-    padding: 0 14px 0 0;
+   /* padding: 0 14px 0 0;*/
+    padding-left:7px;
     font-size: 0.8rem;
     outline: none;
     appearance: none; /* ẩn mũi tên mặc định */
@@ -462,7 +463,7 @@
     }
 
     .home-search-bottom {
-       /* flex-wrap: wrap;*/
+        /* flex-wrap: wrap;*/
         gap: 6px;
     }
 
@@ -494,6 +495,7 @@
     .home-search-tabs {
         max-width: 50%;
     }
+
     .property-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr)); /* 2 cột */
     }
@@ -529,10 +531,11 @@
     .home-search-filter {
         flex: 1 1 100%;
     }
+
     .home-search-tabs {
-        
         padding: 0px;
     }
+
     .home-search-tab-btn {
         border: none;
         background: transparent;

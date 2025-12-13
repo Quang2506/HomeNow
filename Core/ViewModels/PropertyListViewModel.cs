@@ -19,5 +19,9 @@
         public bool IsVrAvailable { get; set; }
 
         public bool IsFavorite { get; set; }
+        public string ListingType { get; set; }
+
+        // apartment / house / villa / office / studio ...
+        public string PropertyType { get; set; }
     }
 }

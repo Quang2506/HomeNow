@@ -1,49 +1,97 @@
-﻿using Core.Models;
+﻿// Services/Implementations/FavoriteService.cs
+using Core.Models;   // dùng PropertyListItemViewModel
 using Data;
-using HomeNow.Services.Interfaces;
 using Services.Interfaces;
+using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 
-namespace HomeNow.Services.Implementations
+namespace Services.Implementations
 {
     public class FavoriteService : IFavoriteService
     {
-        private readonly AppDbContext _db;
-
-        // 👉 constructor NHẬN AppDbContext, đúng với cách bạn khởi tạo trong PropertyController
-        public FavoriteService(AppDbContext db)
+        public async Task<List<PropertyListItemViewModel>> GetFavoritesAsync(int userId, string langCode)
         {
-            _db = db;
-        }
-
-        public List<int> GetFavorites(int userId)
-        {
-            return _db.UserFavoriteProperties
-                      .Where(x => x.UserId == userId)
-                      .Select(x => x.PropertyId)
-                      .ToList();
-        }
-
-        public void Toggle(int userId, int propertyId)
-        {
-            var fav = _db.UserFavoriteProperties
-                         .FirstOrDefault(x => x.UserId == userId && x.PropertyId == propertyId);
-
-            if (fav == null)
+            using (var db = new AppDbContext())
             {
-                _db.UserFavoriteProperties.Add(new UserFavoriteProperty
+                langCode = (langCode ?? "vi").Substring(0, 2).ToLower();
+
+                // 1) Query chỉ lấy dữ liệu thô, KHÔNG ép decimal trong LINQ to Entities
+                var raw = await
+                    (from f in db.UserFavoriteProperties
+                     join p in db.Properties on f.PropertyId equals p.PropertyId
+                     where f.UserId == userId && p.Status == "published"
+                     orderby f.CreatedAt descending
+                     select new
+                     {
+                         Property = p,
+                         Translation = p.Translations
+                             .FirstOrDefault(t => t.LangCode == langCode)
+                     })
+                    .ToListAsync();
+
+                // 2) Map sang ViewModel ở ngoài (in-memory) → ép kiểu thoải mái
+                var list = raw.Select(x =>
                 {
-                    UserId = userId,
-                    PropertyId = propertyId
-                });
-            }
-            else
-            {
-                _db.UserFavoriteProperties.Remove(fav);
-            }
+                    var p = x.Property;
+                    var tr = x.Translation;
 
-            _db.SaveChanges();
+                    return new PropertyListItemViewModel
+                    {
+                        PropertyId = p.PropertyId,
+                        Title = tr != null ? (tr.DisplayTitle ?? tr.Title) : p.Title,
+                        Address = tr != null ? tr.AddressLine : p.AddressLine,
+
+                        // p.Price là decimal? → PropertyListItemViewModel.Price là decimal
+                        Price = p.Price ?? 0m,
+                        PriceLabel = p.Price.HasValue ? p.Price.Value.ToString("N0") : "",
+
+                        Area = (float)(p.AreaSqm ?? 0),
+                        Bed = p.BedroomCount,
+                        Bath = p.BathroomCount,
+                        ThumbnailUrl = p.CoverImageUrl,
+                        ListingType = p.ListingType,
+                        PropertyType = p.PropertyType,
+                        IsFavorite = true
+                    };
+                }).ToList();
+
+                return list;
+            }
+        }
+
+        public async Task<bool> ToggleFavoriteAsync(int userId, int propertyId)
+        {
+            using (var db = new AppDbContext())
+            {
+                var fav = await db.UserFavoriteProperties
+                    .FirstOrDefaultAsync(x => x.UserId == userId && x.PropertyId == propertyId);
+
+                bool isFavorite;
+
+                if (fav == null)
+                {
+                    fav = new UserFavoriteProperty
+                    {
+                        UserId = userId,
+                        PropertyId = propertyId,
+                        CreatedAt = DateTime.Now
+                    };
+
+                    db.UserFavoriteProperties.Add(fav);
+                    isFavorite = true;
+                }
+                else
+                {
+                    db.UserFavoriteProperties.Remove(fav);
+                    isFavorite = false;
+                }
+
+                await db.SaveChangesAsync();
+                return isFavorite;
+            }
         }
     }
 }

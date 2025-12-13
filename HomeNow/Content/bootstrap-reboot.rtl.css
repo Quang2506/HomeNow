@@ -239,7 +239,7 @@ sup {
 }
 
 a {
-  color: var(--bs-link-color);
+  color: white;
   text-decoration: underline;
 }
 a:hover {

@@ -1,0 +1,154 @@
+﻿@using Core.Models
+@model System.Collections.Generic.List<Core.Models.PropertyListItemViewModel>
+
+
+@{
+    ViewBag.Title = "Bất động sản yêu thích";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<head>
+    <link rel="stylesheet" href="~/Content/style/Home/index.css" />
+
+    <style>
+
+        .fa-trash-can{
+            color:red
+        }
+        .property-card-fav.is-fav {
+            background: #ef4444;
+        }
+
+            .property-card-fav.is-fav i {
+                color: #fff;
+            }
+
+        .property-card {
+            position: relative; /* để đặt icon heart tuyệt đối */
+        }
+
+        .home-search-filter-select {
+            padding-left: 7px;
+        }
+
+        .property-card {
+            position: relative;
+        }
+
+
+        .property-card-fav {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.65);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.1s ease;
+        }
+
+            .property-card-fav i {
+                font-size: 14px;
+                color: #fff;
+            }
+
+            .property-card-fav:hover {
+                transform: scale(1.05);
+            }
+
+            .property-card-fav.is-fav {
+                background: #ef4444;
+            }
+
+                .property-card-fav.is-fav i {
+                    color: #fff;
+                }
+    </style>
+</head>
+
+
+<div class="home-body-container">
+    <div class="home-section-header">
+        <h2>Bất động sản yêu thích</h2>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <p>Bạn chưa thêm bất kỳ bất động sản nào vào Yêu thích.</p>
+    }
+    else
+    {
+        <div class="property-grid">
+            @foreach (var item in Model)
+            {
+                <div class="property-card">
+                    <div class="property-card-fav js-fav-toggle @(item.IsFavorite ? "is-fav" : "")"
+                         data-id="@item.PropertyId">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </div>
+
+                    <img src="@item.ThumbnailUrl" alt="@item.Title" />
+                    <div class="property-card-body">
+                        <div class="property-card-title">@item.Title</div>
+                        <div class="property-card-address">@item.Address</div>
+                        <div class="property-card-meta">
+                            <span>@(item.Bed ?? 0) PN · @(item.Bath ?? 0) WC</span>
+                            <span>@item.Area m²</span>
+                        </div>
+                        <div class="property-card-price">
+                            @item.PriceLabel VND
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            $(document).on('click', '.js-fav-toggle', function (e) {
+                e.preventDefault();
+
+                var $btn = $(this);
+                var propertyId = $btn.data('id');
+
+                $.ajax({
+                    url: '@Url.Action("ToggleFavorite", "Property")', // hoặc "Favorite" nếu bạn để action ở FavoriteController
+                    type: 'POST',
+                    data: { propertyId: propertyId },
+                    success: function (res) {
+                        if (!res) return;
+
+                        if (res.needLogin || res.requiresLogin) {
+                            if (window.loginModal && typeof window.loginModal.open === 'function') {
+                                window.loginModal.open(window.location.pathname + window.location.search);
+                            } else {
+                                alert('Bạn cần đăng nhập để sử dụng chức năng Yêu thích.');
+                            }
+                            return;
+                        }
+
+                        if (res.success) {
+                            if (res.isFavorite) {
+                                $btn.addClass('is-fav');
+                            } else {
+                                $btn.removeClass('is-fav');
+                                $btn.closest('.property-card').fadeOut(200, function () {
+                                    $(this).remove();
+                                });
+                            }
+                        }
+                    },
+                    error: function () {
+                        alert('Không thể cập nhật Yêu thích. Vui lòng thử lại.');
+                    }
+                });
+            });
+        })();
+    </script>
+}

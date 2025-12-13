@@ -12,367 +12,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@HomeTexts.Meta_HtmlTitle</title>
+    @*<title>NhàNew - Nâng tầm Bất động sản</title>*@
 
-    @*<link rel="stylesheet" href="~/Content/font-awesome/all.min.css">*@
-
+    <!-- Font Awesome cho Icons -->
+    <link rel="stylesheet" href="~/Content/font-awesome/all.min.css">
+    <link rel="stylesheet" href="~/Content/style/Landlord/Request.css" />
+   
     <style>
-        /* --- CSS RESET & GLOBAL --- */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Roboto', sans-serif;
-            color: #333;
-            line-height: 1.6;
-            background-color: #f9fafb;
-        }
-
         a {
-            text-decoration: none;
-            color: inherit;
+            color: snow !important;
+            text-decoration: none
         }
-
-        ul {
-            list-style: none;
-        }
-
-        img {
-            max-width: 100%;
-            display: block;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 15px;
-        }
-
-        .hidden-mobile {
-            display: none;
-        }
-
-        .float-zalo {
-            background-color: #0068ff;
-            font-weight: bold;
-            font-size: 17px !important;
-        }
-
-        /* HERO BANNER */
-        .home-hero {
-            position: relative;
-            width: 100%;
-            min-height: 58vh;
-            background-image: url('/Assets/bannerPost.jpg');
-            background-repeat: no-repeat;
-            color: #fff;
-            background-attachment: fixed;
-            background-size: 100% 58vh;
-            background-position: top center;
-        }
-
-            .home-hero::before {
-                content: "";
-                position: absolute;
-                inset: 0;
-                background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.4) 100%);
-            }
-
-        .home-hero-shell {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2% 4% 6%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 36vh;
-        }
-
-        .home-hero-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 4%;
-            padding-top: 10px;
-        }
-
-        /* Logo */
-        .home-header-left-box {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .home-logo-icon {
-            width: 2rem;
-            height: 1.6rem;
-            border: 0.15rem solid #fff;
-            border-radius: 0.4rem;
-            position: relative;
-        }
-
-            .home-logo-icon::after {
-                content: "";
-                position: absolute;
-                left: 20%;
-                bottom: 20%;
-                width: 55%;
-                height: 45%;
-                border-top: 0.15rem solid #fff;
-                border-left: 0.15rem solid #fff;
-                transform: skewX(-15deg);
-            }
-
-        .home-header-left {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .home-header-left-top {
-            display: flex;
-            align-items: baseline;
-            gap: 0.5rem;
-            font-size: clamp(1.2rem, 2vw, 1.6rem);
-            font-weight: 700;
-        }
-
-        .home-header-left-tagline {
-            font-size: 0.8rem;
-            opacity: .9;
-            margin-top: 0.15rem;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        /* MENU */
-        .home-header-right-box {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-        }
-
-        .home-header-right-top {
-            font-size: clamp(0.9rem, 1.4vw, 1rem);
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-        }
-
-            .home-header-right-top a {
-                color: #fff;
-                margin: 0 0.5rem;
-                font-weight: 500;
-            }
-
-                .home-header-right-top a:hover {
-                    text-decoration: underline;
-                }
-
-        .nav-post {
-            margin-left: 1rem;
-            padding: 0.4rem 1.2rem;
-            border-radius: 999px;
-            background: #00b56b;
-            font-weight: 700;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-
-            .nav-post:hover {
-                background: #00a15f;
-            }
-
-        /* LANGUAGE */
-        .home-header-right-bottom {
-            font-size: 0.75rem;
-            opacity: .9;
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .lang-active {
-            font-weight: 700;
-            text-decoration: underline;
-        }
-
-        /* MAIN HERO */
-        .home-hero-main {
-            width: 100%;
-            max-width: 900px;
-            margin: 0 auto;
-            text-align: center;
-            padding-bottom: 40px;
-        }
-
-        .home-main-title {
-            font-size: clamp(2rem, 5vw, 3rem);
-            font-weight: 900;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-        }
-
-        .home-sub-title {
-            font-size: clamp(1rem, 2vw, 1.25rem);
-            opacity: 0.95;
-            margin-bottom: 30px;
-        }
-
-        .btn-hero-action {
-            background-color: #007bff;
-            color: #fff;
-            padding: 15px 35px;
-            border-radius: 5px;
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 1rem;
-            box-shadow: 0 4px 15px rgba(0,123,255,0.4);
-            transition: all 0.3s;
-        }
-
-            .btn-hero-action:hover {
-                background-color: #0056b3;
-                transform: translateY(-2px);
-            }
-
-        /* FEATURES */
-        .section {
-            padding: 60px 0;
-        }
-
-        .section-title {
-            font-size: 24px;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 40px;
-            text-transform: uppercase;
-        }
-
-        .features-grid {
-            display: flex;
-            justify-content: space-around;
-            gap: 20px;
-        }
-
-        .feature-item {
-            background: #fff;
-            border: 1px solid #eee;
-            border-radius: 12px;
-            text-align: center;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            transition: 0.3s;
-            width: 32%;
-        }
-
-            .feature-item:hover {
-                box-shadow: 0 10px 15px rgba(0,0,0,0.1);
-            }
-
-        .feature-icon {
-            font-size: 40px;
-            color: #0056b3;
-            margin-bottom: 15px;
-        }
-
-        /* PROCESS */
-        .process-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            text-align: center;
-        }
-
-        .process-step {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .process-icon {
-            font-size: 40px;
-            margin-bottom: 10px;
-        }
-
-        /* FORM */
-        .contact-section {
-            background-color: #f9fafb;
-        }
-
-        .form-box {
-            background: #fff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border-top: 5px solid #0f172a;
-           /* max-width: 600px;*/
-            margin: auto;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #d1d5db;
-            border-radius: 4px;
-            margin-bottom: 15px;
-        }
-
-        .checkbox-group {
-            display: flex;
-            gap: 20px;
-        }
-
-        .btn-submit {
-            width: 100%;
-            background-color: #0f172a;
-            color: #fff;
-            padding: 15px;
-            border: none;
-            border-radius: 4px;
-            font-weight: bold;
-            text-transform: uppercase;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-
-        /* FLOAT */
-        .floating-buttons {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            z-index: 9999;
-        }
-
-        .float-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-
-        .float-zalo {
-            background-color: #0068ff;
-        }
-
-        .float-mess {
-            background: linear-gradient(45deg,#00C6FF,#0072FF);
-            font-size: 27px;
-        }
-     /*   element.style {
-            font-size: 27px;
-        }*/
     </style>
 </head>
 
@@ -468,17 +118,17 @@
             <div class="features-grid">
                 <div class="feature-item">
                     <div class="feature-icon"><i class="fa-solid fa-camera-rotate"></i></div>
-                    <h3>@HomeTexts.Feature_360</h3>
+                    <h4>@HomeTexts.Feature_360</h4>
                 </div>
 
                 <div class="feature-item">
                     <div class="feature-icon"><i class="fa-solid fa-globe"></i></div>
-                    <h3>@HomeTexts.Feature_Reach</h3>
+                    <h4>@HomeTexts.Feature_Reach</h4>
                 </div>
 
                 <div class="feature-item">
                     <div class="feature-icon"><i class="fa-solid fa-clock"></i></div>
-                    <h3>@HomeTexts.Feature_TimeSaving</h3>
+                    <h4>@HomeTexts.Feature_TimeSaving</h4>
                 </div>
             </div>
         </div>
@@ -492,22 +142,22 @@
             <div class="process-grid">
                 <div class="process-step">
                     <div class="process-icon"><i class="fa-regular fa-file-lines"></i></div>
-                    <p>@HomeTexts.Process_Step1</p>
+                    <h4>@HomeTexts.Process_Step1</h4>
                 </div>
 
                 <div class="process-step">
                     <div class="process-icon"><i class="fa-solid fa-people-group"></i></div>
-                    <p>@HomeTexts.Process_Step2</p>
+                    <h4>@HomeTexts.Process_Step2</h4>
                 </div>
 
                 <div class="process-step">
                     <div class="process-icon"><i class="fa-solid fa-person-chalkboard"></i></div>
-                    <p>@HomeTexts.Process_Step3</p>
+                    <h4>@HomeTexts.Process_Step3</h4>
                 </div>
 
                 <div class="process-step">
                     <div class="process-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
-                    <p>@HomeTexts.Process_Step4</p>
+                    <h4>@HomeTexts.Process_Step4</h4>
                 </div>
             </div>
         </div>
@@ -526,10 +176,10 @@
                     <input type="tel" class="form-input" placeholder="@HomeTexts.Form_PhonePlaceholder" />
                     <input type="text" class="form-input" placeholder="@HomeTexts.Form_AddressPlaceholder" />
 
-                    <div class="checkbox-group">
+                    @*<div class="checkbox-group">
                         <label><input type="checkbox"> @HomeTexts.Form_OptionMedia</label>
                         <label><input type="checkbox"> @HomeTexts.Form_OptionManage</label>
-                    </div>
+                    </div>*@
 
                     <button type="submit" class="btn-submit">@HomeTexts.Form_Submit</button>
                 </form>

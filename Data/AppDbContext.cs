@@ -1,13 +1,13 @@
 ﻿using Core.Models;
 using System.Data.Entity;
+// KHÔNG cần using Core.Models ở đây
 
-namespace Data   
+namespace Data
 {
     public class AppDbContext : DbContext
     {
-        public AppDbContext() : base("HomeNowConnection"){ }
+        public AppDbContext() : base("HomeNowConnection") { }
 
-     
         public DbSet<LandlordRequest> LandlordRequests { get; set; }
         public DbSet<ViewingRequest> ViewingRequests { get; set; }
         public DbSet<Property> Properties { get; set; }
@@ -18,16 +18,16 @@ namespace Data
         public DbSet<VrHotspotTranslation> VrHotspotTranslations { get; set; }
 
         public DbSet<User> Users { get; set; }
-        public DbSet<UserFavoriteProperty> UserFavoriteProperties { get; set; }
         public DbSet<City> Cities { get; set; }
         public DbSet<PriceFilter> PriceFilters { get; set; }
         public DbSet<PropertyType> PropertyTypes { get; set; }
 
+
+        public DbSet<UserFavoriteProperty> UserFavoriteProperties { get; set; }
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            //  default schema là public thay vì dbo
             modelBuilder.HasDefaultSchema("public");
-
             base.OnModelCreating(modelBuilder);
         }
     }

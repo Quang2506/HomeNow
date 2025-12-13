@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
 using HomeNow.ViewModels;
@@ -13,10 +14,10 @@ namespace HomeNow.Controllers
 
         public AccountController()
         {
-            _userService = new UserService();   // dùng đúng UserService hiện tại
+            _userService = new UserService();
         }
 
-       
+        //  LOGIN 
 
         [HttpGet]
         [AllowAnonymous]
@@ -39,7 +40,6 @@ namespace HomeNow.Controllers
                 return View(model);
             }
 
-        
             var user = _userService.ValidateLogin(model.LoginName, model.Password);
             if (user == null)
             {
@@ -52,10 +52,15 @@ namespace HomeNow.Controllers
                 return View(model);
             }
 
-          
+         
+            ClearAuthCookie();
+
+       
             FormsAuthentication.SetAuthCookie(user.Id.ToString(), model.RememberMe);
 
-        
+            // Session cho header + favorite
+            Session["CurrentUserId"] = user.Id;
+
             var displayName = user.DisplayName;
             if (string.IsNullOrWhiteSpace(displayName))
             {
@@ -84,7 +89,7 @@ namespace HomeNow.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-     
+        // REGISTER 
 
         [HttpGet]
         [AllowAnonymous]
@@ -108,15 +113,20 @@ namespace HomeNow.Controllers
 
             try
             {
-             
                 var user = _userService.Register(
                     email: string.IsNullOrWhiteSpace(model.Email) ? null : model.Email.Trim(),
                     phoneNumber: model.PhoneNumber.Trim(),
                     password: model.Password
                 );
 
-                FormsAuthentication.SetAuthCookie(user.Id.ToString(), true);
-                Session["CurrentUserName"] = user.DisplayName ?? user.PhoneNumber ?? "Tài khoản";
+                // ✅ Khuyến nghị: đăng ký xong login nhưng KHÔNG remember (đúng ý "chỉ tick remember mới nhớ")
+                ClearAuthCookie();
+                FormsAuthentication.SetAuthCookie(user.Id.ToString(), false);
+
+                Session["CurrentUserId"] = user.Id;
+                Session["CurrentUserName"] = user.DisplayName
+                                             ?? user.PhoneNumber
+                                             ?? "Tài khoản";
 
                 if (Request.IsAjaxRequest())
                     return Json(new { success = true });
@@ -125,7 +135,6 @@ namespace HomeNow.Controllers
             }
             catch (InvalidOperationException ex)
             {
-              
                 if (Request.IsAjaxRequest())
                     return Json(new { success = false, message = ex.Message });
 
@@ -134,14 +143,29 @@ namespace HomeNow.Controllers
             }
         }
 
-      
+        // ================== LOGOUT ==================
 
         [HttpGet]
         public ActionResult Logout()
         {
             FormsAuthentication.SignOut();
+            ClearAuthCookie();
+
+            Session["CurrentUserId"] = null;
             Session["CurrentUserName"] = null;
+
             return RedirectToAction("Index", "Home");
+        }
+
+        private void ClearAuthCookie()
+        {
+            // SignOut đôi khi chưa đủ chắc khi cookie persistent/path khác nhau -> expire thẳng
+            var cookie = new HttpCookie(FormsAuthentication.FormsCookieName, "")
+            {
+                Expires = DateTime.Now.AddYears(-1),
+                HttpOnly = true
+            };
+            Response.Cookies.Add(cookie);
         }
     }
 }
