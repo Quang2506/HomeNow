@@ -20,6 +20,9 @@
 
         public bool IsFavorite { get; set; }
         public string ListingType { get; set; }
+        public int? BedroomCount { get; set; }
+        public int? BathroomCount { get; set; }
+        public float? AreaSqm { get; set; }
 
         // apartment / house / villa / office / studio ...
         public string PropertyType { get; set; }

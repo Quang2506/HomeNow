@@ -1,0 +1,39 @@
+@model IEnumerable<Core.Models.PropertyListItemViewModel>
+
+@foreach (var item in Model)
+{
+    <div class="p-row">
+        <a class="p-img" href="@Url.Action("Detail", "Property", new { id = item.PropertyId })">
+            <img src="@item.ThumbnailUrl" alt="@item.Title" />
+        </a>
+
+        <div class="p-main">
+            <a class="p-title" href="@Url.Action("Detail", "Property", new { id = item.PropertyId })">
+                @item.Title
+            </a>
+
+            <div class="p-line">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>@item.Address</span>
+            </div>
+
+            <div class="p-meta">
+                <span><i class="fa-solid fa-bed"></i> @(item.Bed ?? 0) PN</span>
+                <span><i class="fa-solid fa-bath"></i> @(item.Bath ?? 0) WC</span>
+                <span><i class="fa-solid fa-ruler-combined"></i> @item.Area m²</span>
+            </div>
+
+            <div class="p-actions">
+                <button type="button"
+                        class="p-fav js-fav-toggle @(item.IsFavorite ? "is-fav" : "")"
+                        data-id="@item.PropertyId">
+                    <i class="fa-solid fa-heart"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="p-price">
+            <div class="p-price-main">@item.PriceLabel</div>
+        </div>
+    </div>
+}

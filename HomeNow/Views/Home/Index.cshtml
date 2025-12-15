@@ -39,13 +39,13 @@
         <img src="@item.ThumbnailUrl" alt="@item.Title" />
         <div class="property-card-body">
             <div class="property-card-title">@item.Title</div>
-            <div class="property-card-address">@item.Address</div>
+            <div class="property-card-address"><i class="fa-solid fa-location-dot"></i>@item.Address</div>
             <div class="property-card-meta">
-                <span>@(item.Bed ?? 0) PN · @(item.Bath ?? 0) WC</span>
+                <span><i class="fa-solid fa-house"></i>@(item.Bed ?? 0) PN · @(item.Bath ?? 0) WC</span>
                 <span>@item.Area m²</span>
             </div>
             <div class="property-card-price">
-                @item.PriceLabel VND
+                <i class="fa-solid fa-sack-dollar"></i>@item.PriceLabel VND
             </div>
         </div>
     </div>
@@ -56,6 +56,34 @@
     <link rel="stylesheet" href="~/Content/style/Home/index.css" />
 
     <style>
+        /* ===== Section header + Xem thêm button ===== */
+        .home-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .home-section-more {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: #0f172a;
+            color: #fff !important;
+            text-decoration: none;
+            font-size: 13px;
+            white-space: nowrap;
+            opacity: .92;
+        }
+
+            .home-section-more:hover {
+                opacity: 1;
+                transform: translateY(-1px);
+            }
+
+
         .fa-angles-up{
             color:#aaa
         }
@@ -599,7 +627,10 @@
         <section style="margin-bottom:24px;">
             <div class="home-section-header">
                 <h2>Các căn cho thuê nổi bật</h2>
-                <a href="@Url.Action("List", "Property", new { mode = "rent" })">xem thêm</a>
+                <a class="home-section-more"
+                   href="@Url.Action("List", "Property", new { mode = "rent" })">
+                    Xem thêm <i class="fa-solid fa-angle-right"></i>
+                </a>
             </div>
 
             <div class="property-grid">
@@ -614,7 +645,10 @@
         <section>
             <div class="home-section-header">
                 <h2>Các căn bán nổi bật</h2>
-                <a href="@Url.Action("List", "Property", new { mode = "sale" })">xem thêm</a>
+                <a class="home-section-more"
+                   href="@Url.Action("List", "Property", new { mode = "sale" })">
+                    Xem thêm <i class="fa-solid fa-angle-right"></i>
+                </a>
             </div>
 
             <div class="property-grid">

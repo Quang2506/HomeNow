@@ -163,6 +163,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\FavoriteController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LandlordController.cs" />
@@ -179,6 +180,7 @@
       <DependentUpon>HomeTexts.resx</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\LoginPhoneViewModel.cs" />
+    <Compile Include="ViewModels\PropertyListPageViewModel.cs" />
     <Compile Include="ViewModels\RegisterViewModel.cs" />
     <Compile Include="ViewModels\VrViewModel.cs" />
   </ItemGroup>
@@ -290,6 +292,7 @@
     <Content Include="Views\Shared\_LoginModal.cshtml" />
     <Content Include="Views\Property\Favorites.cshtml" />
     <Content Include="Views\Home\_PropertyCardList.cshtml" />
+    <Content Include="Views\Home\_PropertyRowList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

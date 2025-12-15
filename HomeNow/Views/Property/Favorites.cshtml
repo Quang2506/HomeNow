@@ -93,13 +93,13 @@
                     <img src="@item.ThumbnailUrl" alt="@item.Title" />
                     <div class="property-card-body">
                         <div class="property-card-title">@item.Title</div>
-                        <div class="property-card-address">@item.Address</div>
+                        <div class="property-card-address"><i class="fa-solid fa-house"></i>@item.Address</div>
                         <div class="property-card-meta">
-                            <span>@(item.Bed ?? 0) PN · @(item.Bath ?? 0) WC</span>
+                            <span><i class="fa-solid fa-location-dot"></i>@(item.Bed ?? 0) PN · @(item.Bath ?? 0) WC</span>
                             <span>@item.Area m²</span>
                         </div>
                         <div class="property-card-price">
-                            @item.PriceLabel VND
+                            <i class="fa-solid fa-sack-dollar"></i> @item.PriceLabel VND
                         </div>
                     </div>
                 </div>

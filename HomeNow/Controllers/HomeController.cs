@@ -12,7 +12,7 @@ using Services.Interfaces;
 
 namespace HomeNow.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly IPropertyService _propertyService;
         private readonly IFavoriteService _favoriteService;
@@ -23,28 +23,21 @@ namespace HomeNow.Controllers
             _favoriteService = new FavoriteService();
         }
 
-        // Lấy userId giống bên PropertyController
         private int? GetCurrentUserId()
         {
             if (Session["CurrentUserId"] is int id1)
                 return id1;
 
-            if (Session["CurrentUserId"] != null)
-            {
-                int parsed;
-                if (int.TryParse(Session["CurrentUserId"].ToString(), out parsed))
-                    return parsed;
-            }
+            if (Session["CurrentUserId"] != null &&
+                int.TryParse(Session["CurrentUserId"].ToString(), out var parsed))
+                return parsed;
 
             if (Session["UserId"] is int id2)
                 return id2;
 
-            if (Session["UserId"] != null)
-            {
-                int parsed2;
-                if (int.TryParse(Session["UserId"].ToString(), out parsed2))
-                    return parsed2;
-            }
+            if (Session["UserId"] != null &&
+                int.TryParse(Session["UserId"].ToString(), out var parsed2))
+                return parsed2;
 
             return null;
         }
@@ -57,7 +50,6 @@ namespace HomeNow.Controllers
             string keyword,
             int page = 1)
         {
-            // 👉 16 item mỗi trang
             const int PageSize = 16;
 
             var uiLang = System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
@@ -74,64 +66,53 @@ namespace HomeNow.Controllers
                 PageSize = PageSize
             };
 
-            // --- Load combobox (City, Price, PropertyType) ---
             using (var db = new AppDbContext())
             {
-                // Thành phố
                 var cities = db.Cities
                     .Where(c => c.IsActive)
                     .OrderBy(c => c.DisplayOrder)
                     .ToList();
 
-                vm.Cities = cities
-                    .Select(c => new CityDropDownItem
-                    {
-                        CityId = c.CityId,
-                        Name =
-                            lang == "en" ? (c.NameEn ?? c.NameVi) :
-                            lang == "zh" ? (c.NameZh ?? c.NameVi) :
-                            c.NameVi,
-                        BackgroundUrl = c.BackgroundUrl
-                    })
-                    .ToList();
+                vm.Cities = cities.Select(c => new CityDropDownItem
+                {
+                    CityId = c.CityId,
+                    Name =
+                        lang == "en" ? (c.NameEn ?? c.NameVi) :
+                        lang == "zh" ? (c.NameZh ?? c.NameVi) :
+                        c.NameVi,
+                    BackgroundUrl = c.BackgroundUrl
+                }).ToList();
 
-                // Mốc giá
                 var priceFilters = db.PriceFilters
                     .Where(p => p.IsActive)
                     .OrderBy(p => p.DisplayOrder)
                     .ToList();
 
-                vm.PriceFilters = priceFilters
-                    .Select(p => new PriceFilterDropDownItem
-                    {
-                        Code = p.Code,
-                        Name =
-                            lang == "en" ? (p.NameEn ?? p.NameVi) :
-                            lang == "zh" ? (p.NameZh ?? p.NameVi) :
-                            p.NameVi,
-                        MinPrice = p.MinPrice,
-                        MaxPrice = p.MaxPrice
-                    })
-                    .ToList();
+                vm.PriceFilters = priceFilters.Select(p => new PriceFilterDropDownItem
+                {
+                    Code = p.Code,
+                    Name =
+                        lang == "en" ? (p.NameEn ?? p.NameVi) :
+                        lang == "zh" ? (p.NameZh ?? p.NameVi) :
+                        p.NameVi,
+                    MinPrice = p.MinPrice,
+                    MaxPrice = p.MaxPrice
+                }).ToList();
 
-                // Loại nhà
                 var propTypes = db.PropertyTypes
                     .Where(t => t.IsActive)
                     .OrderBy(t => t.DisplayOrder)
                     .ToList();
 
-                vm.PropertyTypes = propTypes
-                    .Select(t => new PropertyTypeDropDownItem
-                    {
-                        Code = t.Code,
-                        Name =
-                            lang == "en" ? (t.NameEn ?? t.NameVi) :
-                            lang == "zh" ? (t.NameZh ?? t.NameVi) :
-                            t.NameVi
-                    })
-                    .ToList();
+                vm.PropertyTypes = propTypes.Select(t => new PropertyTypeDropDownItem
+                {
+                    Code = t.Code,
+                    Name =
+                        lang == "en" ? (t.NameEn ?? t.NameVi) :
+                        lang == "zh" ? (t.NameZh ?? t.NameVi) :
+                        t.NameVi
+                }).ToList();
 
-                // Background theo city
                 var cityForBg = vm.CityId.HasValue
                     ? cities.FirstOrDefault(c => c.CityId == vm.CityId.Value)
                     : cities.FirstOrDefault();
@@ -139,7 +120,6 @@ namespace HomeNow.Controllers
                 ViewBag.HeroBackground = cityForBg?.BackgroundUrl ?? "/Assets/Banner.jpg";
             }
 
-            // --- Lấy danh sách property đã favorite của user ---
             var userId = GetCurrentUserId();
             HashSet<int> favoriteIds = null;
 
@@ -149,7 +129,6 @@ namespace HomeNow.Controllers
                 favoriteIds = new HashSet<int>(favList.Select(f => f.PropertyId));
             }
 
-            // --- Xác định có đang search hay không ---
             bool hasAnyFilter =
                 !string.IsNullOrWhiteSpace(keyword) ||
                 cityId.HasValue ||
@@ -161,17 +140,10 @@ namespace HomeNow.Controllers
 
             if (vm.HasSearch)
             {
-                string listingType = string.IsNullOrWhiteSpace(transactionType)
-                    ? null
-                    : transactionType;      // rent / sale
+                string listingType = string.IsNullOrWhiteSpace(transactionType) ? null : transactionType;
 
                 var all = await _propertyService.SearchAsync(
-                    lang,
-                    listingType,
-                    vm.CityId,
-                    vm.PriceRange,
-                    vm.PropertyType,
-                    vm.Keyword);
+                    lang, listingType, vm.CityId, vm.PriceRange, vm.PropertyType, vm.Keyword);
 
                 vm.TotalItems = all.Count;
                 vm.TotalPages = (int)Math.Ceiling(vm.TotalItems / (double)vm.PageSize);
@@ -181,29 +153,18 @@ namespace HomeNow.Controllers
                     .Take(vm.PageSize)
                     .ToList();
 
-                vm.SearchResults = pageData
-                    .Select(x => ToHomeItem(x, favoriteIds))
-                    .ToList();
+                vm.SearchResults = pageData.Select(x => ToHomeItem(x, favoriteIds)).ToList();
             }
             else
             {
-                // Home nổi bật: TransactionType = null để không highlight nút
                 vm.TransactionType = null;
 
-                var rentList = await _propertyService.SearchAsync(
-                    lang, "rent", null, null, null, null);
-                var saleList = await _propertyService.SearchAsync(
-                    lang, "sale", null, null, null, null);
+                // SearchAsync đã order featured trước rồi
+                var rentList = await _propertyService.SearchAsync(lang, "rent", null, null, null, null);
+                var saleList = await _propertyService.SearchAsync(lang, "sale", null, null, null, null);
 
-                vm.FeaturedRent = rentList
-                    .Take(4)
-                    .Select(x => ToHomeItem(x, favoriteIds))
-                    .ToList();
-
-                vm.FeaturedSale = saleList
-                    .Take(4)
-                    .Select(x => ToHomeItem(x, favoriteIds))
-                    .ToList();
+                vm.FeaturedRent = rentList.Take(4).Select(x => ToHomeItem(x, favoriteIds)).ToList();
+                vm.FeaturedSale = saleList.Take(4).Select(x => ToHomeItem(x, favoriteIds)).ToList();
             }
 
             return View(vm);
@@ -218,7 +179,6 @@ namespace HomeNow.Controllers
             string keyword,
             int page = 1)
         {
-            // 👉 16 item mỗi lần load thêm
             const int PageSize = 16;
 
             var uiLang = System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
@@ -226,60 +186,65 @@ namespace HomeNow.Controllers
 
             var userId = GetCurrentUserId();
             HashSet<int> favoriteIds = null;
+
             if (userId.HasValue)
             {
                 var favList = await _favoriteService.GetFavoritesAsync(userId.Value, lang);
                 favoriteIds = new HashSet<int>(favList.Select(f => f.PropertyId));
             }
 
-            string listingType = string.IsNullOrWhiteSpace(transactionType)
-                ? null
-                : transactionType;
+            string listingType = string.IsNullOrWhiteSpace(transactionType) ? null : transactionType;
 
             var all = await _propertyService.SearchAsync(
-                lang,
-                listingType,
-                cityId,
-                priceRange,
-                propertyType,
-                keyword);
+                lang, listingType, cityId, priceRange, propertyType, keyword);
 
             var pageData = all
                 .Skip((page - 1) * PageSize)
                 .Take(PageSize)
                 .ToList();
 
-            var list = pageData
-                .Select(x => ToHomeItem(x, favoriteIds))
-                .ToList();
+            var list = pageData.Select(x => ToHomeItem(x, favoriteIds)).ToList();
 
             return PartialView("_PropertyCardList", list);
         }
 
-        // Overload 1: dùng khi không cần favorite
-        private PropertyListItemViewModel ToHomeItem(PropertyListViewModel x)
+        private PropertyListItemViewModel ToHomeItem(PropertyListViewModel x, ISet<int> favoriteIds)
         {
-            return ToHomeItem(x, null);
-        }
+            var listingType = string.IsNullOrWhiteSpace(x.ListingType) ? null : x.ListingType;
 
-        // Overload 2: có truyền danh sách favoriteId
-        private PropertyListItemViewModel ToHomeItem(
-            PropertyListViewModel x,
-            ISet<int> favoriteIds)
-        {
+            var price = x.Price ?? 0m;
+            var priceLabel = price > 0m ? FormatPriceLabel(price, listingType) : "";
+
+            var area = x.AreaSqm.HasValue ? (float)x.AreaSqm.Value : (float)(x.AreaM2 ?? 0m);
+
             return new PropertyListItemViewModel
             {
                 PropertyId = x.Id,
                 Title = x.Title,
                 Address = x.Address,
-                Price = x.Price ?? 0,
-                PriceLabel = x.Price.HasValue ? $"{x.Price:N0}" : "",
-                Area = (float)(x.AreaM2 ?? 0),
-                Bed = null,   // nếu sau này có thì map thêm
-                Bath = null,
+
+                Price = price,
+                PriceLabel = priceLabel,
+
+                Area = area,
+                Bed = x.BedroomCount,
+                Bath = x.BathroomCount,
+
                 ThumbnailUrl = x.CoverImageUrl,
+
+                ListingType = x.ListingType,
+                PropertyType = x.PropertyType,
+
                 IsFavorite = favoriteIds != null && favoriteIds.Contains(x.Id)
             };
+        }
+
+        private string FormatPriceLabel(decimal price, string listingType)
+        {
+            var vi = System.Globalization.CultureInfo.GetCultureInfo("vi-VN");
+            var s = price.ToString("#,0", vi) + " ";
+            if ((listingType ?? "").ToLower() == "rent") s += "";
+            return s;
         }
     }
 }
