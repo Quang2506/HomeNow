@@ -132,10 +132,6 @@
     <value>Đăng ký</value>
     <comment>Register</comment>
   </data>
-  <data name="SearchPlaceholder" xml:space="preserve">
-    <value>Nhập quận, khu vực hoặc tên đường để bắt đầu tìm nhà…</value>
-    <comment>SearchPlaceholder</comment>
-  </data>
   <data name="SearchButton" xml:space="preserve">
     <value>Bắt đầu tìm nhà</value>
     <comment>SearchButton</comment>
@@ -276,5 +272,62 @@
   <data name="Form_Submit" xml:space="preserve">
     <value>Gửi yêu cầu ngay
 </value>
+  </data>
+  <data name="PageTitle_Home" xml:space="preserve">
+    <value>NhàNow - Tìm nhà dễ dàng</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Đăng xuất</value>
+  </data>
+  <data name="Account_Default" xml:space="preserve">
+    <value>Tài khoản</value>
+  </data>
+  <data name="Tab_Rent" xml:space="preserve">
+    <value>Thuê nhà</value>
+  </data>
+  <data name="Tab_Sale" xml:space="preserve">
+    <value> Mua nhà</value>
+  </data>
+  <data name="Search_Placeholder" xml:space="preserve">
+    <value>Nhập địa chỉ hoặc  tên bất động sản...</value>
+  </data>
+  <data name="Filter_City" xml:space="preserve">
+    <value>Thành phố</value>
+  </data>
+  <data name="Filter_Price" xml:space="preserve">
+    <value>Mốc giá</value>
+  </data>
+  <data name="Filter_PropertyType" xml:space="preserve">
+    <value> Loại nhà</value>
+  </data>
+  <data name="SearchResult_Title" xml:space="preserve">
+    <value>Kết quả tìm kiếm</value>
+  </data>
+  <data name="Search_NotFound" xml:space="preserve">
+    <value>Không tìm thấy căn phù hợp, bạn thử thay đổi điều kiện tìm kiếm nhé.</value>
+  </data>
+  <data name="FeaturedRent_Title" xml:space="preserve">
+    <value>Các căn cho thuê nổi bật</value>
+  </data>
+  <data name="FeaturedSale_Title" xml:space="preserve">
+    <value>Các căn bán nổi bật</value>
+  </data>
+  <data name="ViewMore" xml:space="preserve">
+    <value>Xem thêm</value>
+  </data>
+  <data name="Unit_Bedroom" xml:space="preserve">
+    <value>PN</value>
+  </data>
+  <data name="Unit_Bathroom" xml:space="preserve">
+    <value>WC</value>
+  </data>
+  <data name="Currency_VND" xml:space="preserve">
+    <value>VND</value>
+  </data>
+  <data name="Favorite_NeedLogin" xml:space="preserve">
+    <value>Bạn cần đăng nhập để sử dụng chức năng Yêu thích.</value>
+  </data>
+  <data name="Favorite_UpdateFailed" xml:space="preserve">
+    <value>Không thể cập nhật Yêu thích. Vui lòng thử lại.</value>
   </data>
 </root>

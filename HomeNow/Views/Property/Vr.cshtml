@@ -14,6 +14,7 @@
 
     <link rel="stylesheet" href="~/Content/pannellum/pannellum.css" />
     <script src="~/Content/pannellum/pannellum.js"></script>
+
     <style>
         html, body {
             margin: 0;
@@ -21,15 +22,23 @@
             height: 100%;
             overflow: hidden;
             font-family: Arial, sans-serif;
+            background: #000;
         }
 
         #vr {
             width: 100%;
             height: 100vh;
             margin: auto;
-            /* margin-top: 100px;*/
+            background: #000;
         }
 
+            /* Tối ưu nét nhẹ */
+            #vr canvas {
+                image-rendering: auto;
+                filter: contrast(1.04) saturate(1.03);
+            }
+
+        /* Ẩn loading spinner của Pannellum */
         .pnlm-load-box,
         .pnlm-loader,
         .pnlm-load-box p {
@@ -37,6 +46,7 @@
             opacity: 0 !important;
             visibility: hidden !important;
         }
+
         /* ------- Checkpoint: vòng tròn trên sàn ------- */
         .footspot {
             width: 23px;
@@ -83,6 +93,7 @@
             padding: 8px;
             border-radius: 8px;
             min-width: 180px;
+            backdrop-filter: blur(4px);
         }
 
         #minimap-title {
@@ -98,6 +109,7 @@
             border-radius: 4px;
             cursor: pointer;
             background: rgba(255, 255, 255, 0.08);
+            user-select: none;
         }
 
             .minimap-room:hover {
@@ -136,6 +148,7 @@
             background: rgba(0, 0, 0, 0.65);
             color: #fff;
             max-width: 260px;
+            line-height: 1.35;
         }
     </style>
 </head>
@@ -164,8 +177,6 @@
         </div>
     </div>
 
-    @*<script src="~/Content/pannellum/pannellum.js"></script>*@
-
     <script>
         (function () {
             'use strict';
@@ -174,27 +185,76 @@
             var hotspotMode = false;
             var autorunOn = false;
 
+            // ======= OPT: detect mobile =======
+            var isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+            // ======= OPT: zoom limit (không zoom sâu) =======
+            var HFOV_DEFAULT = isMobile ? 95 : 110;
+            var HFOV_MIN = isMobile ? 80 : 70;
+            var HFOV_MAX = 120;
+
+            // ======= OPT: chống giật khi spam click =======
+            var sceneBusy = false;
+            var sceneBusyTimer = null;
+
+            // ======= OPT: nâng độ nét canvas theo DPR có giới hạn =======
+            function pickDprCap() {
+                var dpr = window.devicePixelRatio || 1;
+                var mem = navigator.deviceMemory || 0; // Chrome
+                var lowMem = mem > 0 && mem <= 4;
+
+                // PC: cap 2.0; mobile/low mem: cap 1.5 (mượt hơn)
+                var cap = (isMobile || lowMem) ? 1.5 : 2.0;
+                return Math.min(dpr, cap);
+            }
+
+            function upscaleCanvas() {
+                try {
+                    var vr = document.getElementById('vr');
+                    if (!vr) return;
+                    var canvas = vr.querySelector('canvas');
+                    if (!canvas) return;
+
+                    var dpr = pickDprCap();
+                    var w = Math.floor(canvas.clientWidth * dpr);
+                    var h = Math.floor(canvas.clientHeight * dpr);
+
+                    if (w <= 0 || h <= 0) return;
+
+                    if (canvas.width !== w || canvas.height !== h) {
+                        canvas.width = w;
+                        canvas.height = h;
+                    }
+                } catch (e) {
+                    // đừng làm crash
+                }
+            }
+
+            var resizeTimer = null;
+            window.addEventListener('resize', function () {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function () {
+                    upscaleCanvas();
+                }, 180);
+            });
+
             function getCoordsPanel() {
                 return document.getElementById('coords-panel');
             }
 
             function showUserMessage(message) {
                 var panel = getCoordsPanel();
-                if (panel) {
-                    panel.textContent = message;
-                }
+                if (panel) panel.textContent = message;
             }
 
             function logError(where, err) {
                 console.error('[VR ERROR] ' + where, err);
                 var msg = where;
-                if (err && err.message) {
-                    msg += ' - ' + err.message;
-                }
+                if (err && err.message) msg += ' - ' + err.message;
                 showUserMessage('VR gặp lỗi: ' + msg);
             }
 
-            // Global error handler – tránh JS crash làm “đơ” trang
+            // Global error handler
             window.addEventListener('error', function (e) {
                 logError('Lỗi JavaScript toàn cục', e.error || e.message || e);
             });
@@ -205,36 +265,39 @@
 
             // ---------- Hàm chuyển cảnh kiểu "lao về phía trước" ----------
             function walkToScene(hotSpot, args) {
-                if (!viewer) {
-                    console.warn('[VR] walkToScene nhưng viewer chưa sẵn sàng');
-                    return;
-                }
-                if (!args || !args.sceneId) {
-                    console.warn('[VR] walkToScene: thiếu sceneId');
-                    return;
-                }
-                if (!config.scenes || !config.scenes[args.sceneId]) {
-                    console.warn('[VR] Scene đích không tồn tại: ' + args.sceneId);
-                    return;
-                }
+                if (!viewer) { console.warn('[VR] walkToScene nhưng viewer chưa sẵn sàng'); return; }
+                if (!args || !args.sceneId) { console.warn('[VR] walkToScene: thiếu sceneId'); return; }
+                if (!config.scenes || !config.scenes[args.sceneId]) { console.warn('[VR] Scene đích không tồn tại: ' + args.sceneId); return; }
+
+                if (sceneBusy) return; // OPT: chặn spam
+                sceneBusy = true;
+                clearTimeout(sceneBusyTimer);
+                sceneBusyTimer = setTimeout(function () { sceneBusy = false; }, 450);
 
                 try {
-                    // zoom vào (giảm hfov) trong 250ms
-                    viewer.setHfov(70, 250);
+                    // zoom-in nhẹ (không sâu)
+                    viewer.setHfov(Math.max(HFOV_MIN, HFOV_DEFAULT - 20), 180);
 
-                    // sau 220ms thì load scene mới, rồi zoom ra lại
                     setTimeout(function () {
                         try {
                             if (!viewer) return;
                             if (!config.scenes[args.sceneId]) return;
-                            viewer.loadScene(args.sceneId);
-                            viewer.setHfov(110, 400);
+
+                            // load scene + set hướng nếu có
+                            viewer.loadScene(args.sceneId, args.targetPitch || 0, args.targetYaw || 0);
+
+                            // zoom-out về mặc định
+                            viewer.setHfov(HFOV_DEFAULT, 220);
+
+                            // OPT: upscale sau đổi scene để nét hơn
+                            setTimeout(upscaleCanvas, 90);
                         } catch (err2) {
                             logError('Lỗi load scene ' + args.sceneId, err2);
                         }
-                    }, 220);
+                    }, 160);
                 } catch (err) {
                     logError('Lỗi trong walkToScene', err);
+                    sceneBusy = false;
                 }
             }
 
@@ -243,12 +306,26 @@
                 "default": {
                     "firstScene": "@firstSceneKey",
                     "author": "HomeNow VR",
-                    "sceneFadeDuration": 0,   // tắt hiệu ứng fade, chỉ dùng zoom
-                    "autoLoad": true
+                    "sceneFadeDuration": 0,
+                    "autoLoad": true,
+
+                    // OPT: zoom range
+                    "hfov": HFOV_DEFAULT,
+                    "minHfov": HFOV_MIN,
+                    "maxHfov": HFOV_MAX,
+
+                    // OPT: PC cho con lăn zoom, mobile tắt để đỡ say
+                    "mouseZoom": !isMobile,
+
+                    // OPT: giảm trôi
+                    "friction": isMobile ? 0.55 : 0.35,
+
+                    // OPT: không bật cảm biến mặc định (đỡ chóng mặt)
+                    "orientationOnByDefault": false,
+                    "compass": false
                 },
                 "scenes": {
 @{
-    // sinh JSON scenes từ Model
     for (int i = 0; i < sceneList.Count; i++)
     {
         var s = sceneList[i];
@@ -286,14 +363,9 @@
                 }
             };
 
-            // Validate config cơ bản để tránh lỗi cấu hình
             function validateConfig(cfg) {
-                if (!cfg || typeof cfg !== 'object') {
-                    throw new Error('Config VR không hợp lệ');
-                }
-                if (!cfg.scenes || Object.keys(cfg.scenes).length === 0) {
-                    throw new Error('Config VR không có scene nào');
-                }
+                if (!cfg || typeof cfg !== 'object') throw new Error('Config VR không hợp lệ');
+                if (!cfg.scenes || Object.keys(cfg.scenes).length === 0) throw new Error('Config VR không có scene nào');
 
                 var first = cfg.default && cfg.default.firstScene;
                 if (!first || !cfg.scenes[first]) {
@@ -302,23 +374,18 @@
                     cfg.default.firstScene = keys[0];
                     console.warn('[VR] firstScene không hợp lệ, auto chọn: ' + keys[0]);
                 }
-
                 return cfg;
             }
 
             function updateMinimapActive(sceneId) {
                 var rooms = document.querySelectorAll('.minimap-room');
                 rooms.forEach(function (el) {
-                    if (el.getAttribute('data-scene') === sceneId) {
-                        el.classList.add('active');
-                    } else {
-                        el.classList.remove('active');
-                    }
+                    if (el.getAttribute('data-scene') === sceneId) el.classList.add('active');
+                    else el.classList.remove('active');
                 });
             }
 
             function initUiEvents() {
-                // minimap
                 document.querySelectorAll('.minimap-room').forEach(function (el) {
                     el.addEventListener('click', function () {
                         var sceneId = el.getAttribute('data-scene');
@@ -326,7 +393,6 @@
                     });
                 });
 
-                // chế độ tạo hotspot
                 var btn = document.getElementById('hotspot-mode-btn');
                 var coordsPanel = getCoordsPanel();
 
@@ -358,8 +424,7 @@
                             var yaw = coords[1].toFixed(2);
                             var sceneId = viewer.getScene();
 
-                            var text = 'Scene: ' + sceneId + ' | pitch: ' + pitch + ' | yaw: ' + yaw +
-                                '  (copy để lưu DB)';
+                            var text = 'Scene: ' + sceneId + ' | pitch: ' + pitch + ' | yaw: ' + yaw + '  (copy để lưu DB)';
                             var panel = getCoordsPanel();
                             if (panel) panel.textContent = text;
                             console.log(text);
@@ -382,7 +447,8 @@
                             }
 
                             if (autorunOn) {
-                                viewer.startAutoRotate(-1.2);   // xoay nhẹ, tiết kiệm tài nguyên
+                                // OPT: mobile quay cực chậm (đỡ chóng mặt)
+                                viewer.startAutoRotate(isMobile ? -0.25 : -1.2);
                                 autorunBtn.classList.add('on');
                                 autorunBtn.textContent = 'Tự chạy: ON';
                             } else {
@@ -404,9 +470,16 @@
                     try {
                         updateMinimapActive(sceneId);
                         showUserMessage('Scene: ' + sceneId + ' | pitch: - | yaw: -');
+                        // OPT: sau đổi scene, upscale lại canvas để nét
+                        setTimeout(upscaleCanvas, 90);
                     } catch (err) {
                         logError('Lỗi trong scenechange', err);
                     }
+                });
+
+                viewer.on('load', function () {
+                    // OPT: lúc load xong, upscale nét
+                    setTimeout(upscaleCanvas, 80);
                 });
 
                 viewer.on('error', function (e) {
@@ -429,8 +502,10 @@
                     registerViewerEvents();
                     initUiEvents();
 
-                    // set active minimap ban đầu
                     updateMinimapActive(viewer.getScene());
+
+                    // OPT: lần đầu upscale
+                    setTimeout(upscaleCanvas, 120);
                 } catch (err) {
                     logError('Khởi tạo VR thất bại', err);
                 }

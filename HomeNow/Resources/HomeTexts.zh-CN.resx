@@ -129,9 +129,6 @@
   <data name="Register" xml:space="preserve">
     <value>注册</value>
   </data>
-  <data name="SearchPlaceholder" xml:space="preserve">
-    <value>输入区域、小区或街道名称开始找房…</value>
-  </data>
   <data name="SearchButton" xml:space="preserve">
     <value>开始找房</value>
   </data>
@@ -271,5 +268,62 @@
   <data name="Form_Submit" xml:space="preserve">
     <value>立即提交需求
 </value>
+  </data>
+  <data name="PageTitle_Home" xml:space="preserve">
+    <value> NhàNow - 轻松找房</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>退出登录</value>
+  </data>
+  <data name="Account_Default" xml:space="preserve">
+    <value>账户</value>
+  </data>
+  <data name="Tab_Rent" xml:space="preserve">
+    <value>租房</value>
+  </data>
+  <data name="Tab_Sale" xml:space="preserve">
+    <value>买房</value>
+  </data>
+  <data name="Search_Placeholder" xml:space="preserve">
+    <value>输入地址或房产名称.....</value>
+  </data>
+  <data name="Filter_City" xml:space="preserve">
+    <value>城市</value>
+  </data>
+  <data name="Filter_Price" xml:space="preserve">
+    <value> 价格区间</value>
+  </data>
+  <data name="Filter_PropertyType" xml:space="preserve">
+    <value>房屋类型</value>
+  </data>
+  <data name="SearchResult_Title" xml:space="preserve">
+    <value>搜索结果</value>
+  </data>
+  <data name="Search_NotFound" xml:space="preserve">
+    <value>未找到匹配房源，请调整筛选条件。</value>
+  </data>
+  <data name="FeaturedRent_Title" xml:space="preserve">
+    <value> 精选出租房源</value>
+  </data>
+  <data name="FeaturedSale_Title" xml:space="preserve">
+    <value>精选出售房源</value>
+  </data>
+  <data name="ViewMore" xml:space="preserve">
+    <value>查看更多</value>
+  </data>
+  <data name="Unit_Bedroom" xml:space="preserve">
+    <value>卧</value>
+  </data>
+  <data name="Unit_Bathroom" xml:space="preserve">
+    <value>卫</value>
+  </data>
+  <data name="Currency_VND" xml:space="preserve">
+    <value>越南盾</value>
+  </data>
+  <data name="Favorite_NeedLogin" xml:space="preserve">
+    <value>请先登录后使用收藏功能。</value>
+  </data>
+  <data name="Favorite_UpdateFailed" xml:space="preserve">
+    <value>无法更新收藏，请重试。</value>
   </data>
 </root>

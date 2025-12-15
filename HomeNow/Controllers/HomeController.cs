@@ -192,7 +192,7 @@ namespace HomeNow.Controllers
                 var favList = await _favoriteService.GetFavoritesAsync(userId.Value, lang);
                 favoriteIds = new HashSet<int>(favList.Select(f => f.PropertyId));
             }
-
+            ViewBag.FavoriteCount = favoriteIds?.Count ?? 0;
             string listingType = string.IsNullOrWhiteSpace(transactionType) ? null : transactionType;
 
             var all = await _propertyService.SearchAsync(

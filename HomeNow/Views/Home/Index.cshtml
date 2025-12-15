@@ -1,11 +1,12 @@
 ﻿@using HomeNow.Resources
 @using Core.Models
 @using Core.ViewModels
+@using System.Web
 
 @model HomeIndexViewModel
 
 @{
-    ViewBag.Title = "NhàNow - Tìm nhà dễ dàng";
+    ViewBag.Title = HomeTexts.PageTitle_Home;
 
     var currentLang = System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
     var totalListings = ViewBag.TotalListings ?? 0;
@@ -14,18 +15,22 @@
     var featuredRent = Model.FeaturedRent ?? new List<PropertyListItemViewModel>();
     var featuredSale = Model.FeaturedSale ?? new List<PropertyListItemViewModel>();
 
-    // === CHỈ set active khi đang search ===
     string currentType;
     if (Model.HasSearch)
     {
-        currentType = string.IsNullOrEmpty(Model.TransactionType)
-            ? "rent"               // đang search mà không truyền, default = rent
-            : Model.TransactionType;
+        currentType = string.IsNullOrEmpty(Model.TransactionType) ? "rent" : Model.TransactionType;
     }
     else
     {
-        currentType = "";           // đang ở trang nổi bật -> không nút nào được chọn
+        currentType = "";
     }
+
+    var JS_FavNeedLogin = HttpUtility.JavaScriptStringEncode(HomeTexts.Favorite_NeedLogin);
+    var JS_FavUpdateFail = HttpUtility.JavaScriptStringEncode(HomeTexts.Favorite_UpdateFailed);
+
+    // ✅ Favorites count cho badge trên icon trái tim header
+    var favCount = (int)(ViewBag.FavoriteCount ?? 0);
+    var favCountText = favCount > 99 ? "99+" : favCount.ToString();
 }
 
 @helper RenderPropertyCard(Core.Models.PropertyListItemViewModel item)
@@ -41,11 +46,15 @@
             <div class="property-card-title">@item.Title</div>
             <div class="property-card-address"><i class="fa-solid fa-location-dot"></i>@item.Address</div>
             <div class="property-card-meta">
-                <span><i class="fa-solid fa-house"></i>@(item.Bed ?? 0) PN · @(item.Bath ?? 0) WC</span>
+                <span>
+                    <i class="fa-solid fa-house"></i>
+                    @(item.Bed ?? 0) @HomeTexts.Unit_Bedroom · @(item.Bath ?? 0) @HomeTexts.Unit_Bathroom
+                </span>
                 <span>@item.Area m²</span>
             </div>
             <div class="property-card-price">
-                <i class="fa-solid fa-sack-dollar"></i>@item.PriceLabel VND
+                <i class="fa-solid fa-sack-dollar"></i>
+                @item.PriceLabel @HomeTexts.Currency_VND
             </div>
         </div>
     </div>
@@ -56,7 +65,6 @@
     <link rel="stylesheet" href="~/Content/style/Home/index.css" />
 
     <style>
-        /* ===== Section header + Xem thêm button ===== */
         .home-section-header {
             display: flex;
             align-items: center;
@@ -83,24 +91,21 @@
                 transform: translateY(-1px);
             }
 
-
-        .fa-angles-up{
-            color:#aaa
+        .fa-angles-up {
+            color: #aaa
         }
+
         .home-header-right-top .nav-post {
             background: #00B1FE;
         }
-        /* ===== Account hover dropdown (FIX hover gap) ===== */
+
         .account-hover {
             position: relative;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            /* tạo vùng hover “dài” xuống dưới để không rớt hover */
             padding-bottom: 14px;
         }
-
-       
 
         .account-dropdown {
             position: absolute;
@@ -119,7 +124,6 @@
             z-index: 99999;
         }
 
-            /* “cầu nối” vô hình để rê chuột từ trigger xuống dropdown không bị mất */
             .account-dropdown::before {
                 content: "";
                 position: absolute;
@@ -129,7 +133,6 @@
                 height: 12px;
             }
 
-        /* mở bằng hover hoặc bằng class open (JS) */
         .account-hover:hover .account-dropdown,
         .account-hover.open .account-dropdown {
             opacity: 1;
@@ -152,7 +155,6 @@
                 background: rgba(255,255,255,.08);
             }
 
-
         .scroll-top-btn {
             position: fixed;
             right: 40px;
@@ -160,7 +162,6 @@
             width: 40px;
             height: 40px;
             border-radius: 999px;
-            /*background: #0f172a;*/
             color: #fff;
             display: flex;
             align-items: center;
@@ -178,7 +179,6 @@
                 font-size: 16px;
             }
 
-
             .scroll-top-btn.show {
                 opacity: 1;
                 pointer-events: auto;
@@ -190,26 +190,9 @@
             text-decoration: none
         }
 
-        .property-card-fav.is-fav {
-            background: #ef4444;
-        }
-
-            .property-card-fav.is-fav i {
-                color: #fff;
-            }
-
-        .property-card {
-            position: relative; /* để đặt icon heart tuyệt đối */
-        }
-
-        .home-search-filter-select {
-            padding-left: 7px;
-        }
-
         .property-card {
             position: relative;
         }
-
 
         .property-card-fav {
             position: absolute;
@@ -243,10 +226,20 @@
                     color: #fff;
                 }
 
+        .home-search-filter-select {
+            padding-left: 7px;
+        }
+
         .property-grid {
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
             grid-gap: 24px;
+        }
+
+        @@media (max-width: 991px) {
+            .property-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
         }
 
         @@media(min-width:500px) {
@@ -266,54 +259,13 @@
                     background: rgba(15, 23, 42, 0.55);
                 }
         }
-        @@media (max-width: 991px) {
-            .property-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-        }
-
-        .pagination {
-            display: flex;
-            list-style: none;
-            padding-left: 0;
-            margin-top: 24px;
-            justify-content: center;
-        }
-
-            .pagination li {
-                margin: 0 4px;
-            }
-
-            .pagination a,
-            .pagination span {
-                display: block;
-                padding: 6px 10px;
-                border-radius: 4px;
-                border: 1px solid #ddd;
-                font-size: 14px;
-                text-decoration: none;
-                color: #333;
-                background-color: #fff;
-            }
-
-            .pagination .active span {
-                background-color: #16a34a;
-                border-color: #16a34a;
-                color: #fff;
-            }
-
-            .pagination .disabled span {
-                color: #aaa;
-                background-color: #f5f5f5;
-            }
 
         @@media(max-width:500px) {
             .account-dropdown a {
-              
                 gap: 10px;
                 padding: 4px 2px;
-                
             }
+
             .account-dropdown {
                 position: absolute;
                 top: 68%;
@@ -322,8 +274,7 @@
                 min-width: 101px;
                 background: rgba(15, 23, 42, 0.95);
                 border-radius: 12px;
-                 box-shadow: none;
-                /* overflow: hidden; */
+                box-shadow: none;
                 opacity: 0;
                 transform: translateY(-6px);
                 pointer-events: none;
@@ -331,75 +282,67 @@
                 z-index: 99999;
             }
 
-
             .home-hero-header {
-               
-                 margin-bottom: 0px; 
+                margin-bottom: 0px;
             }
+
             .home-header-right-top {
-                /*font-size: clamp(0.9rem, 1.4vw, 1rem);*/
-                 margin-bottom: 0rem;
+                margin-bottom: 0rem;
             }
+
             .account-trigger {
-                /* display: inline-flex; */
-                /* align-items: center; */
-                /* gap: 8px; */
                 cursor: pointer;
                 color: #fff;
-                /* padding: 6px 6px; */
                 border-radius: 999px;
-                /* background: rgba(15, 23, 42, 0.35); */
                 user-select: none;
             }
-            .home-hero {
-                min-height: 40vh;
-                background-size: 100% 40vh;
+        }
+
+        /* ===========================
+           ✅ Badge trên icon trái tim header
+           =========================== */
+        .fav-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+        }
+
+            /* đổi màu icon khi có badge */
+            .fav-wrap.has-badge i {
+                color: #ff4d6d;
             }
 
-            .home-search-btn-main {
-                width: 30px;
-                height: 30px;
-            }
-
-            .home-search-input-wrap input {
-                font-size: 0.75rem;
-            }
-
-            .home-search-tab-btn {
-                padding: 6px;
-            }
-
-            home-hero-header {
-                margin-top: 5px;
-            }
-
-            .home-hero-shell {
-                width: 97%;
-            }
-            .home-header-left-box {
-                display: flex;
-                align-items: center;
-                gap: 0.2rem;
-            }
-            .home-header-right-top a {
-               
-                 margin: 0 0rem; 
-            }
+        .fav-badge {
+            position: absolute;
+            top: -4px;
+            right: -6px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 999px;
+            background: #22c55e; /* badge màu khác */
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
         }
     </style>
 </head>
 
 <div class="home-hero" style="background-image:url('@(ViewBag.HeroBackground ?? "/Assets/Banner.jpg")');">
     <div class="home-hero-shell">
-        <!-- HEADER -->
         <div class="home-hero-header">
-            <!-- Logo + city -->
             <a href=@Url.Action("Index", "Home") class="home-header-left-box">
                 <div class="home-logo-icon"></div>
                 <div class="home-header-left">
-                    <div class="home-header-left-top">
-                        <span>NhàNow</span>
-                    </div>
+                    <div class="home-header-left-top"><span>NhàNow</span></div>
                     <div class="home-header-left-tagline">
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
                             <path d="M12 2.5C8.96 2.5 6.5 4.96 6.5 8c0 3.74 3.39 7.47 4.96 9.15.29.31.77.31 1.06 0C14.11 15.47 17.5 11.74 17.5 8c0-3.04-2.46-5.5-5.5-5.5zm0 6.5A2 2 0 1 1 12 5a2 2 0 0 1 0 4z" />
@@ -409,28 +352,27 @@
                 </div>
             </a>
 
-            <!-- Menu phải -->
             <div class="home-header-right-box">
                 <div class="home-header-right-top">
                     @if (User.Identity.IsAuthenticated)
                     {
-                        var name = Session["CurrentUserName"] as string ?? "Tài khoản";
+                        var name = Session["CurrentUserName"] as string ?? HomeTexts.Account_Default;
 
+                        @*  Heart header có badge *@
                         <a href="@Url.Action("Favorites", "Property")"
-                           class="hidden-xs js-fav-top"
+                           class="hidden-xs js-fav-top fav-wrap @(favCount > 0 ? "has-badge" : "")"
                            data-return="@Url.Action("Favorites", "Property")">
                             <i class="fa-solid fa-heart"></i>
+                            @if (favCount > 0)
+                            {
+                                <span id="headerFavBadge" class="fav-badge">@favCountText</span>
+                            }
                         </a>
 
-                        <a @*href="#"
-                           class="hidden-xs js-fav-top"
-                           data-return="@Url.Action("Favorites", "Property")"*@>
+                        <a class="hidden-xs" href="javascript:void(0)">
                             <i class="fa-solid fa-bell"></i>
                         </a>
 
-
-
-                        <!-- Hover vào cụm tài khoản sẽ hiện Logout -->
                         <div class="hidden-xs account-hover">
                             <div class="account-trigger">
                                 <i class="fa-solid fa-user"></i>
@@ -438,11 +380,9 @@
                                 <i class="fa-solid fa-caret-down" style="font-size:12px; opacity:.8;"></i>
                             </div>
 
-
-
                             <div class="account-dropdown">
                                 <a href="@Url.Action("Logout", "Account")">
-                                    <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+                                    <i class="fa-solid fa-right-from-bracket"></i> @HomeTexts.Logout
                                 </a>
                             </div>
                         </div>
@@ -450,16 +390,16 @@
                     else
                     {
                         <a href="@Url.Action("Favorites", "Property")"
-                           class="hidden-xs js-fav-top"
+                           class="hidden-xs js-fav-top fav-wrap"
                            data-return="@Url.Action("Favorites", "Property")">
                             <i class="fa-solid fa-heart"></i>
                         </a>
-                        <a @*href="#"
-                            class="hidden-xs js-fav-top"
-                            data-return="@Url.Action("Favorites", "Property")"*@>
+
+                        <a class="hidden-xs" href="javascript:void(0)">
                             <i class="fa-solid fa-bell"></i>
                         </a>
-                        <a href="javascript:void(0)" class="hidden-xs js-open-login">Đăng nhập</a>
+
+                        <a href="javascript:void(0)" class="hidden-xs js-open-login">@HomeTexts.Login</a>
                     }
 
                     <a href="@Url.Action("Request", "Landlord")" class="nav-post">
@@ -469,59 +409,44 @@
 
                 <div class="home-header-right-bottom">
                     <a href="@Url.Action("Set", "Language", new { lang = "vi-VN", returnUrl = Request.RawUrl })"
-                       class="@(currentLang.StartsWith("vi") ? "lang-active" : "")">
-                        VI
-                    </a>
+                       class="@(currentLang.StartsWith("vi") ? "lang-active" : "")">VI</a>
                     |
                     <a href="@Url.Action("Set", "Language", new { lang = "en-US", returnUrl = Request.RawUrl })"
-                       class="@(currentLang.StartsWith("en") ? "lang-active" : "")">
-                        EN
-                    </a>
+                       class="@(currentLang.StartsWith("en") ? "lang-active" : "")">EN</a>
                     |
                     <a href="@Url.Action("Set", "Language", new { lang = "zh-CN", returnUrl = Request.RawUrl })"
-                       class="@(currentLang.StartsWith("zh") ? "lang-active" : "")">
-                        中文
-                    </a>
+                       class="@(currentLang.StartsWith("zh") ? "lang-active" : "")">中文</a>
                 </div>
             </div>
         </div>
 
-        <!-- MAIN + SEARCH -->
         <div class="home-hero-main">
             <div class="home-main-text">
-                <div class="home-main-title">
-                    @HomeTexts.MainTitle
-                </div>
-                <div class="home-sub-title">
-                    @string.Format(HomeTexts.SubTitle, totalListings)
-                </div>
+                <div class="home-main-title">@HomeTexts.MainTitle</div>
+                <div class="home-sub-title">@string.Format(HomeTexts.SubTitle, totalListings)</div>
             </div>
 
             <div class="home-main-search">
                 @using (Html.BeginForm("Index", "Home", FormMethod.Get, new { @class = "home-search-form" }))
                 {
                     <div class="home-search-wrapper">
-                        <!-- HÀNG TRÊN: Thuê/Mua + ô nhập + nút kính lúp -->
                         <div class="home-search-top">
                             <div class="home-search-tabs">
                                 <button type="button"
                                         class="home-search-tab-btn @(currentType == "rent" ? "active" : "")"
                                         data-value="rent">
-                                    Thuê nhà
+                                    @HomeTexts.Tab_Rent
                                 </button>
                                 <span style="color:#aaa">|</span>
                                 <button type="button"
                                         class="home-search-tab-btn @(currentType == "sale" ? "active" : "")"
                                         data-value="sale">
-                                    Mua nhà
+                                    @HomeTexts.Tab_Sale
                                 </button>
                             </div>
 
                             <div class="home-search-input-wrap">
-                                <input type="text"
-                                       name="keyword"
-                                       value="@Model.Keyword"
-                                       placeholder="Nhập vị trí chi tiết: đường, xã, phường..." />
+                                <input type="text" name="keyword" value="@Model.Keyword" placeholder="@HomeTexts.Search_Placeholder" />
                             </div>
 
                             <button type="submit" class="home-search-btn-main">
@@ -529,18 +454,12 @@
                             </button>
                         </div>
 
-                        <!-- giữ transactionType -->
-                        <input type="hidden"
-                               name="transactionType"
-                               id="transactionTypeInput"
-                               value="@currentType" />
+                        <input type="hidden" name="transactionType" id="transactionTypeInput" value="@currentType" />
 
-                        <!-- HÀNG DƯỚI: Thành phố / Mốc giá / Loại nhà -->
                         <div class="home-search-bottom">
-                            <!-- THÀNH PHỐ -->
                             <div class="home-search-filter">
                                 <select id="citySelect" name="cityId" class="home-search-filter-select">
-                                    <option value="">Thành phố</option>
+                                    <option value="">@HomeTexts.Filter_City</option>
                                     @if (Model.Cities != null)
                                     {
                                         foreach (var c in Model.Cities)
@@ -555,35 +474,27 @@
                                 </select>
                             </div>
 
-                            <!-- MỐC GIÁ -->
                             <div class="home-search-filter">
                                 <select name="priceRange" class="home-search-filter-select">
-                                    <option value="">Mốc giá</option>
+                                    <option value="">@HomeTexts.Filter_Price</option>
                                     @if (Model.PriceFilters != null)
                                     {
                                         foreach (var pf in Model.PriceFilters)
                                         {
-                                            <option value="@pf.Code"
-                                                    @(Model.PriceRange == pf.Code ? "selected" : "")>
-                                                @pf.Name
-                                            </option>
+                                            <option value="@pf.Code" @(Model.PriceRange == pf.Code ? "selected" : "")>@pf.Name</option>
                                         }
                                     }
                                 </select>
                             </div>
 
-                            <!-- LOẠI NHÀ -->
                             <div class="home-search-filter">
                                 <select name="propertyType" class="home-search-filter-select">
-                                    <option value="">Loại nhà</option>
+                                    <option value="">@HomeTexts.Filter_PropertyType</option>
                                     @if (Model.PropertyTypes != null)
                                     {
                                         foreach (var pt in Model.PropertyTypes)
                                         {
-                                            <option value="@pt.Code"
-                                                    @(Model.PropertyType == pt.Code ? "selected" : "")>
-                                                @pt.Name
-                                            </option>
+                                            <option value="@pt.Code" @(Model.PropertyType == pt.Code ? "selected" : "")>@pt.Name</option>
                                         }
                                     }
                                 </select>
@@ -600,75 +511,62 @@
     @if (Model.HasSearch)
     {
         <div class="home-section-header">
-            <h2>Kết quả tìm kiếm</h2>
+            <h2>@HomeTexts.SearchResult_Title</h2>
         </div>
 
         if (results.Any())
         {
-            <!-- GRID kết quả + dữ liệu cho infinite scroll -->
             <div id="search-results" class="property-grid">
                 @Html.Partial("_PropertyCardList", results)
             </div>
 
             <input type="hidden" id="currentPage" value="@Model.Page" />
             <input type="hidden" id="totalPages" value="@Model.TotalPages" />
-
-            <!-- sentinel để IntersectionObserver canh load thêm -->
             <div id="load-more-sentinel" style="height: 1px;"></div>
         }
         else
         {
-            <p>Không tìm thấy căn phù hợp, bạn thử thay đổi điều kiện tìm kiếm nhé.</p>
+            <p>@HomeTexts.Search_NotFound</p>
         }
     }
     else
     {
-        <!-- Các căn cho thuê nổi bật -->
         <section style="margin-bottom:24px;">
             <div class="home-section-header">
-                <h2>Các căn cho thuê nổi bật</h2>
-                <a class="home-section-more"
-                   href="@Url.Action("List", "Property", new { mode = "rent" })">
-                    Xem thêm <i class="fa-solid fa-angle-right"></i>
+                <h2>@HomeTexts.FeaturedRent_Title</h2>
+                <a class="home-section-more" href="@Url.Action("List", "Property", new { mode = "rent" })">
+                    @HomeTexts.ViewMore <i class="fa-solid fa-angle-right"></i>
                 </a>
             </div>
 
             <div class="property-grid">
                 @foreach (var item in featuredRent)
-                {
-                    @RenderPropertyCard(item)
-                }
+                {@RenderPropertyCard(item)}
             </div>
         </section>
 
-        <!-- Các căn bán nổi bật -->
         <section>
             <div class="home-section-header">
-                <h2>Các căn bán nổi bật</h2>
-                <a class="home-section-more"
-                   href="@Url.Action("List", "Property", new { mode = "sale" })">
-                    Xem thêm <i class="fa-solid fa-angle-right"></i>
+                <h2>@HomeTexts.FeaturedSale_Title</h2>
+                <a class="home-section-more" href="@Url.Action("List", "Property", new { mode = "sale" })">
+                    @HomeTexts.ViewMore <i class="fa-solid fa-angle-right"></i>
                 </a>
             </div>
 
             <div class="property-grid">
                 @foreach (var item in featuredSale)
-                {
-                    @RenderPropertyCard(item)
-                }
+                {@RenderPropertyCard(item)}
             </div>
         </section>
     }
 </div>
 
-<!-- Nút lên đầu trang -->
 <div href="#" id="scrollTopBtn" class="scroll-top-btn">
     <i class="fa-solid fa-angles-up"></i>
 </div>
 
 @section Scripts {
     <script>
-
         (function () {
             var buttons = document.querySelectorAll(".home-search-tab-btn");
             var hiddenInput = document.getElementById("transactionTypeInput");
@@ -677,14 +575,12 @@
                 btn.addEventListener("click", function () {
                     var val = this.getAttribute("data-value");
                     hiddenInput.value = val;
-
                     buttons.forEach(function (b) { b.classList.remove("active"); });
                     this.classList.add("active");
                 });
             });
         })();
 
-        // Đổi background theo thành phố
         (function () {
             var hero = document.querySelector(".home-hero");
             var citySelect = document.getElementById("citySelect");
@@ -695,19 +591,75 @@
                 if (!opt) return;
 
                 var bg = opt.getAttribute("data-bg");
-                if (bg && bg.length > 0) {
-                    hero.style.backgroundImage = "url('" + bg + "')";
-                } else {
-                    hero.style.backgroundImage = "";
-                }
+                if (bg && bg.length > 0) hero.style.backgroundImage = "url('" + bg + "')";
+                else hero.style.backgroundImage = "";
             }
 
             citySelect.addEventListener("change", applyCityBackground);
             applyCityBackground();
         })();
 
-        // Toggle Favorite (dùng chung cho Home, Favorites, LoadMore append)
+     
+        //  HEADER FAVORITES BADGE
+      
+
+        // trạng thái auth có thể thay đổi sau login modal -> dùng biến global
+        window.__isAuth = @User.Identity.IsAuthenticated.ToString().ToLower();
+
+        function updateHeaderFavBadge(count) {
+            count = parseInt(count || 0, 10);
+
+            var $wrap = $('.js-fav-top.fav-wrap');
+            if ($wrap.length === 0) return;
+
+            var $badge = $('#headerFavBadge');
+
+            if (count > 0) {
+                var text = count > 99 ? '99+' : String(count);
+                $wrap.addClass('has-badge');
+
+                if ($badge.length === 0) {
+                    $wrap.append('<span id="headerFavBadge" class="fav-badge">' + text + '</span>');
+                } else {
+                    $badge.text(text);
+                }
+            } else {
+                $wrap.removeClass('has-badge');
+                if ($badge.length) $badge.remove();
+            }
+        }
+
+        //  gọi server lấy count + auth để cập nhật theo thời gian thực
+        window.refreshHeaderFav = function () {
+            return $.get('@Url.Action("HeaderFavoriteInfo", "Property")')
+                .done(function (res) {
+                    if (!res) return;
+                    window.__isAuth = !!res.isAuth;
+                    updateHeaderFavBadge(res.favoriteCount || 0);
+                });
+        };
+
+        //  tự sync khi load trang + khi quay lại tab
+        $(function () {
+            window.refreshHeaderFav();
+
+            document.addEventListener('visibilitychange', function () {
+                if (!document.hidden) window.refreshHeaderFav();
+            });
+        });
+
+        //  bạn có thể gọi event này sau khi login modal thành công
+        window.addEventListener('auth:changed', function () {
+            window.refreshHeaderFav();
+        });
+
+      
+        //  Toggle Favorite (update badge realtime)
+      
         (function () {
+            var MSG_NEED_LOGIN = '@JS_FavNeedLogin';
+            var MSG_UPDATE_FAIL = '@JS_FavUpdateFail';
+
             $(document).on('click', '.js-fav-toggle', function (e) {
                 e.preventDefault();
 
@@ -725,30 +677,30 @@
                             if (window.loginModal && typeof window.loginModal.open === 'function') {
                                 window.loginModal.open(window.location.pathname + window.location.search);
                             } else {
-                                alert('Bạn cần đăng nhập để sử dụng chức năng Yêu thích.');
+                                alert(MSG_NEED_LOGIN);
                             }
                             return;
                         }
 
                         if (res.success) {
-                            if (res.isFavorite) {
-                                $btn.addClass('is-fav');
-                            } else {
-                                $btn.removeClass('is-fav');
-                            }
+                            if (res.isFavorite) $btn.addClass('is-fav');
+                            else $btn.removeClass('is-fav');
+
+                            //  luôn sync lại count ở header (không phụ thuộc res.favoriteCount)
+                            window.refreshHeaderFav();
                         }
                     },
-                    error: function () {
-                        alert('Không thể cập nhật Yêu thích. Vui lòng thử lại.');
-                    }
+                    error: function () { alert(MSG_UPDATE_FAIL); }
                 });
             });
         })();
 
-        // ---------- Infinite Scroll cho kết quả tìm kiếm ----------
+     
+        // Infinite Scroll search
+       
         (function () {
             var $results = $('#search-results');
-            if ($results.length === 0) return; // không có search thì thôi
+            if ($results.length === 0) return;
 
             var currentPage = parseInt($('#currentPage').val() || '1', 10);
             var totalPages = parseInt($('#totalPages').val() || '1', 10);
@@ -775,36 +727,24 @@
                     .done(function (html) {
                         if (html && $.trim(html).length > 0) {
                             $results.append(html);
-
-                            // cập nhật currentPage vào hidden để JS khác nếu cần
                             $('#currentPage').val(currentPage);
                         } else {
                             currentPage = totalPages;
                         }
                     })
-                    .always(function () {
-                        isLoading = false;
-                    });
+                    .always(function () { isLoading = false; });
             }
 
             var sentinel = document.getElementById('load-more-sentinel');
-
             if ('IntersectionObserver' in window && sentinel) {
                 var io = new IntersectionObserver(function (entries) {
                     entries.forEach(function (entry) {
-                        if (entry.isIntersecting) {
-                            loadNextPage();
-                        }
+                        if (entry.isIntersecting) loadNextPage();
                     });
-                }, {
-                    root: null,
-                    rootMargin: '0px 0px 200px 0px',
-                    threshold: 0
-                });
+                }, { root: null, rootMargin: '0px 0px 200px 0px', threshold: 0 });
 
                 io.observe(sentinel);
             } else {
-                // fallback cho trình duyệt cũ
                 $(window).on('scroll', function () {
                     if ($(window).scrollTop() + $(window).height() + 200 >= $(document).height()) {
                         loadNextPage();
@@ -813,18 +753,16 @@
             }
         })();
 
-        // ---------- Nút LÊN ĐẦU TRANG ----------
+        
+        // Scroll top
+        
         (function () {
             var $btn = $('#scrollTopBtn');
             if ($btn.length === 0) return;
 
             $(window).on('scroll', function () {
-
-                if ($(this).scrollTop() > window.innerHeight) {
-                    $btn.addClass('show');
-                } else {
-                    $btn.removeClass('show');
-                }
+                if ($(this).scrollTop() > window.innerHeight) $btn.addClass('show');
+                else $btn.removeClass('show');
             });
 
             $btn.on('click', function (e) {
@@ -833,46 +771,43 @@
             });
         })();
 
+     
+        // Account dropdown hover
+       
+        (function () {
+            var menu = document.querySelector('.account-hover');
+            if (!menu) return;
 
+            var timer = null;
 
-  // Giữ dropdown account không tắt ngay khi rê chuột xuống
-  (function () {
-      var menu = document.querySelector('.account-hover');
-      if (!menu) return;
+            menu.addEventListener('mouseenter', function () {
+                if (timer) clearTimeout(timer);
+                menu.classList.add('open');
+            });
 
-      var timer = null;
+            menu.addEventListener('mouseleave', function () {
+                timer = setTimeout(function () { menu.classList.remove('open'); }, 200);
+            });
+        })();
 
-      menu.addEventListener('mouseenter', function () {
-          if (timer) clearTimeout(timer);
-          menu.classList.add('open');
-      });
+       
+        // Favorites header click: check login realtime
+        
+        (function () {
+            $(document).on('click', '.js-fav-top', function (e) {
+                if (window.__isAuth) return; // ✅ login rồi thì cho đi bình thường
 
-      menu.addEventListener('mouseleave', function () {
-          timer = setTimeout(function () {
-              menu.classList.remove('open');
-          }, 200);
-      });
-  })();
+                e.preventDefault();
 
-    // ---------- Favorites trên header: check login giống item ----------
-    (function () {
-        var isAuth = @User.Identity.IsAuthenticated.ToString().ToLower();
+                var returnUrl = $(this).data('return') || (window.location.pathname + window.location.search);
 
-        $(document).on('click', '.js-fav-top', function (e) {
-            if (isAuth) return; 
-
-            e.preventDefault();
-
-            var returnUrl = $(this).data('return') || (window.location.pathname + window.location.search);
-
-          
-            if (window.loginModal && typeof window.loginModal.open === 'function') {
-                window.loginModal.open(returnUrl);
-            } else {
-                
-                window.location.href = '@Url.Action("Login", "Account")' + '?returnUrl=' + encodeURIComponent(returnUrl);
-            }
-        });
-    })();
+                if (window.loginModal && typeof window.loginModal.open === 'function') {
+                    window.loginModal.open(returnUrl);
+                } else {
+                    window.location.href = '@Url.Action("Login", "Account")' + '?returnUrl=' + encodeURIComponent(returnUrl);
+                }
+            });
+        })();
     </script>
 }
+

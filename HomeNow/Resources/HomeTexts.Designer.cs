@@ -61,6 +61,15 @@ namespace HomeNow.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Tài khoản.
+        /// </summary>
+        public static string Account_Default {
+            get {
+                return ResourceManager.GetString("Account_Default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cam kết và bảo đảm dịch vụ trung thực của công ty môi giới bất động sản.
         /// </summary>
         public static string BottomNote {
@@ -109,6 +118,33 @@ namespace HomeNow.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to VND.
+        /// </summary>
+        public static string Currency_VND {
+            get {
+                return ResourceManager.GetString("Currency_VND", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bạn cần đăng nhập để sử dụng chức năng Yêu thích..
+        /// </summary>
+        public static string Favorite_NeedLogin {
+            get {
+                return ResourceManager.GetString("Favorite_NeedLogin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không thể cập nhật Yêu thích. Vui lòng thử lại..
+        /// </summary>
+        public static string Favorite_UpdateFailed {
+            get {
+                return ResourceManager.GetString("Favorite_UpdateFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Hình ảnh 360° Chuyên nghiệp
         ///.
         /// </summary>
@@ -139,12 +175,57 @@ namespace HomeNow.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Các căn cho thuê nổi bật.
+        /// </summary>
+        public static string FeaturedRent_Title {
+            get {
+                return ResourceManager.GetString("FeaturedRent_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Các căn bán nổi bật.
+        /// </summary>
+        public static string FeaturedSale_Title {
+            get {
+                return ResourceManager.GetString("FeaturedSale_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Tại sao chọn NhàNow?
         ///.
         /// </summary>
         public static string Features_Title {
             get {
                 return ResourceManager.GetString("Features_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Thành phố.
+        /// </summary>
+        public static string Filter_City {
+            get {
+                return ResourceManager.GetString("Filter_City", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mốc giá.
+        /// </summary>
+        public static string Filter_Price {
+            get {
+                return ResourceManager.GetString("Filter_Price", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to  Loại nhà.
+        /// </summary>
+        public static string Filter_PropertyType {
+            get {
+                return ResourceManager.GetString("Filter_PropertyType", resourceCulture);
             }
         }
         
@@ -267,6 +348,15 @@ namespace HomeNow.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Đăng xuất.
+        /// </summary>
+        public static string Logout {
+            get {
+                return ResourceManager.GetString("Logout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Nhà thật – Thông tin thật – Trải nghiệm thật.
         /// </summary>
         public static string MainTitle {
@@ -360,6 +450,15 @@ namespace HomeNow.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to NhàNow - Tìm nhà dễ dàng.
+        /// </summary>
+        public static string PageTitle_Home {
+            get {
+                return ResourceManager.GetString("PageTitle_Home", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 1. Gửi yêu cầu
         ///.
         /// </summary>
@@ -419,6 +518,24 @@ namespace HomeNow.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Không tìm thấy căn phù hợp, bạn thử thay đổi điều kiện tìm kiếm nhé..
+        /// </summary>
+        public static string Search_NotFound {
+            get {
+                return ResourceManager.GetString("Search_NotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nhập địa chỉ hoặc  tên bất động sản....
+        /// </summary>
+        public static string Search_Placeholder {
+            get {
+                return ResourceManager.GetString("Search_Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bắt đầu tìm nhà.
         /// </summary>
         public static string SearchButton {
@@ -428,11 +545,11 @@ namespace HomeNow.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Nhập quận, khu vực hoặc tên đường để bắt đầu tìm nhà….
+        ///   Looks up a localized string similar to Kết quả tìm kiếm.
         /// </summary>
-        public static string SearchPlaceholder {
+        public static string SearchResult_Title {
             get {
-                return ResourceManager.GetString("SearchPlaceholder", resourceCulture);
+                return ResourceManager.GetString("SearchResult_Title", resourceCulture);
             }
         }
         
@@ -442,6 +559,24 @@ namespace HomeNow.Resources {
         public static string SubTitle {
             get {
                 return ResourceManager.GetString("SubTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Thuê nhà.
+        /// </summary>
+        public static string Tab_Rent {
+            get {
+                return ResourceManager.GetString("Tab_Rent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to  Mua nhà.
+        /// </summary>
+        public static string Tab_Sale {
+            get {
+                return ResourceManager.GetString("Tab_Sale", resourceCulture);
             }
         }
         
@@ -469,6 +604,33 @@ namespace HomeNow.Resources {
         public static string TabFindRoom {
             get {
                 return ResourceManager.GetString("TabFindRoom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WC.
+        /// </summary>
+        public static string Unit_Bathroom {
+            get {
+                return ResourceManager.GetString("Unit_Bathroom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PN.
+        /// </summary>
+        public static string Unit_Bedroom {
+            get {
+                return ResourceManager.GetString("Unit_Bedroom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Xem thêm.
+        /// </summary>
+        public static string ViewMore {
+            get {
+                return ResourceManager.GetString("ViewMore", resourceCulture);
             }
         }
     }

@@ -53,8 +53,20 @@ namespace HomeNow.Controllers
                 return Json(new { success = false, needLogin = true }, JsonRequestBehavior.DenyGet);
 
             var isFav = await _favoriteService.ToggleFavoriteAsync(userId.Value, propertyId);
-            return Json(new { success = true, isFavorite = isFav }, JsonRequestBehavior.DenyGet);
+
+           
+            var lang = GetLang2();
+            var favList = await _favoriteService.GetFavoritesAsync(userId.Value, lang);
+            var favoriteCount = favList?.Count ?? 0;
+
+            return Json(new
+            {
+                success = true,
+                isFavorite = isFav,
+                favoriteCount = favoriteCount
+            }, JsonRequestBehavior.DenyGet);
         }
+
 
         [HttpGet]
         [Authorize]
@@ -66,6 +78,20 @@ namespace HomeNow.Controllers
             var lang = GetLang2();
             var list = await _favoriteService.GetFavoritesAsync(userId.Value, lang);
             return View(list);
+        }
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<ActionResult> HeaderFavoriteInfo()
+        {
+            var userId = GetCurrentUserId();
+            if (!userId.HasValue)
+                return Json(new { isAuth = false, favoriteCount = 0 }, JsonRequestBehavior.AllowGet);
+
+            var lang = GetLang2();
+            var favList = await _favoriteService.GetFavoritesAsync(userId.Value, lang);
+            var count = favList?.Count ?? 0;
+
+            return Json(new { isAuth = true, favoriteCount = count }, JsonRequestBehavior.AllowGet);
         }
 
         // ================= LIST =================
@@ -186,7 +212,7 @@ namespace HomeNow.Controllers
             var listingType = GetString(src, "ListingType", fallbackListingType);
             if (string.IsNullOrWhiteSpace(listingType)) listingType = fallbackListingType;
 
-            // ✅ FIX: Id của VM là "Id", không phải PropertyId
+            //
             var pid = GetInt(src, "PropertyId", GetInt(src, "Id", 0));
 
             var price = GetDecimal(src, "Price", 0m);
@@ -195,7 +221,7 @@ namespace HomeNow.Controllers
             if (string.IsNullOrWhiteSpace(priceLabel) && price > 0m)
                 priceLabel = FormatPriceLabel(price, listingType);
 
-            // ✅ FIX: ưu tiên AreaSqm, fallback AreaM2
+            //
             var area = GetNullableFloat(src, "AreaSqm", null) ?? GetNullableFloat(src, "Area", null) ?? 0f;
             if (area <= 0f)
             {

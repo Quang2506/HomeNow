@@ -103,7 +103,7 @@ p, li {
 
 a {
     text-decoration: none !important;
-    color: white !important;
+    color: white ;
     /* color: var(--bs-link-color); */
     /* text-decoration: underline; */
 }

@@ -129,9 +129,6 @@
   <data name="Register" xml:space="preserve">
     <value>Sign up</value>
   </data>
-  <data name="SearchPlaceholder" xml:space="preserve">
-    <value>Enter district, area or street name to start searching…</value>
-  </data>
   <data name="SearchButton" xml:space="preserve">
     <value>Start searching</value>
   </data>
@@ -270,5 +267,62 @@
   <data name="Form_Submit" xml:space="preserve">
     <value>Send request now
 </value>
+  </data>
+  <data name="PageTitle_Home" xml:space="preserve">
+    <value>NhaNow - Find homes easily</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Logout</value>
+  </data>
+  <data name="Account_Default" xml:space="preserve">
+    <value>Account</value>
+  </data>
+  <data name="Tab_Rent" xml:space="preserve">
+    <value>Rent</value>
+  </data>
+  <data name="Tab_Sale" xml:space="preserve">
+    <value>Buy</value>
+  </data>
+  <data name="Search_Placeholder" xml:space="preserve">
+    <value>Enter address or property name...</value>
+  </data>
+  <data name="Filter_City" xml:space="preserve">
+    <value>City</value>
+  </data>
+  <data name="Filter_Price" xml:space="preserve">
+    <value>Price range</value>
+  </data>
+  <data name="Filter_PropertyType" xml:space="preserve">
+    <value>Property type</value>
+  </data>
+  <data name="SearchResult_Title" xml:space="preserve">
+    <value>Search results</value>
+  </data>
+  <data name="Search_NotFound" xml:space="preserve">
+    <value>No matching properties. Try adjusting your filters.</value>
+  </data>
+  <data name="FeaturedRent_Title" xml:space="preserve">
+    <value> Featured rentals</value>
+  </data>
+  <data name="FeaturedSale_Title" xml:space="preserve">
+    <value>Featured for sale</value>
+  </data>
+  <data name="ViewMore" xml:space="preserve">
+    <value> View more</value>
+  </data>
+  <data name="Unit_Bedroom" xml:space="preserve">
+    <value>BR</value>
+  </data>
+  <data name="Unit_Bathroom" xml:space="preserve">
+    <value>BA</value>
+  </data>
+  <data name="Currency_VND" xml:space="preserve">
+    <value>VND</value>
+  </data>
+  <data name="Favorite_NeedLogin" xml:space="preserve">
+    <value>Please log in to use Favorites.</value>
+  </data>
+  <data name="Favorite_UpdateFailed" xml:space="preserve">
+    <value>Could not update Favorites. Please try again.</value>
   </data>
 </root>
