@@ -227,6 +227,7 @@
     <Content Include="Content\pannellum\pannellum.js" />
     <Content Include="Content\Property\xiaoerlang.jpg" />
     <Content Include="Content\style\Home\index.css" />
+    <Content Include="Content\style\Property\List.css" />
     <Content Include="Content\VR\balcony.png" />
     <Content Include="Content\VR\balcony2.png" />
     <Content Include="Content\VR\bathroom.png" />

@@ -21,9 +21,10 @@ namespace Services.Implementations
         {
             using (var db = new AppDbContext())
             {
+                // ✅ đọc nhanh hơn
                 var query =
-                    from p in db.Properties
-                    join tr in db.PropertyTranslations
+                    from p in db.Properties.AsNoTracking()
+                    join tr in db.PropertyTranslations.AsNoTracking()
                         on new { Id = p.PropertyId, Lang = langCode }
                         equals new { Id = tr.PropertyId, Lang = tr.LangCode }
                         into gj
@@ -45,15 +46,9 @@ namespace Services.Implementations
                     var kw = keyword.Trim().ToLower();
 
                     query = query.Where(x =>
-                        (
-                            (((x.tr != null ? x.tr.Title : null) ?? x.p.Title) ?? "")
-                            .ToLower().Contains(kw)
-                        )
+                        ((((x.tr != null ? x.tr.Title : null) ?? x.p.Title) ?? "").ToLower().Contains(kw))
                         ||
-                        (
-                            (((x.tr != null ? x.tr.AddressLine : null) ?? x.p.AddressLine) ?? "")
-                            .ToLower().Contains(kw)
-                        )
+                        ((((x.tr != null ? x.tr.AddressLine : null) ?? x.p.AddressLine) ?? "").ToLower().Contains(kw))
                     );
                 }
 
@@ -62,10 +57,10 @@ namespace Services.Implementations
 
                 if (!string.IsNullOrEmpty(priceRange))
                 {
-                    var pf = db.PriceFilters
-                               .Where(f => f.IsActive && f.Code == priceRange)
-                               .Select(f => new { f.MinPrice, f.MaxPrice })
-                               .FirstOrDefault();
+                    var pf = await db.PriceFilters.AsNoTracking()
+                        .Where(f => f.IsActive && f.Code == priceRange)
+                        .Select(f => new { f.MinPrice, f.MaxPrice })
+                        .FirstOrDefaultAsync();
 
                     if (pf != null)
                     {
@@ -77,6 +72,7 @@ namespace Services.Implementations
                 if (minPrice.HasValue) query = query.Where(x => x.p.Price >= minPrice.Value);
                 if (maxPrice.HasValue) query = query.Where(x => x.p.Price <= maxPrice.Value);
 
+                // ✅ Service đã sort featured + created + id → Controller không cần query lại
                 var raw = await query
                     .OrderByDescending(x => (x.p.IsFeatured ?? 0))
                     .ThenByDescending(x => (x.p.CreatedAt ?? System.DateTime.MinValue))
@@ -94,34 +90,24 @@ namespace Services.Implementations
 
                         Title = tr != null && !string.IsNullOrEmpty(tr.DisplayTitle)
                                     ? tr.DisplayTitle
-                                    : (tr != null && !string.IsNullOrEmpty(tr.Title)
-                                        ? tr.Title
-                                        : p.Title),
+                                    : (tr != null && !string.IsNullOrEmpty(tr.Title) ? tr.Title : p.Title),
 
                         Address = tr != null && !string.IsNullOrEmpty(tr.AddressLine)
                                     ? tr.AddressLine
                                     : p.AddressLine,
-
-                        AreaName = null,
-                        CommunityName = null,
-                        District = null,
 
                         RoomType = tr?.RoomType,
                         Orientation = tr?.Orientation,
 
                         CoverImageUrl = p.CoverImageUrl,
                         Price = p.Price,
-                        PriceUnit = null,
 
-             
+                        // ✅ m² / PN / WC
                         AreaM2 = p.AreaSqm.HasValue ? (decimal?)p.AreaSqm.Value : null,
-
-                
                         BedroomCount = p.BedroomCount,
                         BathroomCount = p.BathroomCount,
                         AreaSqm = p.AreaSqm,
 
-                    
                         ListingType = p.ListingType,
                         PropertyType = p.PropertyType,
 

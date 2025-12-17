@@ -1,10 +1,17 @@
 ﻿@using HomeNow.Resources
+@using System.Web
 @model Core.Models.LandlordRequest
+
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = HomeTexts.Meta_PageTitle;
 
     var currentLang = System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
+
+    var JS_FavNeedLogin = HttpUtility.JavaScriptStringEncode(HomeTexts.Favorite_NeedLogin);
+
+    var favCount = (int)(ViewBag.FavoriteCount ?? 0);
+    var favCountText = favCount > 99 ? "99+" : favCount.ToString();
 }
 
 <!DOCTYPE html>
@@ -12,16 +19,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    @*<title>NhàNew - Nâng tầm Bất động sản</title>*@
 
-    <!-- Font Awesome cho Icons -->
     <link rel="stylesheet" href="~/Content/font-awesome/all.min.css">
     <link rel="stylesheet" href="~/Content/style/Landlord/Request.css" />
-   
+
     <style>
-        a {
-            color: snow !important;
-            text-decoration: none
+        a { color: snow !important; text-decoration: none; }
+
+        /* ===== HEADER giống Home/Index ===== */
+        .home-header-right-top .nav-post { background: #00B1FE; }
+        .home-hero {background-size: 100% 65vh;}
+        /* Badge trái tim */
+        .fav-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 0px;
+            height: 34px;
+            border-radius: 999px;
+            color: #fff;
+        }
+        .fav-wrap.has-badge i { color: #ff4d6d; }
+
+        .fav-badge {
+            position: absolute;
+            top: -4px;
+            right: -6px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 999px;
+            background: #22c55e;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        /* Account dropdown (PC hover + mobile click) */
+        .account-hover {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 14px;
+            z-index: 99999;
+        }
+
+        .account-trigger {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.35);
+            border: 0;
+            outline: 0;
+        }
+        .account-trigger:hover { background: rgba(15, 23, 42, 0.55); }
+
+        .account-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            min-width: 160px;
+            background: rgba(15, 23, 42, 0.95);
+            border-radius: 12px;
+            box-shadow: 0 12px 24px rgba(0,0,0,.25);
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(-6px);
+            pointer-events: none;
+            transition: opacity .15s ease, transform .15s ease;
+        }
+        .account-dropdown::before {
+            content: "";
+            position: absolute;
+            top: -12px;
+            left: 0;
+            right: 0;
+            height: 12px;
+        }
+
+        .account-hover:hover .account-dropdown,
+        .account-hover.open .account-dropdown {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .account-dropdown a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            color: #fff !important;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .account-dropdown a:hover { background: rgba(255,255,255,.08); }
+
+        /* mobile: nút account gọn */
+        @@media(max-width: 500px) {
+            .account-trigger {
+                padding: 0;
+                background: none;
+            }
         }
     </style>
 </head>
@@ -32,10 +142,10 @@
     <div class="home-hero">
         <div class="home-hero-shell">
 
-            <!-- HEADER -->
+            <!-- HEADER (đã đồng bộ giống Home/Index) -->
             <div class="home-hero-header">
                 <!-- Logo + city -->
-                <a href=@Url.Action("index", "Home") class="home-header-left-box" >
+                <a href="@Url.Action("Index", "Home")" class="home-header-left-box">
                     <div class="home-logo-icon"></div>
                     <div class="home-header-left">
                         <div class="home-header-left-top">
@@ -55,24 +165,51 @@
                     <div class="home-header-right-top">
                         @if (User.Identity.IsAuthenticated)
                         {
-                            var name = Session["CurrentUserName"] as string ?? "Tài khoản";
+                            var name = Session["CurrentUserName"] as string ?? HomeTexts.Account_Default;
 
-                            <a href="@Url.Action("Favorites", "Property")" class="hidden-xs">
+                            <a href="@Url.Action("Favorites", "Property")"
+                               class="js-fav-top fav-wrap @(favCount > 0 ? "has-badge" : "")"
+                               data-return="@Url.Action("Favorites", "Property")">
                                 <i class="fa-solid fa-heart"></i>
+                                @if (favCount > 0)
+                                {
+                                    <span id="headerFavBadge" class="fav-badge">@favCountText</span>
+                                }
                             </a>
-                            <span class="hidden-xs">
-                                <i class="fa-solid fa-user"></i> @name
-                            </span>
-                            <a href="@Url.Action("Logout", "Account")" class="hidden-xs">
-                                <i class="fa-solid fa-right-from-bracket"></i>
+
+                            <a href="javascript:void(0)">
+                                <i class="fa-solid fa-bell"></i>
                             </a>
+
+                            <div class="account-hover" id="accountMenu">
+                                <button type="button" class="account-trigger" aria-haspopup="menu" aria-expanded="false">
+                                    <i class="fa-solid fa-user"></i>
+                                    <span>@name</span>
+                                    <i class="fa-solid fa-caret-down" style="font-size:12px; opacity:.8;"></i>
+                                </button>
+
+                                <div class="account-dropdown" role="menu">
+                                    <a href="@Url.Action("Logout", "Account")" role="menuitem">
+                                        <i class="fa-solid fa-right-from-bracket"></i> @HomeTexts.Logout
+                                    </a>
+                                </div>
+                            </div>
                         }
                         else
                         {
-                            <a href="@Url.Action("Favorites", "Property")" class="hidden-xs">
+                            <a href="@Url.Action("Favorites", "Property")"
+                               class="js-fav-top fav-wrap"
+                               data-return="@Url.Action("Favorites", "Property")">
                                 <i class="fa-solid fa-heart"></i>
                             </a>
-                            <a href="javascript:void(0)" class="hidden-xs js-open-login">Đăng nhập</a>
+
+                            <a href="javascript:void(0)">
+                                <i class="fa-solid fa-bell"></i>
+                            </a>
+
+                            <a href="javascript:void(0)" class="js-open-login">
+                                @HomeTexts.Login
+                            </a>
                         }
 
                         <a href="@Url.Action("Request", "Landlord")" class="nav-post">
@@ -82,19 +219,13 @@
 
                     <div class="home-header-right-bottom">
                         <a href="@Url.Action("Set", "Language", new { lang = "vi-VN", returnUrl = Request.RawUrl })"
-                           class="@(currentLang.StartsWith("vi") ? "lang-active" : "")">
-                            VI
-                        </a>
+                           class="@(currentLang.StartsWith("vi") ? "lang-active" : "")">VI</a>
                         |
                         <a href="@Url.Action("Set", "Language", new { lang = "en-US", returnUrl = Request.RawUrl })"
-                           class="@(currentLang.StartsWith("en") ? "lang-active" : "")">
-                            EN
-                        </a>
+                           class="@(currentLang.StartsWith("en") ? "lang-active" : "")">EN</a>
                         |
                         <a href="@Url.Action("Set", "Language", new { lang = "zh-CN", returnUrl = Request.RawUrl })"
-                           class="@(currentLang.StartsWith("zh") ? "lang-active" : "")">
-                            中文
-                        </a>
+                           class="@(currentLang.StartsWith("zh") ? "lang-active" : "")">中文</a>
                     </div>
                 </div>
             </div>
@@ -176,11 +307,6 @@
                     <input type="tel" class="form-input" placeholder="@HomeTexts.Form_PhonePlaceholder" />
                     <input type="text" class="form-input" placeholder="@HomeTexts.Form_AddressPlaceholder" />
 
-                    @*<div class="checkbox-group">
-                        <label><input type="checkbox"> @HomeTexts.Form_OptionMedia</label>
-                        <label><input type="checkbox"> @HomeTexts.Form_OptionManage</label>
-                    </div>*@
-
                     <button type="submit" class="btn-submit">@HomeTexts.Form_Submit</button>
                 </form>
             </div>
@@ -192,6 +318,99 @@
         <a class="float-btn float-zalo">Zalo</a>
         <a class="float-btn float-mess"><i class="fa-brands fa-facebook-messenger"></i></a>
     </div>
+
+    <!-- ===== SCRIPTS: badge realtime + login check + dropdown ===== -->
+    <script>
+        // auth flag
+        window.__isAuth = @User.Identity.IsAuthenticated.ToString().ToLower();
+
+        function updateHeaderFavBadge(count) {
+            count = parseInt(count || 0, 10);
+
+            var wrap = document.querySelector('.js-fav-top.fav-wrap');
+            if (!wrap) return;
+
+            var badge = document.getElementById('headerFavBadge');
+
+            if (count > 0) {
+                wrap.classList.add('has-badge');
+                var text = count > 99 ? '99+' : String(count);
+
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.id = 'headerFavBadge';
+                    badge.className = 'fav-badge';
+                    badge.textContent = text;
+                    wrap.appendChild(badge);
+                } else {
+                    badge.textContent = text;
+                }
+            } else {
+                wrap.classList.remove('has-badge');
+                if (badge) badge.remove();
+            }
+        }
+
+        // gọi server để lấy count realtime
+        window.refreshHeaderFav = function () {
+            return fetch('@Url.Action("HeaderFavoriteInfo", "Property")', { credentials: 'same-origin' })
+                .then(function (r) { return r.json(); })
+                .then(function (res) {
+                    if (!res) return;
+                    window.__isAuth = !!res.isAuth;
+                    updateHeaderFavBadge(res.favoriteCount || 0);
+                })
+                .catch(function () { });
+        };
+
+        document.addEventListener('DOMContentLoaded', function () {
+            window.refreshHeaderFav();
+
+            document.addEventListener('visibilitychange', function () {
+                if (!document.hidden) window.refreshHeaderFav();
+            });
+        });
+
+        // account dropdown: mobile click toggle + PC hover vẫn hoạt động nhờ CSS
+        (function () {
+            var menu = document.getElementById('accountMenu');
+            if (!menu) return;
+
+            var trigger = menu.querySelector('.account-trigger');
+            if (!trigger) return;
+
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                menu.classList.toggle('open');
+            });
+
+            document.addEventListener('click', function () {
+                menu.classList.remove('open');
+            });
+        })();
+
+        // click heart header: chưa login -> open modal / redirect
+        document.addEventListener('click', function (e) {
+            var a = e.target.closest && e.target.closest('.js-fav-top');
+            if (!a) return;
+
+            if (window.__isAuth) return;
+
+            e.preventDefault();
+
+            var returnUrl = a.getAttribute('data-return') || (window.location.pathname + window.location.search);
+            var msgNeedLogin = '@JS_FavNeedLogin';
+
+            if (window.loginModal && typeof window.loginModal.open === 'function') {
+                window.loginModal.open(returnUrl);
+            } else {
+                // fallback
+                try { alert(msgNeedLogin); } catch (ex) { }
+                window.location.href = '@Url.Action("Login", "Account")' + '?returnUrl=' + encodeURIComponent(returnUrl);
+            }
+        });
+    </script>
 
 </body>
 </html>

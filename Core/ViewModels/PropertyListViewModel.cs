@@ -1,4 +1,7 @@
-﻿namespace Core.ViewModels
+﻿using Core.Models;
+using System.Collections.Generic;
+
+namespace Core.ViewModels
 {
     public class PropertyListViewModel
     {
@@ -26,5 +29,7 @@
 
         // apartment / house / villa / office / studio ...
         public string PropertyType { get; set; }
+
+       
     }
 }

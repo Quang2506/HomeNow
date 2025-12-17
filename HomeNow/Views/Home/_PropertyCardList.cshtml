@@ -16,8 +16,8 @@
             <div class="property-card-title">@item.Title</div>
             <div class="property-card-address"><i class="fa-solid fa-location-dot"></i>@item.Address</div>
             <div class="property-card-meta">
-                <span><i class="fa-solid fa-house"></i>@(item.Bed ?? 0) PN · @(item.Bath ?? 0) WC</span>
-                <span>@item.Area m²</span>
+                <span><i class="fa-solid fa-bed"></i>@(item.Bed ?? 0) PN <i class="fa-solid fa-bath"></i> @(item.Bath ?? 0) WC</span>
+                <span><i class="fa-solid fa-ruler-combined"></i>@item.Area m²</span>
             </div>
             <div class="property-card-price">
                 <i class="fa-solid fa-sack-dollar"></i>@item.PriceLabel VND

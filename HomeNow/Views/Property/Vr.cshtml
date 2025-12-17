@@ -70,7 +70,6 @@
                 display: block;
             }
 
-        /* Ẩn icon mũi tên mặc định */
         .pnlm-hotspot-icon {
             display: none !important;
         }
@@ -185,19 +184,19 @@
             var hotspotMode = false;
             var autorunOn = false;
 
-            // ======= OPT: detect mobile =======
+            //  OPT: detect mobile
             var isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-            // ======= OPT: zoom limit (không zoom sâu) =======
+            // ======= OPT: zoom limit (không zoom sâu) 
             var HFOV_DEFAULT = isMobile ? 95 : 110;
             var HFOV_MIN = isMobile ? 80 : 70;
             var HFOV_MAX = 120;
 
-            // ======= OPT: chống giật khi spam click =======
+            // ======= OPT: chống giật khi spam click
             var sceneBusy = false;
             var sceneBusyTimer = null;
 
-            // ======= OPT: nâng độ nét canvas theo DPR có giới hạn =======
+            // ======= OPT: nâng độ nét canvas theo DPR có giới hạn 
             function pickDprCap() {
                 var dpr = window.devicePixelRatio || 1;
                 var mem = navigator.deviceMemory || 0; // Chrome
@@ -283,7 +282,7 @@
                             if (!viewer) return;
                             if (!config.scenes[args.sceneId]) return;
 
-                            // load scene + set hướng nếu có
+                            // load scene + set hướng 
                             viewer.loadScene(args.sceneId, args.targetPitch || 0, args.targetYaw || 0);
 
                             // zoom-out về mặc định
@@ -447,7 +446,7 @@
                             }
 
                             if (autorunOn) {
-                                // OPT: mobile quay cực chậm (đỡ chóng mặt)
+                                // OPT: mobile quay cực chậm
                                 viewer.startAutoRotate(isMobile ? -0.25 : -1.2);
                                 autorunBtn.classList.add('on');
                                 autorunBtn.textContent = 'Tự chạy: ON';

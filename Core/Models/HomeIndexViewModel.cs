@@ -54,6 +54,7 @@ namespace Core.Models
         public string PropertyType { get; set; }
         public int? CityId { get; set; }
         public bool IsFavorite { get; set; }
+       
     }
 
     public class CityDropDownItem

@@ -28,7 +28,7 @@
     var JS_FavNeedLogin = HttpUtility.JavaScriptStringEncode(HomeTexts.Favorite_NeedLogin);
     var JS_FavUpdateFail = HttpUtility.JavaScriptStringEncode(HomeTexts.Favorite_UpdateFailed);
 
-    // ✅ Favorites count cho badge trên icon trái tim header
+
     var favCount = (int)(ViewBag.FavoriteCount ?? 0);
     var favCountText = favCount > 99 ? "99+" : favCount.ToString();
 }
@@ -47,10 +47,10 @@
             <div class="property-card-address"><i class="fa-solid fa-location-dot"></i>@item.Address</div>
             <div class="property-card-meta">
                 <span>
-                    <i class="fa-solid fa-house"></i>
-                    @(item.Bed ?? 0) @HomeTexts.Unit_Bedroom · @(item.Bath ?? 0) @HomeTexts.Unit_Bathroom
+                    <i class="fa-solid fa-bed"></i>
+                    @(item.Bed ?? 0)@HomeTexts.Unit_Bedroom <i class="fa-solid fa-bath"></i> @(item.Bath ?? 0) @HomeTexts.Unit_Bathroom
                 </span>
-                <span>@item.Area m²</span>
+                <span><i class="fa-solid fa-ruler-combined"></i>@item.Area m²</span>
             </div>
             <div class="property-card-price">
                 <i class="fa-solid fa-sack-dollar"></i>
@@ -65,6 +65,28 @@
     <link rel="stylesheet" href="~/Content/style/Home/index.css" />
 
     <style>
+       
+        .fav-wrap.has-badge i {
+            color: #ff4d6d;
+        }
+
+        .fav-badge {
+            position: absolute;
+            top: -4px;
+            right: -6px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 999px;
+            background: #22c55e; 
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
         .home-section-header {
             display: flex;
             align-items: center;
@@ -296,11 +318,21 @@
                 border-radius: 999px;
                 user-select: none;
             }
+            .home-header-right-top a {
+                margin:0px
+            }
+            .fav-badge {
+              
+                top: -1px;
+                right: -6px;
+                min-width: 15px;
+                height: 15px;
+             
+                
+            }
         }
 
-        /* ===========================
-           ✅ Badge trên icon trái tim header
-           =========================== */
+        /* ===========================*/
         .fav-wrap {
             position: relative;
             display: inline-flex;
@@ -311,28 +343,7 @@
             border-radius: 999px;
         }
 
-            /* đổi màu icon khi có badge */
-            .fav-wrap.has-badge i {
-                color: #ff4d6d;
-            }
-
-        .fav-badge {
-            position: absolute;
-            top: -4px;
-            right: -6px;
-            min-width: 18px;
-            height: 18px;
-            padding: 0 5px;
-            border-radius: 999px;
-            background: #22c55e; /* badge màu khác */
-            color: #fff;
-            font-size: 11px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 1;
-        }
+           
     </style>
 </head>
 
@@ -599,9 +610,9 @@
             applyCityBackground();
         })();
 
-     
+
         //  HEADER FAVORITES BADGE
-      
+
 
         // trạng thái auth có thể thay đổi sau login modal -> dùng biến global
         window.__isAuth = @User.Identity.IsAuthenticated.ToString().ToLower();
@@ -653,9 +664,9 @@
             window.refreshHeaderFav();
         });
 
-      
+
         //  Toggle Favorite (update badge realtime)
-      
+
         (function () {
             var MSG_NEED_LOGIN = '@JS_FavNeedLogin';
             var MSG_UPDATE_FAIL = '@JS_FavUpdateFail';
@@ -695,9 +706,9 @@
             });
         })();
 
-     
+
         // Infinite Scroll search
-       
+
         (function () {
             var $results = $('#search-results');
             if ($results.length === 0) return;
@@ -753,9 +764,9 @@
             }
         })();
 
-        
+
         // Scroll top
-        
+
         (function () {
             var $btn = $('#scrollTopBtn');
             if ($btn.length === 0) return;
@@ -771,9 +782,9 @@
             });
         })();
 
-     
+
         // Account dropdown hover
-       
+
         (function () {
             var menu = document.querySelector('.account-hover');
             if (!menu) return;
@@ -790,9 +801,9 @@
             });
         })();
 
-       
+
         // Favorites header click: check login realtime
-        
+
         (function () {
             $(document).on('click', '.js-fav-top', function (e) {
                 if (window.__isAuth) return; // ✅ login rồi thì cho đi bình thường
