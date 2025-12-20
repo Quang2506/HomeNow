@@ -30,507 +30,536 @@
 
 @section Styles{
     <style>
-             
-             .home-hero {
-                 background: none !important;
-             }
-
-                 .home-hero.list-hero.detail-hero {
-                     position: relative;
-                     background-size: cover;
-                     background-position: center;
-                     padding: 7px 0 3px;
-                     border-radius: 0;
-                     margin: 0;
-                     /* quan trọng: tránh khoảng trắng do index.css set height/min-height */
-                     height: auto !important;
-                     min-height: 0 !important;
-                 }
-
-                     .home-hero.list-hero.detail-hero::before {
-                         content: "";
-                         position: absolute;
-                         inset: 0;
-                         background: rgba(0,0,0,.45);
-                     }
-
-                     .home-hero.list-hero.detail-hero .home-hero-shell {
-                         position: relative;
-                         z-index: 1;
-                         width: 97%;
-                         margin: 0 auto;
-                         padding: 0 !important;
-                     }
-
-             .home-hero-header {
-                 margin: 0 !important;
-                 margin-bottom: 0 !important;
-             }
-
-             .home-header-right-top a {
-                 margin: 0;
-             }
-
-             /* account dropdown (giống List) */
-             .account-hover {
-                 position: relative;
-                 display: inline-flex;
-                 align-items: center;
-                 padding-bottom: 14px;
-                 z-index: 99999;
-             }
-
-             .account-trigger {
-                 display: inline-flex;
-                 align-items: center;
-                 cursor: pointer;
-                 color: #fff;
-                 border-radius: 999px;
-                 background: rgba(15,23,42,0);
-                 border: 0;
-                 outline: 0;
-             }
-
-                 .account-trigger:hover {
-                     background: rgba(15,23,42,.55);
-                 }
-
-             .account-dropdown {
-                 position: absolute;
-                 top: 100%;
-                 right: 0;
-                 margin-top: 8px;
-                 min-width: 160px;
-                 background: rgba(15,23,42,.95);
-                 border-radius: 12px;
-                 overflow: hidden;
-                 opacity: 0;
-                 transform: translateY(-6px);
-                 pointer-events: none;
-                 transition: opacity .15s ease, transform .15s ease;
-                 box-shadow: 0 12px 24px rgba(0,0,0,.25);
-             }
-
-                 .account-dropdown::before {
-                     content: "";
-                     position: absolute;
-                     top: -12px;
-                     left: 0;
-                     right: 0;
-                     height: 12px;
-                 }
-
-             .account-hover.open .account-dropdown {
-                 opacity: 1;
-                 transform: translateY(0);
-                 pointer-events: auto;
-             }
-
-             .account-dropdown a {
-                 display: flex;
-                 align-items: center;
-                 gap: 10px;
-                 padding: 10px 12px;
-                 color: #fff;
-                 text-decoration: none;
-                 white-space: nowrap;
-             }
-
-                 .account-dropdown a:hover {
-                     background: rgba(255,255,255,.08);
-                 }
-
-             /* fav badge */
-             .fav-wrap {
-                 position: relative;
-                 display: inline-flex;
-                 align-items: center;
-                 justify-content: center;
-                 width: 34px;
-                 height: 34px;
-                 border-radius: 999px;
-                 color: #fff;
-             }
-
-                 .fav-wrap.has-badge i {
-                     color: #ff4d6d;
-                 }
-
-             .fav-badge {
-                 position: absolute;
-                 top: -4px;
-                 right: -6px;
-                 min-width: 18px;
-                 height: 18px;
-                 padding: 0 5px;
-                 border-radius: 999px;
-                 background: #22c55e;
-                 color: #fff;
-                 font-size: 11px;
-                 font-weight: 700;
-                 display: flex;
-                 align-items: center;
-                 justify-content: center;
-                 line-height: 1;
-             }
-
-           
-             .detail-wrap {
-                 max-width: 1200px;
-                 margin: 18px auto 24px;
-                 padding: 0 16px;
-             }
-
-             .detail-title {
-                 margin: 18px 0 14px;
-                 font-size: 34px;
-                 font-weight: 900;
-                 text-align: center;
-             }
-
-             .detail-grid {
-                 display: grid;
-                 grid-template-columns: 1.55fr .9fr;
-                 gap: 18px;
-                 align-items: start;
-             }
-
-             .card {
-                 background: #fff;
-                 border-radius: 14px;
-                 padding: 14px;
-                 box-shadow: 0 6px 18px rgba(0,0,0,.06);
-                 border: 1px solid rgba(15,23,42,.08);
-             }
-
-             .section-title {
-                 margin: 0 0 10px;
-                 font-size: 16px;
-                 font-weight: 900;
-             }
-
-             /* Preview */
-             .preview {
-                 position: relative;
-                 border-radius: 12px;
-                 overflow: hidden;
-                 display: block;
-             }
-
-                 .preview img {
-                     width: 100%;
-                     height: 380px;
-                     object-fit: cover;
-                     display: block;
-                     background: #f3f4f6;
-                 }
-
-             .badge {
-                 position: absolute;
-                 top: 12px;
-                 left: 12px;
-                 background: rgba(16,185,129,.95);
-                 color: #fff;
-                 padding: 6px 10px;
-                 border-radius: 999px;
-                 font-weight: 900;
-                 font-size: 12px;
-                 z-index: 3;
-             }
-
-             .play {
-                 position: absolute;
-                 inset: 0;
-                 display: flex;
-                 align-items: center;
-                 justify-content: center;
-                 background: linear-gradient(to bottom, rgba(0,0,0,.10), rgba(0,0,0,.35));
-                 z-index: 2;
-             }
-
-                 .play .btn {
-                     width: 64px;
-                     height: 64px;
-                     border-radius: 999px;
-                     background: rgba(15,23,42,.85);
-                     display: flex;
-                     align-items: center;
-                     justify-content: center;
-                     box-shadow: 0 10px 24px rgba(0,0,0,.25);
-                 }
-
-                     .play .btn span {
-                         color: #fff;
-                         font-weight: 900;
-                         font-size: 12px;
-                         letter-spacing: .6px;
-                     }
-
-             .hint {
-                 margin-top: 10px;
-                 color: #64748b;
-                 font-size: 13px;
-             }
-
-             .danger {
-                 color: #ef4444;
-             }
-
-             /* Right sticky summary */
-             .right {
-                 position: sticky;
-                 top: 16px;
-             }
-
-             .price {
-                 font-size: 22px;
-                 font-weight: 900;
-                 color: #16a34a;
-             }
-
-             .meta {
-                 margin-top: 8px;
-                 color: #475569;
-             }
-
-             .addr {
-                 margin-top: 6px;
-                 color: #475569;
-                 line-height: 1.5;
-             }
-
-             /* Mobile: giá + tiện ích cùng hàng, mô tả full width */
-             .two-col {
-                 display: grid;
-                 grid-template-columns: 1fr 1fr;
-                 gap: 18px;
-                 margin-top: 18px;
-             }
-
-             .mobile-summary {
-                 display: none;
-             }
-
-             .desc-card {
-                 grid-column: auto;
-             }
-
-             .tags {
-                 display: flex;
-                 flex-wrap: wrap;
-                 gap: 8px;
-             }
-
-             .tag {
-                 padding: 6px 10px;
-                 border-radius: 999px;
-                 background: #f1f5f9;
-                 color: #0f172a;
-                 font-weight: 800;
-                 font-size: 12px;
-                 border: 1px solid rgba(15,23,42,.08);
-             }
-
-             .muted {
-                 color: #64748b;
-             }
-
-             /* Map */
-             .map-wrap {
-                 position: relative;
-                 border-radius: 12px;
-                 overflow: hidden;
-                 border: 1px solid rgba(15,23,42,.08);
-             }
-
-                 .map-wrap iframe {
-                     width: 100%;
-                     height: 280px;
-                     border: 0;
-                     display: block;
-                 }
-
-             .map-open {
-                 position: absolute;
-                 right: 10px;
-                 top: 10px;
-                 background: rgba(15,23,42,.85);
-                 color: #fff;
-                 text-decoration: none;
-                 padding: 8px 10px;
-                 border-radius: 999px;
-                 font-weight: 800;
-                 font-size: 12px;
-                 display: inline-flex;
-                 align-items: center;
-                 gap: 8px;
-                 z-index: 2;
-             }
-
-                 .map-open:hover {
-                     opacity: .95;
-                 }
-
-           
-             .similar-scroll {
-                 display: grid;
-                 grid-auto-flow: column;
-                 grid-auto-columns: calc((100% - 18px * 2) / 3); /* PC: 3 item */
-                 gap: 18px;
-                 overflow-x: auto;
-                 overflow-y: hidden;
-                 padding-bottom: 10px;
-                 scroll-snap-type: x mandatory;
-                 -webkit-overflow-scrolling: touch;
-                 scrollbar-gutter: stable both-edges;
-             }
-
-                 .similar-scroll .property-card {
-                     scroll-snap-align: start;
-                     min-width: 0;
-                 }
-
-                 /* scrollbar gọn */
-                 .similar-scroll::-webkit-scrollbar {
-                     height: 8px;
-                 }
-
-                 .similar-scroll::-webkit-scrollbar-thumb {
-                     background: rgba(0,0,0,.18);
-                     border-radius: 999px;
-                 }
-
-                 .similar-scroll::-webkit-scrollbar-track {
-                     background: rgba(0,0,0,.06);
-                     border-radius: 999px;
-                 }
-
-             /* Card giống home */
-             .property-card {
-                 position: relative;
-                 cursor: pointer;
-             }
-
-                 .property-card a.card-link {
-                     color: inherit;
-                     text-decoration: none;
-                     display: block;
-                 }
-
-                 .property-card img {
-                     width: 100%;
-                     height: 160px;
-                     object-fit: cover;
-                     display: block;
-                     background: #f3f4f6;
-                     border-radius: 12px 12px 0 0;
-                 }
-
-             .property-card-body {
-                 padding: 10px 12px 12px;
-             }
-
-             .property-card-title {
-                 font-weight: 900;
-                 line-height: 1.25;
-                 max-height: 2.5em;
-                 overflow: hidden;
-             }
-
-             .property-card-address {
-                 color: #64748b;
-                 font-size: 13px;
-                 margin-top: 4px;
-                 white-space: nowrap;
-                 overflow: hidden;
-                 text-overflow: ellipsis;
-             }
-
-             .property-card-meta {
-                 display: flex;
-                 justify-content: space-between;
-                 gap: 10px;
-                 margin-top: 6px;
-                 color: #334155;
-                 font-size: 13px;
-             }
-
-             .property-card-price {
-                 margin-top: 8px;
-                 font-weight: 900;
-             }
-
-             .property-card-fav {
-                 position: absolute;
-                 top: 10px;
-                 right: 10px;
-                 width: 28px;
-                 height: 28px;
-                 border-radius: 999px;
-                 background: rgba(15,23,42,.65);
-                 display: flex;
-                 align-items: center;
-                 justify-content: center;
-                 cursor: pointer;
-                 z-index: 3;
-             }
-
-                 .property-card-fav i {
-                     font-size: 14px;
-                     color: #fff;
-                 }
-
-                 .property-card-fav.is-fav {
-                     background: #ef4444;
-                 }
-
-          
-             @@media (max-width: 992px) {
-                 .detail-grid {
-                     grid-template-columns: 1fr;
-                 }
-
-                 .right {
-                     display: none;
-                 }
-
-                 .preview img {
-                     height: 260px;
-                 }
-
-                 .mobile-summary {
-                     display: block;
-                 }
-
-                 .desc-card {
-                     grid-column: 1 / -1;
-                 }
-
-                 .similar-scroll {
-                     grid-auto-columns: calc((100% - 16px) / 2); /* mobile: 2 item */
-                     gap: 16px;
-                 }
-             }
-
-             @@media (max-width: 500px) {
-                 .detail-wrap {
-                     padding: 0 4px;
-                 }
-
-                 .price {
-                     font-size: 16px;
-                     font-weight: 700;
-                 }
-
-                 .property-card-price {
-                     font-size: .7rem !important;
-                 }
-
-                 .similar-scroll {
-                     grid-auto-columns: calc((100% - 12px) / 2);
-                     gap: 12px;
-                 }
-             }
+        /* ===================== HEADER (giống List) ===================== */
+        .home-hero {
+            background: none !important;
+        }
+
+            .home-hero.list-hero.detail-hero {
+                position: relative;
+                background-size: cover;
+                background-position: center;
+                padding: 7px 0 3px;
+                border-radius: 0;
+                margin: 0;
+                height: auto !important;
+                min-height: 0 !important;
+            }
+
+                .home-hero.list-hero.detail-hero::before {
+                    content: "";
+                    position: absolute;
+                    inset: 0;
+                    background: rgba(0,0,0,.45);
+                }
+
+                .home-hero.list-hero.detail-hero .home-hero-shell {
+                    position: relative;
+                    z-index: 1;
+                    width: 97%;
+                    margin: 0 auto;
+                    padding: 0 !important;
+                }
+
+        .home-hero-header {
+            margin: 0 !important;
+        }
+
+        .home-header-right-top a {
+            margin: 0;
+        }
+
+        .account-hover {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            padding-bottom: 14px;
+            z-index: 99999;
+        }
+
+        .account-trigger {
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            color: #fff;
+            border-radius: 999px;
+            background: rgba(15,23,42,0);
+            border: 0;
+            outline: 0;
+        }
+
+            .account-trigger:hover {
+                background: rgba(15,23,42,.55);
+            }
+
+        .account-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            min-width: 160px;
+            background: rgba(15,23,42,.95);
+            border-radius: 12px;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(-6px);
+            pointer-events: none;
+            transition: opacity .15s ease, transform .15s ease;
+            box-shadow: 0 12px 24px rgba(0,0,0,.25);
+        }
+
+            .account-dropdown::before {
+                content: "";
+                position: absolute;
+                top: -12px;
+                left: 0;
+                right: 0;
+                height: 12px;
+            }
+
+        .account-hover.open .account-dropdown {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .account-dropdown a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            color: #fff;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+            .account-dropdown a:hover {
+                background: rgba(255,255,255,.08);
+            }
+
+        .fav-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            color: #fff;
+        }
+
+            .fav-wrap.has-badge i {
+                color: #ff4d6d;
+            }
+
+        .fav-badge {
+            position: absolute;
+            top: -4px;
+            right: -6px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 999px;
+            background: #22c55e;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        /* ===================== DETAIL LAYOUT ===================== */
+        .detail-wrap {
+            max-width: 1200px;
+            margin: 18px auto 24px;
+            padding: 0 16px;
+        }
+
+        .detail-title {
+            margin: 18px 0 14px;
+            font-size: 34px;
+            font-weight: 900;
+            text-align: center;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1.55fr .9fr;
+            gap: 18px;
+            align-items: start;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 14px;
+            box-shadow: 0 6px 18px rgba(0,0,0,.06);
+            border: 1px solid rgba(15,23,42,.08);
+        }
+
+        .section-title {
+            margin: 0 0 10px;
+            font-size: 16px;
+            font-weight: 900;
+        }
+
+        /* Preview */
+        .preview {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            display: block;
+        }
+
+            .preview img {
+                width: 100%;
+                height: 380px;
+                object-fit: cover;
+                display: block;
+                background: #f3f4f6;
+            }
+
+        .badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(16,185,129,.95);
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-weight: 900;
+            font-size: 12px;
+            z-index: 3;
+        }
+
+        .play {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to bottom, rgba(0,0,0,.10), rgba(0,0,0,.35));
+            z-index: 2;
+        }
+
+            .play .btn {
+                width: 64px;
+                height: 64px;
+                border-radius: 999px;
+                background: rgba(15,23,42,.85);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 10px 24px rgba(0,0,0,.25);
+            }
+
+                .play .btn span {
+                    color: #fff;
+                    font-weight: 900;
+                    font-size: 12px;
+                    letter-spacing: .6px;
+                }
+
+        .hint {
+            margin-top: 10px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .danger {
+            color: #ef4444;
+        }
+
+        /* Right sticky */
+        .right {
+            position: sticky;
+            top: 16px;
+        }
+
+        .price {
+            font-size: 22px;
+            font-weight: 900;
+            color: #16a34a;
+        }
+
+        .meta {
+            margin-top: 8px;
+            color: #475569;
+        }
+
+        .addr {
+            margin-top: 6px;
+            color: #475569;
+            line-height: 1.5;
+        }
+
+        /* Mobile: summary + amenities */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            margin-top: 18px;
+        }
+
+        .mobile-summary {
+            display: none;
+        }
+
+        .desc-card {
+            grid-column: auto;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #f1f5f9;
+            color: #0f172a;
+            font-weight: 800;
+            font-size: 12px;
+            border: 1px solid rgba(15,23,42,.08);
+        }
+
+        .muted {
+            color: #64748b;
+        }
+
+        /* Map */
+        .map-wrap {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(15,23,42,.08);
+        }
+
+            .map-wrap iframe {
+                width: 100%;
+                height: 280px;
+                border: 0;
+                display: block;
+            }
+
+        .map-open {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background: rgba(15,23,42,.85);
+            color: #fff;
+            text-decoration: none;
+            padding: 8px 10px;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 2;
+        }
+
+            .map-open:hover {
+                opacity: .95;
+            }
+
+        /* ===================== SIMILAR (max 4, scroll ngang) ===================== */
+        .similar-scroll {
+            display: grid;
+            grid-auto-flow: column;
+            grid-auto-columns: calc((100% - 18px * 2) / 3); /* PC: 3 item */
+            gap: 18px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding-bottom: 10px;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-gutter: stable both-edges;
+            align-items: stretch;
+        }
+
+            .similar-scroll .property-card {
+                scroll-snap-align: start;
+                min-width: 0;
+                height: 100%;
+            }
+
+            .similar-scroll::-webkit-scrollbar {
+                height: 8px;
+            }
+
+            .similar-scroll::-webkit-scrollbar-thumb {
+                background: rgba(0,0,0,.18);
+                border-radius: 999px;
+            }
+
+            .similar-scroll::-webkit-scrollbar-track {
+                background: rgba(0,0,0,.06);
+                border-radius: 999px;
+            }
+
+        /* Card */
+        .property-card {
+            position: relative;
+            cursor: pointer;
+        }
+
+            .property-card a.card-link {
+                color: inherit;
+                text-decoration: none;
+                display: block;
+            }
+
+            .property-card img {
+                width: 100%;
+                height: 160px;
+                object-fit: cover;
+                display: block;
+                background: #f3f4f6;
+                border-radius: 12px 12px 0 0;
+            }
+
+        .property-card-body {
+            padding: 10px 12px 12px;
+        }
+
+        .property-card-title {
+            font-weight: 900;
+            line-height: 1.25;
+            max-height: 2.5em;
+            overflow: hidden;
+        }
+
+        .property-card-address {
+            color: #64748b;
+            font-size: 13px;
+            margin-top: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .property-card-meta {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 6px;
+            color: #334155;
+            font-size: 13px;
+        }
+
+        .property-card-price {
+            margin-top: 8px;
+            font-weight: 900;
+        }
+
+        .property-card-fav {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            background: rgba(15,23,42,.65);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 3;
+        }
+
+            .property-card-fav i {
+                font-size: 14px;
+                color: #fff;
+            }
+
+            .property-card-fav.is-fav {
+                background: #ef4444;
+            }
+
+        /* Fix lệch chiều cao: chỉ áp dụng trong khu Similar */
+        .similar-scroll .property-card a.card-link {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .similar-scroll .property-card-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .similar-scroll .property-card-title {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            min-height: calc(1.25em * 2);
+        }
+
+        .similar-scroll .property-card-address {
+            min-height: 1.25em;
+        }
+
+        .similar-scroll .property-card-meta {
+            min-height: 1.25em;
+        }
+
+        .similar-scroll .property-card-price {
+            margin-top: auto;
+        }
+
+        /* ===================== RESPONSIVE ===================== */
+        @@media (max-width: 992px) {
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .right {
+                display: none;
+            }
+
+            .preview img {
+                height: 260px;
+            }
+
+            .mobile-summary {
+                display: block;
+            }
+
+            .desc-card {
+                grid-column: 1 / -1;
+            }
+
+            .similar-scroll {
+                grid-auto-columns: calc((100% - 16px) / 2); /* mobile/tablet: 2 item */
+                gap: 16px;
+            }
+        }
+
+        @@media (max-width: 500px) {
+            .detail-wrap {
+                padding: 0 4px;
+            }
+
+            .price {
+                font-size: 16px;
+                font-weight: 700;
+            }
+
+            .property-card-price {
+                font-size: .7rem !important;
+            }
+
+            .similar-scroll {
+                grid-auto-columns: calc((100% - 12px) / 2);
+                gap: 12px;
+            }
+        }
     </style>
 }
 
@@ -628,14 +657,10 @@
             <div class="card">
                 @if (Model.IsVrAvailable)
                 {
-                    <a class="preview"
-                       href="@Url.Action("Vr","Property", new { id = Model.PropertyId })"
-                       style="text-decoration:none;">
+                    <a class="preview" href="@Url.Action("Vr","Property", new { id = Model.PropertyId })" style="text-decoration:none;">
                         <span class="badge">VR 360°</span>
                         <img src="@Model.CoverImageUrl" alt="@Model.Title" loading="lazy" decoding="async" />
-                        <div class="play">
-                            <div class="btn"><span>PLAY</span></div>
-                        </div>
+                        <div class="play"><div class="btn"><span>PLAY</span></div></div>
                     </a>
                     <div class="hint">Click ảnh để vào màn VR</div>
                 }
@@ -648,13 +673,11 @@
                 }
             </div>
 
-            <!-- Mobile: Summary + Amenities same row -->
+            <!-- Mobile: Summary + Amenities -->
             <div class="two-col">
                 <div class="card mobile-summary">
                     <div class="price">@Model.PriceLabel</div>
-                    <div class="meta">
-                        @Model.Area m² · @(Model.BedroomCount ?? 0) PN · @(Model.BathroomCount ?? 0) WC
-                    </div>
+                    <div class="meta">@Model.Area m² · @(Model.BedroomCount ?? 0) PN · @(Model.BathroomCount ?? 0) WC</div>
                     <div class="addr">
                         @Model.AddressLine
                         @if (!string.IsNullOrWhiteSpace(Model.CityName))
@@ -754,9 +777,7 @@
         <!-- RIGHT (desktop only) -->
         <aside class="card right">
             <div class="price">@Model.PriceLabel</div>
-            <div class="meta">
-                @Model.Area m² · @(Model.BedroomCount ?? 0) PN · @(Model.BathroomCount ?? 0) WC
-            </div>
+            <div class="meta">@Model.Area m² · @(Model.BedroomCount ?? 0) PN · @(Model.BathroomCount ?? 0) WC</div>
             <div class="addr">
                 @Model.AddressLine
                 @if (!string.IsNullOrWhiteSpace(Model.CityName))

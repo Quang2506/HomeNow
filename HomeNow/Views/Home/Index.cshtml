@@ -69,241 +69,253 @@
 <link rel="stylesheet" href="~/Content/style/Home/index.css" />
 
 <style>
-    /* ===== Fav badge ===== */
-    .fav-wrap.has-badge i {
-        color: #ff4d6d;
-    }
+ /* ===== Fav badge ===== */
+.fav-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+}
+.fav-wrap.has-badge i { color: #ff4d6d; }
+
+.fav-badge {
+    position: absolute;
+    top: -4px;
+    right: -6px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: #22c55e;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+/* ===== Section header ===== */
+.home-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.home-section-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: #0f172a;
+    color: #fff !important;
+    text-decoration: none;
+    font-size: 13px;
+    white-space: nowrap;
+    opacity: .92;
+    transition: transform .15s ease, opacity .15s ease;
+}
+.home-section-more:hover { opacity: 1; transform: translateY(-1px); }
+
+/* ===== Scroll top ===== */
+.scroll-top-btn {
+    position: fixed;
+    right: 40px;
+    bottom: 40px;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    background: rgba(15,23,42,.85);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    cursor: pointer;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(10px);
+    transition: opacity .2s ease, transform .2s ease;
+}
+.scroll-top-btn.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+
+/* ===== Cards ===== */
+.property-card { position: relative; border-radius: 0; }
+.property-card-fav {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    background: rgba(15,23,42,.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+}
+.property-card-fav i { font-size: 14px; color: #fff; }
+.property-card-fav.is-fav { background: #ef4444; }
+
+.property-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-gap: 24px;
+}
+@@media (max-width: 991px) {
+    .property-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+
+.home-body-container .property-card { height: 100%; }
+
+/* override inline style display:block ở helper */
+.home-body-container .property-card a.property-card-link {
+    display: flex !important;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* nếu _PropertyCardList có class khác, vẫn cover thêm */
+.home-body-container .property-card a.property-card-link,
+.home-body-container .property-card a.property-card-link[style],
+.home-body-container .property-card a.property-card-link *,
+.home-body-container .property-card a.property-card-link:link {
+    text-decoration: none;
+}
+
+.home-body-container .property-card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.home-body-container .property-card-title {
+    font-weight: 900;
+    line-height: 1.25;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    min-height: calc(1.25em * 2); /* luôn giữ chỗ 2 dòng */
+}
+
+.home-body-container .property-card-address {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 1.25em;
+}
+
+/* desktop/tablet: meta 1 dòng, không làm card cao thấp */
+.home-body-container .property-card-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 1.25em;
+}
+.home-body-container .property-card-meta span {
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.home-body-container .property-card-price { margin-top: auto; }
+
+/* ===== Account dropdown fix (giữ nguyên logic cũ) ===== */
+.account-hover {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    z-index: 9999;
+}
+.account-trigger {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 999px;
+    color: #fff;
+    user-select: none;
+}
+.account-trigger:hover { background: rgba(15,23,42,.55); }
+
+.account-dropdown {
+    position: absolute;
+    right: -29px;
+    top: 21px;
+    min-width: 104px;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 18px 40px rgba(0,0,0,.18);
+    border: 1px solid rgba(15,23,42,.10);
+    padding: 5px;
+    opacity: 0;
+    transform: translateY(-6px);
+    visibility: hidden;
+    pointer-events: none;
+}
+.account-hover:hover .account-dropdown,
+.account-hover.open .account-dropdown {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+    pointer-events: auto;
+}
+.account-dropdown a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0;
+    border-radius: 10px;
+    color: #0f172a;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+
+@@media (max-width: 500px) {
+    .home-header-right-top a { margin: 0; }
 
     .fav-badge {
-        position: absolute;
-        top: -4px;
-        right: -6px;
-        min-width: 18px;
-        height: 18px;
-        padding: 0 5px;
-        border-radius: 999px;
-        background: #22c55e;
-        color: #fff;
-        font-size: 11px;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        line-height: 1;
+        top: 2px;
+        right: 0;
+        min-width: 13px;
+        height: 13px;
+        padding: 0 4px;
+        font-size: 9px;
     }
 
-    .fav-wrap {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 34px;
-        height: 34px;
-        border-radius: 999px;
+    /* Address 2 dòng cho dễ đọc, nhưng cố định chiều cao */
+    .home-body-container .property-card-address {
+        white-space: normal;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+        min-height: calc(1.25em * 2);
     }
 
-    @@media(max-width:500px) {
-        .fav-badge {
-            top: 1px;
-            right: 0px;
-            min-width: 13px;
-            height: 13px;
-        }
-
-        .home-header-right-top a {
-            margin:0px;
-        }
-        .fav-badge {
-            position: absolute;
-            top: 2px;
-            right: 0px;
-            min-width: 8px;
-            height: 12px;
-            /* padding: 0 5px; */
-            border-radius: 999px;
-            background: #22c55e;
-            color: #fff;
-            font-size: 9px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 1;
-        }
-    }
-
-    /* ===== Section header ===== */
-    .home-section-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-    }
-
-    .home-section-more {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 12px;
-        border-radius: 999px;
-        background: #0f172a;
-        color: #fff !important;
-        text-decoration: none;
-        font-size: 13px;
-        white-space: nowrap;
-        opacity: .92;
-        transition: transform .15s ease, opacity .15s ease;
-    }
-
-        .home-section-more:hover {
-            opacity: 1;
-            transform: translateY(-1px);
-        }
-
-    /* ===== Scroll top ===== */
-    .scroll-top-btn {
-        position: fixed;
-        right: 40px;
-        bottom: 40px;
-        width: 40px;
-        height: 40px;
-        border-radius: 999px;
-        background: rgba(15,23,42,.85);
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-        cursor: pointer;
-        z-index: 9999;
-        opacity: 0;
-        pointer-events: none;
-        transform: translateY(10px);
-        transition: opacity .2s ease, transform .2s ease;
-    }
-
-        .scroll-top-btn.show {
-            opacity: 1;
-            pointer-events: auto;
-            transform: translateY(0);
-        }
-
-    /* ===== Cards ===== */
-    .property-card {
-        position: relative;
-        border-radius: 0px;
-    }
-
-    .property-card-fav {
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        width: 28px;
-        height: 28px;
-        border-radius: 999px;
-        background: rgba(15,23,42,.65);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        z-index: 2;
-    }
-
-        .property-card-fav i {
-            font-size: 14px;
-            color: #fff;
-        }
-
-        .property-card-fav.is-fav {
-            background: #ef4444;
-        }
-
-    .property-grid {
+    /* Meta xuống 2 dòng (2 hàng) => đọc dễ, vẫn đều nhau */
+    .home-body-container .property-card-meta {
         display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        grid-gap: 24px;
+        grid-template-columns: 1fr;
+        gap: 4px;
+        min-height: calc(1.25em * 2);
     }
-
-    @@media(max-width:991px) {
-        .property-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
+    .home-body-container .property-card-meta span {
+        white-space: normal;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
-
-    /* =========================================================
-       FIX LỖI KHOANH ĐỎ: account dropdown bị render ra ngoài
-       => Ẩn dropdown mặc định, hover/tap mới hiện
-       ========================================================= */
-    .account-hover {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        z-index: 9999;
-    }
-
-    .account-trigger {
-        display: inline-flex;
-        align-items: center;
-        /* gap: 8px; */
-        cursor: pointer;
-        /* padding: 8px 12px; */
-        border-radius: 999px;
-        /* background: rgba(15, 23, 42, .35); */
-        color: #fff;
-        backdrop-filter: blur(6px);
-        user-select: none;
-    }
-
-        .account-trigger:hover {
-            background: rgba(15,23,42,.55);
-        }
-
-    .account-dropdown {
-        position: absolute;
-        right: -29px;
-        top: 21px;
-        min-width: 104px;
-        background: #fff;
-        border-radius: 14px;
-        box-shadow: 0 18px 40px rgba(0, 0, 0, .18);
-        border: 1px solid rgba(15, 23, 42, .10);
-        padding: 5px;
-        opacity: 0;
-        transform: translateY(-6px);
-        visibility: hidden;
-        pointer-events: none;
-    }
-
-    /* PC hover */
-    .account-hover:hover .account-dropdown {
-        opacity: 1;
-        transform: translateY(0);
-        visibility: visible;
-        pointer-events: auto;
-    }
-
-    /* Mobile click */
-    .account-hover.open .account-dropdown {
-        opacity: 1;
-        transform: translateY(0);
-        visibility: visible;
-        pointer-events: auto;
-    }
-
-    .account-dropdown a {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 0px;
-        border-radius: 10px;
-        color: #0f172a;
-        text-decoration: none;
-        font-weight: 700;
-    }
-
-        .account-dropdown a:hover {
-           /* background: #f1f5f9;*/
-        }
+}
 </style>
 
 <div class="home-hero" style="background-image:url('@(ViewBag.HeroBackground ?? "/Assets/Banner.jpg")');">
@@ -342,7 +354,7 @@
                             <i class="fa-solid fa-bell"></i>
                         </a>
 
-                        <!-- ✅ FIX dropdown -->
+                        <!--  dropdown -->
                         <div class="hidden-xs account-hover" id="hnAccountHover">
                             <div class="account-trigger" id="hnAccountTrigger">
                                 <i class="fa-solid fa-user"></i>
@@ -537,7 +549,7 @@
 
 @section Scripts {
     <script>
-    // ✅ Fix dropdown account trên mobile (tap mở/đóng), PC hover vẫn chạy nhờ CSS
+    // Fix dropdown account trên mobile (tap mở/đóng), PC hover vẫn chạy nhờ CSS
     (function () {
         var wrap = document.getElementById('hnAccountHover');
         var trigger = document.getElementById('hnAccountTrigger');
