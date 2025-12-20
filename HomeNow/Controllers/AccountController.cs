@@ -119,7 +119,7 @@ namespace HomeNow.Controllers
                     password: model.Password
                 );
 
-                // ✅ Khuyến nghị: đăng ký xong login nhưng KHÔNG remember (đúng ý "chỉ tick remember mới nhớ")
+              
                 ClearAuthCookie();
                 FormsAuthentication.SetAuthCookie(user.Id.ToString(), false);
 
@@ -159,7 +159,7 @@ namespace HomeNow.Controllers
 
         private void ClearAuthCookie()
         {
-            // SignOut đôi khi chưa đủ chắc khi cookie persistent/path khác nhau -> expire thẳng
+           
             var cookie = new HttpCookie(FormsAuthentication.FormsCookieName, "")
             {
                 Expires = DateTime.Now.AddYears(-1),

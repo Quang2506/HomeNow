@@ -1,6 +1,8 @@
 ﻿@using HomeNow.Resources
 @using Core.Models
 @using System.Web
+@using System.Linq
+@using System.Collections.Generic
 
 @model Core.Models.HomeIndexViewModel
 
@@ -33,12 +35,17 @@
 <link rel="stylesheet" href="~/Content/style/Property/List.css" />
 
 <style>
-
+    .home-hero{
+        background:none
+    }
+    .fa-heart {
+        font-size: 14px;
+    }
     .list-hero {
         position: relative;
         background-size: cover;
         background-position: center;
-        padding: 14px 0 12px;
+        padding: 7px 0 3px;
     }
 
         .list-hero::before {
@@ -64,7 +71,6 @@
         margin: 0;
     }
 
-
     .account-hover {
         position: relative;
         display: inline-flex;
@@ -76,12 +82,12 @@
     .account-trigger {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
+        /* gap: 6px; */
         cursor: pointer;
         color: #fff;
-        padding: 6px 10px;
+        /* padding: 6px 10px; */
         border-radius: 999px;
-        background: rgba(15, 23, 42, 0.35);
+        background: rgba(15, 23, 42, 0);
         border: 0;
         outline: 0;
     }
@@ -135,7 +141,6 @@
             background: rgba(255,255,255,.08);
         }
 
-  
     .fav-wrap {
         position: relative;
         display: inline-flex;
@@ -169,7 +174,6 @@
         line-height: 1;
     }
 
-  
     .home-search-wrapper {
         background: #fff;
         border-radius: 5px;
@@ -181,7 +185,6 @@
         flex-direction: column;
         gap: 4px;
     }
-
 
     .list-shell {
         max-width: 1200px;
@@ -207,7 +210,6 @@
         margin: auto;
     }
 
-  
     .p-row {
         display: flex;
         gap: 16px;
@@ -277,8 +279,8 @@
         display: flex;
         align-items: center;
         gap: 10px;
+        padding-top:10px
     }
-
 
     .p-price-mobile {
         display: none;
@@ -290,7 +292,6 @@
         flex: 0 0 210px;
         text-align: right;
         padding-top: 6px;
-      
     }
 
     .p-price-main {
@@ -300,19 +301,18 @@
         line-height: 1.1;
     }
 
-    
     .list-shell .js-fav-toggle {
-        width: 34px;
-        height: 34px;
+        width: 24px;
+        height: 24px;
         border-radius: 999px;
         border: none !important;
         outline: none;
         cursor: pointer;
-        background: rgba(15,23,42,.08);
+        background: rgba(15, 23, 42, .08);
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        flex: 0 0 34px;
+        /* flex: 0 0 20px; */
     }
 
         .list-shell .js-fav-toggle i {
@@ -327,7 +327,6 @@
                 color: #fff !important;
             }
 
-    /* ===== MOBILE (<=900): vẫn ngang, thu nhỏ ===== */
     @@media(max-width:900px) {
         .home-search-wrapper {
             width: 97%;
@@ -363,8 +362,6 @@
             -webkit-box-orient: vertical;
         }
 
-       
-
         .p-price-main {
             font-size: 16px;
         }
@@ -396,77 +393,88 @@
         .p-price-mobile {
             display: block !important;
         }
-    }
-    
-
-        .scroll-top-btn {
-            position: fixed;
-            right: 18px;
-            bottom: 18px;
-            width: 40px;
-            height: 40px;
-            border-radius: 999px;
-            background: rgba(15,23,42,.85);
-            color: #fff;
+        .p-actions {
             display: flex;
             align-items: center;
-            justify-content: center;
-            box-shadow: 0 6px 16px rgba(0,0,0,.25);
-            cursor: pointer;
-            z-index: 9999;
-            opacity: 0;
-            pointer-events: none;
-            transform: translateY(10px);
-            transition: opacity .2s ease, transform .2s ease;
-            text-decoration: none;
+            gap: 10px;
+            padding-top: 5px
+        }
+    }
+
+    .scroll-top-btn {
+        position: fixed;
+        right: 18px;
+        bottom: 18px;
+        width: 40px;
+        height: 40px;
+        border-radius: 999px;
+        background: rgba(15,23,42,.85);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 6px 16px rgba(0,0,0,.25);
+        cursor: pointer;
+        z-index: 9999;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(10px);
+        transition: opacity .2s ease, transform .2s ease;
+        text-decoration: none;
+    }
+
+        .scroll-top-btn.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
         }
 
-            .scroll-top-btn.show {
-                opacity: 1;
-                pointer-events: auto;
-                transform: translateY(0);
-            }
-
-        @@media(max-width:500px) {
-            .scroll-top-btn {
-                right: 12px;
-                bottom: 12px;
-            }
-            .list-shell {
-                padding: 0px;
-            }
-
-            .p-row {
-                gap: 10px;
-            }
-
-            .p-img {
-                width: 110px;
-                height: 80px;
-                flex: 0 0 110px;
-            }
-
-
-            .fav-badge {
-                top: -1px;
-                right: -4px;
-                min-width: 15px;
-                height: 15px;
-            }
-
-
-            .p-price-main {
-                font-size: 15px !important;
-                white-space: nowrap;
-            }
+    @@media(max-width:500px) {
+        .scroll-top-btn {
+            right: 12px;
+            bottom: 12px;
         }
+
+        .list-shell {
+            padding: 0px;
+        }
+
+        .p-row {
+            gap: 10px;
+        }
+
+        .p-img {
+            width: 110px;
+            height: 80px;
+            flex: 0 0 110px;
+        }
+
+        .fav-badge {
+            top: -1px;
+            right: -4px;
+            min-width: 15px;
+            height: 15px;
+        }
+
+        .p-price-main {
+            font-size: 15px !important;
+            white-space: nowrap;
+        }
+    }
+
+    /* Spinner load more */
+    #listLoadMoreSpinner {
+        display: none;
+        text-align: center;
+        padding: 12px;
+        opacity: .7;
+    }
 </style>
 
 <!-- ===== HERO HEADER ===== -->
-<div class="home-hero list-hero" >@*style="background-image:url('@heroBg');"*@
+<div class="home-hero list-hero">
     <div class="home-hero-shell">
         <div class="home-hero-header">
-
             <a href="@Url.Action("Index", "Home")" class="home-header-left-box">
                 <div class="home-logo-icon"></div>
                 <div class="home-header-left">
@@ -486,40 +494,40 @@
                     {
                         var name = Session["CurrentUserName"] as string ?? HomeTexts.Account_Default;
 
-                        <a href="@Url.Action("Favorites", "Property")"
-                           class="js-fav-top fav-wrap @(favCount > 0 ? "has-badge" : "")"
-                           data-return="@Url.Action("Favorites", "Property")">
-                            <i class="fa-solid fa-heart"></i>
-                            @if (favCount > 0)
+                    <a href="@Url.Action("Favorites", "Property")"
+                       class="js-fav-top fav-wrap @(favCount > 0 ? "has-badge" : "")"
+                       data-return="@Url.Action("Favorites", "Property")">
+                        <i class="fa-solid fa-heart"></i>
+                        @if (favCount > 0)
                             {<span id="headerFavBadge" class="fav-badge">@favCountText</span>}
-                        </a>
+                    </a>
 
-                        <a href="javascript:void(0)"><i class="fa-solid fa-bell"></i></a>
+                    <a href="javascript:void(0)"><i class="fa-solid fa-bell"></i></a>
 
-                        <div class="account-hover" id="accountMenu">
-                            <button type="button" class="account-trigger" aria-haspopup="menu" aria-expanded="false">
-                                <i class="fa-solid fa-user"></i>
-                                <span>@name</span>
-                                <i class="fa-solid fa-caret-down" style="font-size:12px; opacity:.8;"></i>
-                            </button>
-                            <div class="account-dropdown" role="menu">
-                                <a href="@Url.Action("Logout","Account")" role="menuitem">
-                                    <i class="fa-solid fa-right-from-bracket"></i> @HomeTexts.Logout
-                                </a>
-                            </div>
+                    <div class="account-hover" id="accountMenu">
+                        <button type="button" class="account-trigger" aria-haspopup="menu" aria-expanded="false">
+                            <i class="fa-solid fa-user"></i>
+                            <span>@name</span>
+                            <i class="fa-solid fa-caret-down" style="font-size:12px; opacity:.8;"></i>
+                        </button>
+                        <div class="account-dropdown" role="menu">
+                            <a href="@Url.Action("Logout","Account")" role="menuitem">
+                                <i class="fa-solid fa-right-from-bracket"></i> @HomeTexts.Logout
+                            </a>
                         </div>
+                    </div>
                     }
                     else
                     {
-                        <a href="@Url.Action("Favorites", "Property")"
-                           class="js-fav-top fav-wrap"
-                           data-return="@Url.Action("Favorites", "Property")">
-                            <i class="fa-solid fa-heart"></i>
-                        </a>
+                    <a href="@Url.Action("Favorites", "Property")"
+                       class="js-fav-top fav-wrap"
+                       data-return="@Url.Action("Favorites", "Property")">
+                        <i class="fa-solid fa-heart"></i>
+                    </a>
 
-                        <a href="javascript:void(0)"><i class="fa-solid fa-bell"></i></a>
+                    <a href="javascript:void(0)"><i class="fa-solid fa-bell"></i></a>
 
-                        <a href="javascript:void(0)" class="js-open-login">@HomeTexts.Login</a>
+                    <a href="javascript:void(0)" class="js-open-login">@HomeTexts.Login</a>
                     }
 
                     <a href="@Url.Action("Request", "Landlord")" class="nav-post">@HomeTexts.Menu_Post</a>
@@ -544,57 +552,57 @@
 
     @using (Html.BeginForm("List", "Property", FormMethod.Get, new { id = "listSearchForm", @class = "home-search-form" }))
     {
-        <div class="home-search-wrapper" style="margin-bottom:12px;">
-            <div class="home-search-top">
-                <div class="home-search-tabs">
-                    <button type="button" class="home-search-tab-btn @(mode == "rent" ? "active" : "")" data-value="rent">@HomeTexts.Tab_Rent</button>
-                    <span style="color:#aaa">|</span>
-                    <button type="button" class="home-search-tab-btn @(mode == "sale" ? "active" : "")" data-value="sale">@HomeTexts.Tab_Sale</button>
-                </div>
-
-                <div class="home-search-input-wrap">
-                    <input type="text" name="keyword" value="@(Model.Keyword ?? "")" placeholder="@HomeTexts.Search_Placeholder" />
-                </div>
-
-                <button type="submit" class="home-search-btn-main">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </button>
+    <div class="home-search-wrapper" style="margin-bottom:12px;">
+        <div class="home-search-top">
+            <div class="home-search-tabs">
+                <button type="button" class="home-search-tab-btn @(mode == "rent" ? "active" : "")" data-value="rent">@HomeTexts.Tab_Rent</button>
+                <span style="color:#aaa">|</span>
+                <button type="button" class="home-search-tab-btn @(mode == "sale" ? "active" : "")" data-value="sale">@HomeTexts.Tab_Sale</button>
             </div>
 
-            <input type="hidden" name="mode" id="modeInput" value="@mode" />
+            <div class="home-search-input-wrap">
+                <input type="text" name="keyword" value="@(Model.Keyword ?? "")" placeholder="@HomeTexts.Search_Placeholder" />
+            </div>
 
-            <div class="home-search-bottom">
-                <div class="home-search-filter">
-                    <select name="cityId" id="cityId" class="home-search-filter-select">
-                        <option value="">@HomeTexts.Filter_City</option>
-                        @foreach (var c in (Model.Cities ?? new List<CityDropDownItem>()))
-                        {
-                            <option value="@c.CityId" @(Model.CityId == c.CityId ? "selected" : "")>@c.Name</option>
-                        }
-                    </select>
-                </div>
+            <button type="submit" class="home-search-btn-main">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+        </div>
 
-                <div class="home-search-filter">
-                    <select name="priceRange" id="priceRange" class="home-search-filter-select">
-                        <option value="">@HomeTexts.Filter_Price</option>
-                        @foreach (var pf in (Model.PriceFilters ?? new List<PriceFilterDropDownItem>()))
-                        {
-                            <option value="@pf.Code" @(Model.PriceRange == pf.Code ? "selected" : "")>@pf.Name</option>
-                        }
-                    </select>
-                </div>
+        <input type="hidden" name="mode" id="modeInput" value="@mode" />
 
-                <div class="home-search-filter">
-                    <select name="propertyType" id="propertyType" class="home-search-filter-select">
-                        <option value="">@HomeTexts.Filter_PropertyType</option>
-                        @foreach (var pt in (Model.PropertyTypes ?? new List<PropertyTypeDropDownItem>()))
+        <div class="home-search-bottom">
+            <div class="home-search-filter">
+                <select name="cityId" id="cityId" class="home-search-filter-select">
+                    <option value="">@HomeTexts.Filter_City</option>
+                    @foreach (var c in (Model.Cities ?? new List<CityDropDownItem>()))
                         {
-                            <option value="@pt.Code" @(Model.PropertyType == pt.Code ? "selected" : "")>@pt.Name</option>
+                    <option value="@c.CityId" @(Model.CityId == c.CityId ? "selected" : "")>@c.Name</option>
                         }
-                    </select>
-                </div>
+                </select>
+            </div>
+
+            <div class="home-search-filter">
+                <select name="priceRange" id="priceRange" class="home-search-filter-select">
+                    <option value="">@HomeTexts.Filter_Price</option>
+                    @foreach (var pf in (Model.PriceFilters ?? new List<PriceFilterDropDownItem>()))
+                        {
+                    <option value="@pf.Code" @(Model.PriceRange == pf.Code ? "selected" : "")>@pf.Name</option>
+                        }
+                </select>
+            </div>
+
+            <div class="home-search-filter">
+                <select name="propertyType" id="propertyType" class="home-search-filter-select">
+                    <option value="">@HomeTexts.Filter_PropertyType</option>
+                    @foreach (var pt in (Model.PropertyTypes ?? new List<PropertyTypeDropDownItem>()))
+                        {
+                    <option value="@pt.Code" @(Model.PropertyType == pt.Code ? "selected" : "")>@pt.Name</option>
+                        }
+                </select>
             </div>
         </div>
+    </div>
     }
 
     <div class="list-head">
@@ -607,7 +615,9 @@
 
     <input type="hidden" id="currentPage" value="@Model.Page" />
     <input type="hidden" id="totalPages" value="@Model.TotalPages" />
+
     <div id="load-more-sentinel" style="height:1px;"></div>
+    <div id="listLoadMoreSpinner"><i class="fa-solid fa-circle-notch fa-spin"></i></div>
 </div>
 
 <!--Scroll to top button -->
@@ -617,7 +627,7 @@
 
 @section Scripts{
     <script>
-    //account dropdown: PC hover + mobile click
+    // account dropdown: PC hover + mobile click
     (function () {
         var menu = document.getElementById('accountMenu');
         if (!menu) return;
@@ -632,7 +642,6 @@
         }
         document.addEventListener('click', function () { menu.classList.remove('open'); });
 
-        // giữ hover cho PC
         var timer = null;
         menu.addEventListener('mouseenter', function () {
             if (timer) clearTimeout(timer);
@@ -643,8 +652,9 @@
         });
     })();
 
-    //  header favorites realtime 
+    // header favorites realtime (cache favIds global để dùng lại, không spam gọi)
     window.__isAuth = @User.Identity.IsAuthenticated.ToString().ToLower();
+    window.__favIds = window.__favIds || [];
 
     function updateHeaderFavBadge(count) {
         count = parseInt(count || 0, 10);
@@ -664,12 +674,13 @@
         }
     }
 
-    function applyFavoriteIds(ids) {
+    function applyFavoriteIds(ids, $scope) {
         ids = ids || [];
         var set = {};
         for (var i = 0; i < ids.length; i++) set[ids[i]] = true;
 
-        $('.js-fav-toggle').each(function () {
+        var $root = $scope && $scope.length ? $scope : $(document);
+        $root.find('.js-fav-toggle').each(function () {
             var pid = $(this).data('id');
             $(this).toggleClass('is-fav', !!set[pid]);
         });
@@ -681,7 +692,8 @@
                 if (!res) return;
                 window.__isAuth = !!res.isAuth;
                 updateHeaderFavBadge(res.favoriteCount || 0);
-                if (res.favoriteIds) applyFavoriteIds(res.favoriteIds);
+                window.__favIds = res.favoriteIds || [];
+                applyFavoriteIds(window.__favIds);
             });
     };
 
@@ -706,7 +718,7 @@
         }
     });
 
-    // ===== tabs rent/sale giống Home =====
+    // tabs rent/sale
     (function () {
         var buttons = document.querySelectorAll(".home-search-tab-btn");
         var hidden = document.getElementById("modeInput");
@@ -716,21 +728,25 @@
             btn.addEventListener("click", function () {
                 var val = this.getAttribute("data-value");
                 hidden.value = val;
-
                 buttons.forEach(function (b) { b.classList.remove("active"); });
                 this.classList.add("active");
             });
         });
     })();
 
-    // ===== infinite scroll giống Home =====
+    // ✅ Infinite scroll (mượt: unobserve khi load, observe lại; stop khi hết trang; có spinner)
     (function () {
         var $results = $('#list-results');
         if ($results.length === 0) return;
 
+        var $spinner = $('#listLoadMoreSpinner');
+
         var currentPage = parseInt($('#currentPage').val() || '1', 10);
         var totalPages  = parseInt($('#totalPages').val() || '1', 10);
         var isLoading = false;
+
+        var sentinel = document.getElementById('load-more-sentinel');
+        var io = null;
 
         function buildQuery(page) {
             return {
@@ -743,45 +759,83 @@
             };
         }
 
+        function stop() {
+            if (io) io.disconnect();
+        }
+        function observe() {
+            if (io && sentinel) io.observe(sentinel);
+        }
+        function unobserve() {
+            if (io && sentinel) io.unobserve(sentinel);
+        }
+
         function loadNextPage() {
             if (isLoading) return;
-            if (currentPage >= totalPages) return;
+            if (currentPage >= totalPages) { stop(); return; }
 
             isLoading = true;
             currentPage++;
+            unobserve();
+            $spinner.show();
 
-            $.get('@Url.Action("LoadMoreList", "Property")', buildQuery(currentPage))
+            var data = buildQuery(currentPage);
+
+            $.get('@Url.Action("LoadMoreList", "Property")', data)
                 .done(function (html) {
                     if (html && $.trim(html).length > 0) {
-                        $results.append(html);
+                        // append mượt
+                        var $chunk = $('<div/>').html(html);
+                        $results.append($chunk.contents());
+
                         $('#currentPage').val(currentPage);
-                        window.refreshHeaderFav();
+
+                        // nếu user login sau đó -> đảm bảo chunk mới cũng sync fav (không gọi server)
+                        if (window.__isAuth && window.__favIds && window.__favIds.length) {
+                            applyFavoriteIds(window.__favIds, $results);
+                        }
                     } else {
                         currentPage = totalPages;
                     }
                 })
-                .always(function () { isLoading = false; });
+                .fail(function () {
+                    // lỗi mạng: rollback để không “mất trang”
+                    currentPage--;
+                })
+                .always(function () {
+                    isLoading = false;
+                    $spinner.hide();
+
+                    if (currentPage >= totalPages) stop();
+                    else observe();
+                });
         }
 
-        var sentinel = document.getElementById('load-more-sentinel');
         if ('IntersectionObserver' in window && sentinel) {
-            var io = new IntersectionObserver(function (entries) {
+            io = new IntersectionObserver(function (entries) {
                 entries.forEach(function (entry) {
                     if (entry.isIntersecting) loadNextPage();
                 });
-            }, { rootMargin: '0px 0px 250px 0px', threshold: 0 });
+            }, { root: null, rootMargin: '0px 0px 700px 0px', threshold: 0 });
 
-            io.observe(sentinel);
+            observe();
         } else {
+            // fallback scroll (throttle bằng rAF)
+            var ticking = false;
             $(window).on('scroll', function () {
-                if ($(window).scrollTop() + $(window).height() + 250 >= $(document).height()) {
-                    loadNextPage();
-                }
+                if (ticking) return;
+                ticking = true;
+
+                requestAnimationFrame(function () {
+                    ticking = false;
+                    if ($(window).scrollTop() + $(window).height() + 700 >= $(document).height()) {
+                        loadNextPage();
+                    }
+                });
             });
         }
     })();
 
-    //  toggle favorite + refresh badge
+    // toggle favorite + update badge (KHÔNG cần GET HeaderFavoriteInfo mỗi lần)
     (function () {
         var MSG_NEED_LOGIN = '@JS_FavNeedLogin';
         var MSG_UPDATE_FAIL = '@JS_FavUpdateFail';
@@ -810,7 +864,14 @@
 
                     if (res.success) {
                         $btn.toggleClass('is-fav', !!res.isFavorite);
-                        window.refreshHeaderFav();
+
+                        // update badge ngay (giảm 1 request)
+                        if (typeof res.favoriteCount !== 'undefined') {
+                            updateHeaderFavBadge(res.favoriteCount);
+                        } else {
+                            // fallback nếu server không trả count
+                            window.refreshHeaderFav();
+                        }
                     }
                 },
                 error: function () { alert(MSG_UPDATE_FAIL); }
@@ -818,7 +879,7 @@
         });
     })();
 
-    // 
+    // scroll to top
     (function () {
         var $btn = $('#scrollTopBtn');
         if ($btn.length === 0) return;

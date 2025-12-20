@@ -13,7 +13,7 @@ namespace Core.Models
         public int PropertyId { get; set; }
 
         [Column("scene_key")]
-        public string SceneKey { get; set; }        // living, hallway, kitchen...
+        public string SceneKey { get; set; }        
 
         [Column("title")]
         public string Title { get; set; }           

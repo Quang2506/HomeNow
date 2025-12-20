@@ -3,7 +3,8 @@
     Layout = null; // toàn màn hình VR, không dùng _Layout
     var lang = Model.Lang;
     var sceneList = Model.Scenes.ToList();
-    var firstSceneKey = sceneList.First(s => s.IsDefault).SceneKey;
+    var firstSceneKey = sceneList.FirstOrDefault(s => s.IsDefault)?.SceneKey ?? sceneList.First().SceneKey;
+
 }
 
 <!DOCTYPE html>
@@ -152,6 +153,16 @@
     </style>
 </head>
 <body>
+    @{
+    var pid = (int)(ViewBag.PropertyId ?? 0);
+    }
+    <a href="@Url.Action("Detail","Property", new { id = pid })"
+       style="position:fixed;left:12px;top:12px;z-index:10000;
+          padding:10px 12px;border-radius:12px;
+          background:rgba(15,23,42,.75);color:#fff;text-decoration:none;font-weight:800;">
+        ← Quay lại
+    </a>
+
     <div id="vr"></div>
 
     <!-- UI phụ: minimap + chế độ tạo hotspot + auto run -->
@@ -164,7 +175,7 @@
                 var title = s.Translations
                              ?.FirstOrDefault(t => t.LangCode == lang)?.Title
                              ?? s.Title;
-                <div class="minimap-room" data-scene="@s.SceneKey">@title</div>
+            <div class="minimap-room" data-scene="@s.SceneKey">@title</div>
             }
         </div>
 
@@ -187,7 +198,7 @@
             //  OPT: detect mobile
             var isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-            // ======= OPT: zoom limit (không zoom sâu) 
+            // ======= OPT: zoom limit (không zoom sâu)
             var HFOV_DEFAULT = isMobile ? 95 : 110;
             var HFOV_MIN = isMobile ? 80 : 70;
             var HFOV_MAX = 120;
@@ -196,7 +207,7 @@
             var sceneBusy = false;
             var sceneBusyTimer = null;
 
-            // ======= OPT: nâng độ nét canvas theo DPR có giới hạn 
+            // ======= OPT: nâng độ nét canvas theo DPR có giới hạn
             function pickDprCap() {
                 var dpr = window.devicePixelRatio || 1;
                 var mem = navigator.deviceMemory || 0; // Chrome
@@ -282,7 +293,7 @@
                             if (!viewer) return;
                             if (!config.scenes[args.sceneId]) return;
 
-                            // load scene + set hướng 
+                            // load scene + set hướng
                             viewer.loadScene(args.sceneId, args.targetPitch || 0, args.targetYaw || 0);
 
                             // zoom-out về mặc định

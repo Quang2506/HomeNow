@@ -1,5 +1,4 @@
-﻿// Services/Implementations/FavoriteService.cs
-using Core.Models;   // dùng PropertyListItemViewModel
+﻿using Core.Models;   // PropertyListItemViewModel
 using Data;
 using Services.Interfaces;
 using System;
@@ -18,7 +17,6 @@ namespace Services.Implementations
             {
                 langCode = (langCode ?? "vi").Substring(0, 2).ToLower();
 
-                // 1) Query chỉ lấy dữ liệu thô, KHÔNG ép decimal trong LINQ to Entities
                 var raw = await
                     (from f in db.UserFavoriteProperties
                      join p in db.Properties on f.PropertyId equals p.PropertyId
@@ -27,12 +25,10 @@ namespace Services.Implementations
                      select new
                      {
                          Property = p,
-                         Translation = p.Translations
-                             .FirstOrDefault(t => t.LangCode == langCode)
+                         Translation = p.Translations.FirstOrDefault(t => t.LangCode == langCode)
                      })
                     .ToListAsync();
 
-                // 2) Map sang ViewModel ở ngoài (in-memory) → ép kiểu thoải mái
                 var list = raw.Select(x =>
                 {
                     var p = x.Property;
@@ -44,7 +40,6 @@ namespace Services.Implementations
                         Title = tr != null ? (tr.DisplayTitle ?? tr.Title) : p.Title,
                         Address = tr != null ? tr.AddressLine : p.AddressLine,
 
-                        // p.Price là decimal? → PropertyListItemViewModel.Price là decimal
                         Price = p.Price ?? 0m,
                         PriceLabel = p.Price.HasValue ? p.Price.Value.ToString("N0") : "",
 
@@ -62,6 +57,74 @@ namespace Services.Implementations
             }
         }
 
+      
+        public async Task<int[]> GetFavoriteIdsAsync(int userId)
+        {
+            using (var db = new AppDbContext())
+            {
+                var ids = await
+                    (from f in db.UserFavoriteProperties
+                     join p in db.Properties on f.PropertyId equals p.PropertyId
+                     where f.UserId == userId && p.Status == "published"
+                     select f.PropertyId)
+                    .Distinct()
+                    .ToArrayAsync();
+
+                return ids ?? new int[0];
+            }
+        }
+
+        
+        public async Task<FavoriteToggleResult> ToggleFavoriteWithSummaryAsync(int userId, int propertyId, string langCode)
+        {
+            using (var db = new AppDbContext())
+            {
+                var fav = await db.UserFavoriteProperties
+                    .FirstOrDefaultAsync(x => x.UserId == userId && x.PropertyId == propertyId);
+
+                bool isFavorite;
+
+                if (fav == null)
+                {
+                    fav = new UserFavoriteProperty
+                    {
+                        UserId = userId,
+                        PropertyId = propertyId,
+                        CreatedAt = DateTime.Now
+                    };
+
+                    db.UserFavoriteProperties.Add(fav);
+                    isFavorite = true;
+                }
+                else
+                {
+                    db.UserFavoriteProperties.Remove(fav);
+                    isFavorite = false;
+                }
+
+                await db.SaveChangesAsync();
+
+                //summary (published)
+                var ids = await
+                    (from f in db.UserFavoriteProperties
+                     join p in db.Properties on f.PropertyId equals p.PropertyId
+                     where f.UserId == userId && p.Status == "published"
+                     select f.PropertyId)
+                    .Distinct()
+                    .ToArrayAsync();
+
+                ids = ids ?? new int[0];
+
+                return new FavoriteToggleResult
+                {
+                    IsFavorite = isFavorite,
+                    FavoriteIds = ids,
+                    FavoriteCount = ids.Length
+                };
+            }
+        }
+
+        //
         public async Task<bool> ToggleFavoriteAsync(int userId, int propertyId)
         {
             using (var db = new AppDbContext())

@@ -92,7 +92,7 @@ namespace HomeNow.Controllers
             Session["CurrentUserId"] = null;
             Session["CurrentUserName"] = null;
 
-            // quan trọng: request hiện tại cũng coi như logout
+          
             HttpContext.User = new GenericPrincipal(new GenericIdentity(string.Empty), null);
             System.Threading.Thread.CurrentPrincipal = HttpContext.User;
         }

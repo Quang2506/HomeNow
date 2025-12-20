@@ -22,335 +22,294 @@
     }
     else
     {
-        currentType = "";
+        currentType = ""; // ✅ nổi bật thì KHÔNG active tab nào
     }
 
     var JS_FavNeedLogin = HttpUtility.JavaScriptStringEncode(HomeTexts.Favorite_NeedLogin);
     var JS_FavUpdateFail = HttpUtility.JavaScriptStringEncode(HomeTexts.Favorite_UpdateFailed);
 
-
     var favCount = (int)(ViewBag.FavoriteCount ?? 0);
     var favCountText = favCount > 99 ? "99+" : favCount.ToString();
 }
 
-@helper RenderPropertyCard(Core.Models.PropertyListItemViewModel item)
+@helper RenderPropertyCard(PropertyListItemViewModel item)
 {
     <div class="property-card">
         <div class="property-card-fav js-fav-toggle @(item.IsFavorite ? "is-fav" : "")"
-             data-id="@item.PropertyId">
+             data-id="@item.PropertyId"
+             @*title="@HomeTexts."*@
+             >
             <i class="fa-solid fa-heart"></i>
         </div>
 
-        <img src="@item.ThumbnailUrl" alt="@item.Title" />
-        <div class="property-card-body">
-            <div class="property-card-title">@item.Title</div>
-            <div class="property-card-address"><i class="fa-solid fa-location-dot"></i>@item.Address</div>
-            <div class="property-card-meta">
-                <span>
-                    <i class="fa-solid fa-bed"></i>
-                    @(item.Bed ?? 0)@HomeTexts.Unit_Bedroom <i class="fa-solid fa-bath"></i> @(item.Bath ?? 0) @HomeTexts.Unit_Bathroom
-                </span>
-                <span><i class="fa-solid fa-ruler-combined"></i>@item.Area m²</span>
+        <a class="property-card-link"
+           href="@Url.Action("Detail","Property", new { id = item.PropertyId })"
+           style="display:block; color:inherit; text-decoration:none;">
+            <img src="@item.ThumbnailUrl" alt="@item.Title" loading="lazy" decoding="async" />
+            <div class="property-card-body">
+                <div class="property-card-title">@item.Title</div>
+                <div class="property-card-address"><i class="fa-solid fa-location-dot"></i>@item.Address</div>
+                <div class="property-card-meta">
+                    <span>
+                        <i class="fa-solid fa-bed"></i>
+                        @(item.Bed ?? 0)@HomeTexts.Unit_Bedroom <i class="fa-solid fa-bath"></i> @(item.Bath ?? 0) @HomeTexts.Unit_Bathroom
+                    </span>
+                    <span><i class="fa-solid fa-ruler-combined"></i>@item.Area m²</span>
+                </div>
+                <div class="property-card-price">
+                    <i class="fa-solid fa-sack-dollar"></i>
+                    @item.PriceLabel @HomeTexts.Currency_VND
+                </div>
             </div>
-            <div class="property-card-price">
-                <i class="fa-solid fa-sack-dollar"></i>
-                @item.PriceLabel @HomeTexts.Currency_VND
-            </div>
-        </div>
+        </a>
     </div>
 }
 
-<head>
-    <link rel="stylesheet" href="~/Content/font-awesome/all.min.css">
-    <link rel="stylesheet" href="~/Content/style/Home/index.css" />
+<link rel="stylesheet" href="~/Content/font-awesome/all.min.css">
+<link rel="stylesheet" href="~/Content/style/Home/index.css" />
 
-    <style>
-       
-        .fav-wrap.has-badge i {
-            color: #ff4d6d;
+<style>
+    /* ===== Fav badge ===== */
+    .fav-wrap.has-badge i {
+        color: #ff4d6d;
+    }
+
+    .fav-badge {
+        position: absolute;
+        top: -4px;
+        right: -6px;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 5px;
+        border-radius: 999px;
+        background: #22c55e;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+    }
+
+    .fav-wrap {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+    }
+
+    @@media(max-width:500px) {
+        .fav-badge {
+            top: 1px;
+            right: 0px;
+            min-width: 13px;
+            height: 13px;
         }
 
+        .home-header-right-top a {
+            margin:0px;
+        }
         .fav-badge {
             position: absolute;
-            top: -4px;
-            right: -6px;
-            min-width: 18px;
-            height: 18px;
-            padding: 0 5px;
+            top: 2px;
+            right: 0px;
+            min-width: 8px;
+            height: 12px;
+            /* padding: 0 5px; */
             border-radius: 999px;
-            background: #22c55e; 
+            background: #22c55e;
             color: #fff;
-            font-size: 11px;
+            font-size: 9px;
             font-weight: 700;
             display: flex;
             align-items: center;
             justify-content: center;
             line-height: 1;
         }
-        .home-section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-        }
+    }
 
-        .home-section-more {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            border-radius: 999px;
-            background: #0f172a;
-            color: #fff !important;
-            text-decoration: none;
-            font-size: 13px;
-            white-space: nowrap;
-            opacity: .92;
-        }
+    /* ===== Section header ===== */
+    .home-section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
 
-            .home-section-more:hover {
-                opacity: 1;
-                transform: translateY(-1px);
-            }
+    .home-section-more {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: #0f172a;
+        color: #fff !important;
+        text-decoration: none;
+        font-size: 13px;
+        white-space: nowrap;
+        opacity: .92;
+        transition: transform .15s ease, opacity .15s ease;
+    }
 
-        .fa-angles-up {
-            color: #aaa
-        }
-
-        .home-header-right-top .nav-post {
-            background: #00B1FE;
-        }
-
-        .account-hover {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding-bottom: 14px;
-        }
-
-        .account-dropdown {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            margin-top: 8px;
-            min-width: 160px;
-            background: rgba(15, 23, 42, 0.95);
-            border-radius: 12px;
-            box-shadow: 0 12px 24px rgba(0,0,0,.25);
-            overflow: hidden;
-            opacity: 0;
-            transform: translateY(-6px);
-            pointer-events: none;
-            transition: opacity .15s ease, transform .15s ease;
-            z-index: 99999;
-        }
-
-            .account-dropdown::before {
-                content: "";
-                position: absolute;
-                top: -12px;
-                left: 0;
-                right: 0;
-                height: 12px;
-            }
-
-        .account-hover:hover .account-dropdown,
-        .account-hover.open .account-dropdown {
+        .home-section-more:hover {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(-1px);
+        }
+
+    /* ===== Scroll top ===== */
+    .scroll-top-btn {
+        position: fixed;
+        right: 40px;
+        bottom: 40px;
+        width: 40px;
+        height: 40px;
+        border-radius: 999px;
+        background: rgba(15,23,42,.85);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+        cursor: pointer;
+        z-index: 9999;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(10px);
+        transition: opacity .2s ease, transform .2s ease;
+    }
+
+        .scroll-top-btn.show {
+            opacity: 1;
             pointer-events: auto;
+            transform: translateY(0);
         }
 
-        .account-dropdown a {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 12px;
-            color: #fff;
-            text-decoration: none;
+    /* ===== Cards ===== */
+    .property-card {
+        position: relative;
+        border-radius: 0px;
+    }
+
+    .property-card-fav {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        background: rgba(15,23,42,.65);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 2;
+    }
+
+        .property-card-fav i {
             font-size: 14px;
-            white-space: nowrap;
-        }
-
-            .account-dropdown a:hover {
-                background: rgba(255,255,255,.08);
-            }
-
-        .scroll-top-btn {
-            position: fixed;
-            right: 40px;
-            bottom: 40px;
-            width: 40px;
-            height: 40px;
-            border-radius: 999px;
             color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-            cursor: pointer;
-            z-index: 9999;
-            opacity: 0;
-            pointer-events: none;
-            transform: translateY(10px);
-            transition: opacity 0.2s ease, transform 0.2s ease;
         }
 
-            .scroll-top-btn i {
-                font-size: 16px;
-            }
-
-            .scroll-top-btn.show {
-                opacity: 1;
-                pointer-events: auto;
-                transform: translateY(0);
-            }
-
-        a {
-            color: snow;
-            text-decoration: none
+        .property-card-fav.is-fav {
+            background: #ef4444;
         }
 
-        .property-card {
-            position: relative;
-        }
+    .property-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-gap: 24px;
+    }
 
-        .property-card-fav {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 28px;
-            height: 28px;
-            border-radius: 999px;
-            background: rgba(15, 23, 42, 0.65);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background 0.2s ease, transform 0.1s ease;
-        }
-
-            .property-card-fav i {
-                font-size: 14px;
-                color: #fff;
-            }
-
-            .property-card-fav:hover {
-                transform: scale(1.05);
-            }
-
-            .property-card-fav.is-fav {
-                background: #ef4444;
-            }
-
-                .property-card-fav.is-fav i {
-                    color: #fff;
-                }
-
-        .home-search-filter-select {
-            padding-left: 7px;
-        }
-
+    @@media(max-width:991px) {
         .property-grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            grid-gap: 24px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    /* =========================================================
+       FIX LỖI KHOANH ĐỎ: account dropdown bị render ra ngoài
+       => Ẩn dropdown mặc định, hover/tap mới hiện
+       ========================================================= */
+    .account-hover {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        z-index: 9999;
+    }
+
+    .account-trigger {
+        display: inline-flex;
+        align-items: center;
+        /* gap: 8px; */
+        cursor: pointer;
+        /* padding: 8px 12px; */
+        border-radius: 999px;
+        /* background: rgba(15, 23, 42, .35); */
+        color: #fff;
+        backdrop-filter: blur(6px);
+        user-select: none;
+    }
+
+        .account-trigger:hover {
+            background: rgba(15,23,42,.55);
         }
 
-        @@media (max-width: 991px) {
-            .property-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
+    .account-dropdown {
+        position: absolute;
+        right: -29px;
+        top: 21px;
+        min-width: 104px;
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 18px 40px rgba(0, 0, 0, .18);
+        border: 1px solid rgba(15, 23, 42, .10);
+        padding: 5px;
+        opacity: 0;
+        transform: translateY(-6px);
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    /* PC hover */
+    .account-hover:hover .account-dropdown {
+        opacity: 1;
+        transform: translateY(0);
+        visibility: visible;
+        pointer-events: auto;
+    }
+
+    /* Mobile click */
+    .account-hover.open .account-dropdown {
+        opacity: 1;
+        transform: translateY(0);
+        visibility: visible;
+        pointer-events: auto;
+    }
+
+    .account-dropdown a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0px;
+        border-radius: 10px;
+        color: #0f172a;
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+        .account-dropdown a:hover {
+           /* background: #f1f5f9;*/
         }
-
-        @@media(min-width:500px) {
-            .account-trigger {
-                display: inline-flex;
-                align-items: center;
-                gap: 8px;
-                cursor: pointer;
-                color: #fff;
-                padding: 6px 10px;
-                border-radius: 999px;
-                background: rgba(15, 23, 42, 0.35);
-                user-select: none;
-            }
-
-                .account-trigger:hover {
-                    background: rgba(15, 23, 42, 0.55);
-                }
-        }
-
-        @@media(max-width:500px) {
-            .account-dropdown a {
-                gap: 10px;
-                padding: 4px 2px;
-            }
-
-            .account-dropdown {
-                position: absolute;
-                top: 68%;
-                right: -50px;
-                margin-top: 0px;
-                min-width: 101px;
-                background: rgba(15, 23, 42, 0.95);
-                border-radius: 12px;
-                box-shadow: none;
-                opacity: 0;
-                transform: translateY(-6px);
-                pointer-events: none;
-                transition: opacity .15s ease, transform .15s ease;
-                z-index: 99999;
-            }
-
-            .home-hero-header {
-                margin-bottom: 0px;
-            }
-
-            .home-header-right-top {
-                margin-bottom: 0rem;
-            }
-
-            .account-trigger {
-                cursor: pointer;
-                color: #fff;
-                border-radius: 999px;
-                user-select: none;
-            }
-            .home-header-right-top a {
-                margin:0px
-            }
-            .fav-badge {
-              
-                top: -1px;
-                right: -6px;
-                min-width: 15px;
-                height: 15px;
-             
-                
-            }
-        }
-
-        /* ===========================*/
-        .fav-wrap {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 34px;
-            height: 34px;
-            border-radius: 999px;
-        }
-
-           
-    </style>
-</head>
+</style>
 
 <div class="home-hero" style="background-image:url('@(ViewBag.HeroBackground ?? "/Assets/Banner.jpg")');">
     <div class="home-hero-shell">
         <div class="home-hero-header">
-            <a href=@Url.Action("Index", "Home") class="home-header-left-box">
+            <a href="@Url.Action("Index", "Home")" class="home-header-left-box">
                 <div class="home-logo-icon"></div>
                 <div class="home-header-left">
                     <div class="home-header-left-top"><span>NhàNow</span></div>
@@ -369,7 +328,6 @@
                     {
                         var name = Session["CurrentUserName"] as string ?? HomeTexts.Account_Default;
 
-                        @*  Heart header có badge *@
                         <a href="@Url.Action("Favorites", "Property")"
                            class="hidden-xs js-fav-top fav-wrap @(favCount > 0 ? "has-badge" : "")"
                            data-return="@Url.Action("Favorites", "Property")">
@@ -384,14 +342,15 @@
                             <i class="fa-solid fa-bell"></i>
                         </a>
 
-                        <div class="hidden-xs account-hover">
-                            <div class="account-trigger">
+                        <!-- ✅ FIX dropdown -->
+                        <div class="hidden-xs account-hover" id="hnAccountHover">
+                            <div class="account-trigger" id="hnAccountTrigger">
                                 <i class="fa-solid fa-user"></i>
                                 <span>@name</span>
                                 <i class="fa-solid fa-caret-down" style="font-size:12px; opacity:.8;"></i>
                             </div>
 
-                            <div class="account-dropdown">
+                            <div class="account-dropdown" id="hnAccountDropdown">
                                 <a href="@Url.Action("Logout", "Account")">
                                     <i class="fa-solid fa-right-from-bracket"></i> @HomeTexts.Logout
                                 </a>
@@ -438,7 +397,7 @@
             </div>
 
             <div class="home-main-search">
-                @using (Html.BeginForm("Index", "Home", FormMethod.Get, new { @class = "home-search-form" }))
+                @using (Html.BeginForm("Index", "Home", FormMethod.Get, new { @class = "home-search-form", id = "homeSearchForm" }))
                 {
                     <div class="home-search-wrapper">
                         <div class="home-search-top">
@@ -486,7 +445,7 @@
                             </div>
 
                             <div class="home-search-filter">
-                                <select name="priceRange" class="home-search-filter-select">
+                                <select name="priceRange" id="priceRange" class="home-search-filter-select">
                                     <option value="">@HomeTexts.Filter_Price</option>
                                     @if (Model.PriceFilters != null)
                                     {
@@ -499,7 +458,7 @@
                             </div>
 
                             <div class="home-search-filter">
-                                <select name="propertyType" class="home-search-filter-select">
+                                <select name="propertyType" id="propertyType" class="home-search-filter-select">
                                     <option value="">@HomeTexts.Filter_PropertyType</option>
                                     @if (Model.PropertyTypes != null)
                                     {
@@ -572,253 +531,238 @@
     }
 </div>
 
-<div href="#" id="scrollTopBtn" class="scroll-top-btn">
+<div id="scrollTopBtn" class="scroll-top-btn">
     <i class="fa-solid fa-angles-up"></i>
 </div>
 
 @section Scripts {
     <script>
-        (function () {
-            var buttons = document.querySelectorAll(".home-search-tab-btn");
-            var hiddenInput = document.getElementById("transactionTypeInput");
+    // ✅ Fix dropdown account trên mobile (tap mở/đóng), PC hover vẫn chạy nhờ CSS
+    (function () {
+        var wrap = document.getElementById('hnAccountHover');
+        var trigger = document.getElementById('hnAccountTrigger');
+        if (!wrap || !trigger) return;
 
-            buttons.forEach(function (btn) {
-                btn.addEventListener("click", function () {
-                    var val = this.getAttribute("data-value");
-                    hiddenInput.value = val;
-                    buttons.forEach(function (b) { b.classList.remove("active"); });
-                    this.classList.add("active");
-                });
+        trigger.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            wrap.classList.toggle('open');
+        });
+
+        document.addEventListener('click', function () {
+            wrap.classList.remove('open');
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') wrap.classList.remove('open');
+        });
+    })();
+
+    // Tabs
+    (function () {
+        var buttons = document.querySelectorAll(".home-search-tab-btn");
+        var hiddenInput = document.getElementById("transactionTypeInput");
+        if (!buttons || !hiddenInput) return;
+
+        buttons.forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                var val = this.getAttribute("data-value");
+                hiddenInput.value = val;
+
+                buttons.forEach(function (b) { b.classList.remove("active"); });
+                this.classList.add("active");
             });
-        })();
+        });
+    })();
 
-        (function () {
-            var hero = document.querySelector(".home-hero");
-            var citySelect = document.getElementById("citySelect");
-            if (!hero || !citySelect) return;
+    // Hero BG
+    (function () {
+        var hero = document.querySelector(".home-hero");
+        var citySelect = document.getElementById("citySelect");
+        if (!hero || !citySelect) return;
 
-            function applyCityBackground() {
-                var opt = citySelect.options[citySelect.selectedIndex];
-                if (!opt) return;
-
-                var bg = opt.getAttribute("data-bg");
-                if (bg && bg.length > 0) hero.style.backgroundImage = "url('" + bg + "')";
-                else hero.style.backgroundImage = "";
-            }
-
-            citySelect.addEventListener("change", applyCityBackground);
-            applyCityBackground();
-        })();
-
-
-        //  HEADER FAVORITES BADGE
-
-
-        // trạng thái auth có thể thay đổi sau login modal -> dùng biến global
-        window.__isAuth = @User.Identity.IsAuthenticated.ToString().ToLower();
-
-        function updateHeaderFavBadge(count) {
-            count = parseInt(count || 0, 10);
-
-            var $wrap = $('.js-fav-top.fav-wrap');
-            if ($wrap.length === 0) return;
-
-            var $badge = $('#headerFavBadge');
-
-            if (count > 0) {
-                var text = count > 99 ? '99+' : String(count);
-                $wrap.addClass('has-badge');
-
-                if ($badge.length === 0) {
-                    $wrap.append('<span id="headerFavBadge" class="fav-badge">' + text + '</span>');
-                } else {
-                    $badge.text(text);
-                }
-            } else {
-                $wrap.removeClass('has-badge');
-                if ($badge.length) $badge.remove();
-            }
+        function applyCityBackground() {
+            var opt = citySelect.options[citySelect.selectedIndex];
+            if (!opt) return;
+            var bg = opt.getAttribute("data-bg");
+            hero.style.backgroundImage = (bg && bg.length > 0) ? ("url('" + bg + "')") : "";
         }
 
-        //  gọi server lấy count + auth để cập nhật theo thời gian thực
-        window.refreshHeaderFav = function () {
-            return $.get('@Url.Action("HeaderFavoriteInfo", "Property")')
-                .done(function (res) {
+        citySelect.addEventListener("change", applyCityBackground);
+        applyCityBackground();
+    })();
+
+    // Header fav badge
+    window.__isAuth = @User.Identity.IsAuthenticated.ToString().ToLower();
+
+    function updateHeaderFavBadge(count) {
+        count = parseInt(count || 0, 10);
+        var $wrap = $('.js-fav-top.fav-wrap');
+        if ($wrap.length === 0) return;
+
+        var $badge = $('#headerFavBadge');
+
+        if (count > 0) {
+            var text = count > 99 ? '99+' : String(count);
+            $wrap.addClass('has-badge');
+
+            if ($badge.length === 0) $wrap.append('<span id="headerFavBadge" class="fav-badge">' + text + '</span>');
+            else $badge.text(text);
+        } else {
+            $wrap.removeClass('has-badge');
+            if ($badge.length) $badge.remove();
+        }
+    }
+
+    window.refreshHeaderFav = function () {
+        return $.get('@Url.Action("HeaderFavoriteInfo", "Property")')
+            .done(function (res) {
+                if (!res) return;
+                window.__isAuth = !!res.isAuth;
+                updateHeaderFavBadge(res.favoriteCount || 0);
+            });
+    };
+
+    $(function () {
+        window.refreshHeaderFav();
+        document.addEventListener('visibilitychange', function () {
+            if (!document.hidden) window.refreshHeaderFav();
+        });
+    });
+
+    // click heart header: chưa login -> open login
+    $(document).on('click', '.js-fav-top', function (e) {
+        if (window.__isAuth) return;
+
+        e.preventDefault();
+        var returnUrl = $(this).data('return') || (window.location.pathname + window.location.search);
+
+        if (window.loginModal && typeof window.loginModal.open === 'function') {
+            window.loginModal.open(returnUrl);
+        } else {
+            window.location.href = '@Url.Action("Login", "Account")' + '?returnUrl=' + encodeURIComponent(returnUrl);
+        }
+    });
+
+    // Toggle favorite: update UI + update badge luôn
+    (function () {
+        var MSG_NEED_LOGIN = '@JS_FavNeedLogin';
+        var MSG_UPDATE_FAIL = '@JS_FavUpdateFail';
+
+        $(document).on('click', '.js-fav-toggle', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var $btn = $(this);
+            var propertyId = $btn.data('id');
+
+            $.ajax({
+                url: '@Url.Action("ToggleFavorite", "Property")',
+                type: 'POST',
+                data: { propertyId: propertyId },
+                success: function (res) {
                     if (!res) return;
-                    window.__isAuth = !!res.isAuth;
-                    updateHeaderFavBadge(res.favoriteCount || 0);
-                });
-        };
 
-        //  tự sync khi load trang + khi quay lại tab
-        $(function () {
-            window.refreshHeaderFav();
-
-            document.addEventListener('visibilitychange', function () {
-                if (!document.hidden) window.refreshHeaderFav();
-            });
-        });
-
-        //  bạn có thể gọi event này sau khi login modal thành công
-        window.addEventListener('auth:changed', function () {
-            window.refreshHeaderFav();
-        });
-
-
-        //  Toggle Favorite (update badge realtime)
-
-        (function () {
-            var MSG_NEED_LOGIN = '@JS_FavNeedLogin';
-            var MSG_UPDATE_FAIL = '@JS_FavUpdateFail';
-
-            $(document).on('click', '.js-fav-toggle', function (e) {
-                e.preventDefault();
-
-                var $btn = $(this);
-                var propertyId = $btn.data('id');
-
-                $.ajax({
-                    url: '@Url.Action("ToggleFavorite", "Property")',
-                    type: 'POST',
-                    data: { propertyId: propertyId },
-                    success: function (res) {
-                        if (!res) return;
-
-                        if (res.needLogin) {
-                            if (window.loginModal && typeof window.loginModal.open === 'function') {
-                                window.loginModal.open(window.location.pathname + window.location.search);
-                            } else {
-                                alert(MSG_NEED_LOGIN);
-                            }
-                            return;
-                        }
-
-                        if (res.success) {
-                            if (res.isFavorite) $btn.addClass('is-fav');
-                            else $btn.removeClass('is-fav');
-
-                            //  luôn sync lại count ở header (không phụ thuộc res.favoriteCount)
-                            window.refreshHeaderFav();
-                        }
-                    },
-                    error: function () { alert(MSG_UPDATE_FAIL); }
-                });
-            });
-        })();
-
-
-        // Infinite Scroll search
-
-        (function () {
-            var $results = $('#search-results');
-            if ($results.length === 0) return;
-
-            var currentPage = parseInt($('#currentPage').val() || '1', 10);
-            var totalPages = parseInt($('#totalPages').val() || '1', 10);
-            var isLoading = false;
-
-            var filters = {
-                transactionType: '@(Model.TransactionType ?? "")',
-                cityId: '@(Model.CityId.HasValue ? Model.CityId.ToString() : "")',
-                priceRange: '@(Model.PriceRange ?? "")',
-                propertyType: '@(Model.PropertyType ?? "")',
-                keyword: '@(Model.Keyword ?? "")'
-            };
-
-            function loadNextPage() {
-                if (isLoading) return;
-                if (currentPage >= totalPages) return;
-
-                isLoading = true;
-                currentPage++;
-
-                var data = $.extend({}, filters, { page: currentPage });
-
-                $.get('@Url.Action("LoadMore", "Home")', data)
-                    .done(function (html) {
-                        if (html && $.trim(html).length > 0) {
-                            $results.append(html);
-                            $('#currentPage').val(currentPage);
+                    if (res.needLogin) {
+                        if (window.loginModal && typeof window.loginModal.open === 'function') {
+                            window.loginModal.open(window.location.pathname + window.location.search);
                         } else {
-                            currentPage = totalPages;
+                            alert(MSG_NEED_LOGIN);
                         }
-                    })
-                    .always(function () { isLoading = false; });
-            }
-
-            var sentinel = document.getElementById('load-more-sentinel');
-            if ('IntersectionObserver' in window && sentinel) {
-                var io = new IntersectionObserver(function (entries) {
-                    entries.forEach(function (entry) {
-                        if (entry.isIntersecting) loadNextPage();
-                    });
-                }, { root: null, rootMargin: '0px 0px 200px 0px', threshold: 0 });
-
-                io.observe(sentinel);
-            } else {
-                $(window).on('scroll', function () {
-                    if ($(window).scrollTop() + $(window).height() + 200 >= $(document).height()) {
-                        loadNextPage();
+                        return;
                     }
-                });
+
+                    if (res.success) {
+                        $btn.toggleClass('is-fav', !!res.isFavorite);
+                        updateHeaderFavBadge(res.favoriteCount || 0);
+                        window.__isAuth = true;
+                    }
+                },
+                error: function () { alert(MSG_UPDATE_FAIL); }
+            });
+        });
+    })();
+
+    // Infinite scroll
+    (function () {
+        var $results = $('#search-results');
+        if ($results.length === 0) return;
+
+        var currentPage = parseInt($('#currentPage').val() || '1', 10);
+        var totalPages  = parseInt($('#totalPages').val() || '1', 10);
+
+        var isLoading = false;
+        var done = false;
+
+        function buildQuery(page) {
+            return {
+                transactionType: $('#transactionTypeInput').val() || '',
+                cityId: $('#citySelect').val() || '',
+                priceRange: $('#priceRange').val() || '',
+                propertyType: $('#propertyType').val() || '',
+                keyword: $('input[name="keyword"]').val() || '',
+                page: page
+            };
+        }
+
+        var sentinel = document.getElementById('load-more-sentinel');
+        if (!sentinel) return;
+
+        function loadNextPage(io) {
+            if (isLoading || done) return;
+            if (currentPage >= totalPages) {
+                done = true;
+                if (io) io.unobserve(sentinel);
+                return;
             }
-        })();
 
+            isLoading = true;
+            var nextPage = currentPage + 1;
 
-        // Scroll top
+            $.get('@Url.Action("LoadMore", "Home")', buildQuery(nextPage))
+                .done(function (html) {
+                    if (html && $.trim(html).length > 0) {
+                        $results.append(html);
+                        currentPage = nextPage;
+                        $('#currentPage').val(currentPage);
+                    } else {
+                        done = true;
+                    }
+                })
+                .always(function () { isLoading = false; });
+        }
 
-        (function () {
-            var $btn = $('#scrollTopBtn');
-            if ($btn.length === 0) return;
+        if ('IntersectionObserver' in window) {
+            var io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) loadNextPage(io);
+                });
+            }, { root: null, rootMargin: '0px 0px 800px 0px', threshold: 0 });
 
+            io.observe(sentinel);
+        } else {
             $(window).on('scroll', function () {
-                if ($(this).scrollTop() > window.innerHeight) $btn.addClass('show');
-                else $btn.removeClass('show');
-            });
-
-            $btn.on('click', function (e) {
-                e.preventDefault();
-                $('html, body').animate({ scrollTop: 0 }, 400);
-            });
-        })();
-
-
-        // Account dropdown hover
-
-        (function () {
-            var menu = document.querySelector('.account-hover');
-            if (!menu) return;
-
-            var timer = null;
-
-            menu.addEventListener('mouseenter', function () {
-                if (timer) clearTimeout(timer);
-                menu.classList.add('open');
-            });
-
-            menu.addEventListener('mouseleave', function () {
-                timer = setTimeout(function () { menu.classList.remove('open'); }, 200);
-            });
-        })();
-
-
-        // Favorites header click: check login realtime
-
-        (function () {
-            $(document).on('click', '.js-fav-top', function (e) {
-                if (window.__isAuth) return; // ✅ login rồi thì cho đi bình thường
-
-                e.preventDefault();
-
-                var returnUrl = $(this).data('return') || (window.location.pathname + window.location.search);
-
-                if (window.loginModal && typeof window.loginModal.open === 'function') {
-                    window.loginModal.open(returnUrl);
-                } else {
-                    window.location.href = '@Url.Action("Login", "Account")' + '?returnUrl=' + encodeURIComponent(returnUrl);
+                if ($(window).scrollTop() + $(window).height() + 800 >= $(document).height()) {
+                    loadNextPage(null);
                 }
             });
-        })();
+        }
+    })();
+
+    // Scroll top
+    (function () {
+        var $btn = $('#scrollTopBtn');
+        if ($btn.length === 0) return;
+
+        $(window).on('scroll', function () {
+            if ($(this).scrollTop() > window.innerHeight) $btn.addClass('show');
+            else $btn.removeClass('show');
+        });
+
+        $btn.on('click', function (e) {
+            e.preventDefault();
+            $('html, body').animate({ scrollTop: 0 }, 400);
+        });
+    })();
     </script>
 }
-

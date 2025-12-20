@@ -19,9 +19,26 @@ namespace Services.Implementations
             string propertyType,
             string keyword)
         {
+            
+            var paged = await SearchPagedAsync(langCode, listingType, cityId, priceRange, propertyType, keyword, 1, 1000000);
+            return paged.Items ?? new List<PropertyListViewModel>();
+        }
+
+        public async Task<PagedResult<PropertyListViewModel>> SearchPagedAsync(
+        string langCode,
+        string listingType,
+        int? cityId,
+        string priceRange,
+        string propertyType,
+        string keyword,
+        int page,
+        int pageSize)
+        {
+            if (page <= 0) page = 1;
+            if (pageSize <= 0) pageSize = 16;
+
             using (var db = new AppDbContext())
             {
-                // ✅ đọc nhanh hơn
                 var query =
                     from p in db.Properties.AsNoTracking()
                     join tr in db.PropertyTranslations.AsNoTracking()
@@ -44,16 +61,11 @@ namespace Services.Implementations
                 if (!string.IsNullOrWhiteSpace(keyword))
                 {
                     var kw = keyword.Trim().ToLower();
-
                     query = query.Where(x =>
-                        ((((x.tr != null ? x.tr.Title : null) ?? x.p.Title) ?? "").ToLower().Contains(kw))
-                        ||
-                        ((((x.tr != null ? x.tr.AddressLine : null) ?? x.p.AddressLine) ?? "").ToLower().Contains(kw))
+                        (((x.tr != null ? x.tr.Title : null) ?? x.p.Title) ?? "").ToLower().Contains(kw) ||
+                        (((x.tr != null ? x.tr.AddressLine : null) ?? x.p.AddressLine) ?? "").ToLower().Contains(kw)
                     );
                 }
-
-                decimal? minPrice = null;
-                decimal? maxPrice = null;
 
                 if (!string.IsNullOrEmpty(priceRange))
                 {
@@ -64,22 +76,24 @@ namespace Services.Implementations
 
                     if (pf != null)
                     {
-                        minPrice = pf.MinPrice;
-                        maxPrice = pf.MaxPrice;
+                        if (pf.MinPrice.HasValue) query = query.Where(x => x.p.Price >= pf.MinPrice.Value);
+                        if (pf.MaxPrice.HasValue) query = query.Where(x => x.p.Price <= pf.MaxPrice.Value);
                     }
                 }
 
-                if (minPrice.HasValue) query = query.Where(x => x.p.Price >= minPrice.Value);
-                if (maxPrice.HasValue) query = query.Where(x => x.p.Price <= maxPrice.Value);
+                var total = await query.CountAsync();
 
-                // ✅ Service đã sort featured + created + id → Controller không cần query lại
-                var raw = await query
-                    .OrderByDescending(x => (x.p.IsFeatured ?? 0))
-                    .ThenByDescending(x => (x.p.CreatedAt ?? System.DateTime.MinValue))
+              
+                var pageRows = await query
+                    .OrderByDescending(x => x.p.IsFeatured)          // nếu IsFeatured là bool/int => OK
+                    .ThenByDescending(x => x.p.CreatedAt)            // tránh DateTime.MinValue trong query
                     .ThenByDescending(x => x.p.PropertyId)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
                     .ToListAsync();
 
-                var list = raw.Select(x =>
+                
+                var items = pageRows.Select(x =>
                 {
                     var p = x.p;
                     var tr = x.tr;
@@ -87,26 +101,19 @@ namespace Services.Implementations
                     return new PropertyListViewModel
                     {
                         Id = p.PropertyId,
+                        Title = (tr != null && !string.IsNullOrEmpty(tr.DisplayTitle)) ? tr.DisplayTitle
+                              : (tr != null && !string.IsNullOrEmpty(tr.Title) ? tr.Title : p.Title),
 
-                        Title = tr != null && !string.IsNullOrEmpty(tr.DisplayTitle)
-                                    ? tr.DisplayTitle
-                                    : (tr != null && !string.IsNullOrEmpty(tr.Title) ? tr.Title : p.Title),
-
-                        Address = tr != null && !string.IsNullOrEmpty(tr.AddressLine)
-                                    ? tr.AddressLine
-                                    : p.AddressLine,
-
-                        RoomType = tr?.RoomType,
-                        Orientation = tr?.Orientation,
+                        Address = (tr != null && !string.IsNullOrEmpty(tr.AddressLine)) ? tr.AddressLine : p.AddressLine,
 
                         CoverImageUrl = p.CoverImageUrl,
                         Price = p.Price,
 
-                        // ✅ m² / PN / WC
+                     
                         AreaM2 = p.AreaSqm.HasValue ? (decimal?)p.AreaSqm.Value : null,
+                        AreaSqm = p.AreaSqm,
                         BedroomCount = p.BedroomCount,
                         BathroomCount = p.BathroomCount,
-                        AreaSqm = p.AreaSqm,
 
                         ListingType = p.ListingType,
                         PropertyType = p.PropertyType,
@@ -116,7 +123,11 @@ namespace Services.Implementations
                     };
                 }).ToList();
 
-                return list;
+                return new PagedResult<PropertyListViewModel>
+                {
+                    TotalItems = total,
+                    Items = items
+                };
             }
         }
 

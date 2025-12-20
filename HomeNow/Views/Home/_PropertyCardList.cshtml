@@ -5,12 +5,15 @@
 
 @foreach (var item in Model)
 {
-    <div class="property-card">
-        <div class="property-card-fav js-fav-toggle @(item.IsFavorite ? "is-fav" : "")"
-             data-id="@item.PropertyId">
-            <i class="fa-solid fa-heart"></i>
-        </div>
+<div class="property-card">
+    <div class="property-card-fav js-fav-toggle @(item.IsFavorite ? "is-fav" : "")"
+         data-id="@item.PropertyId">
+        <i class="fa-solid fa-heart"></i>
+    </div>
 
+    <a class="property-card-link"
+       href="@Url.Action("Detail","Property", new { id = item.PropertyId })"
+       style="display:block; color:inherit; text-decoration:none;">
         <img src="@item.ThumbnailUrl" alt="@item.Title" />
         <div class="property-card-body">
             <div class="property-card-title">@item.Title</div>
@@ -23,5 +26,6 @@
                 <i class="fa-solid fa-sack-dollar"></i>@item.PriceLabel VND
             </div>
         </div>
-    </div>
+    </a>
+</div>
 }

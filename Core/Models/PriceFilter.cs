@@ -9,7 +9,7 @@ namespace Core.Models
         [Column("id")]
         public int Id { get; set; }
 
-        // Code dùng cho filter, ví dụ: "0-10", "10-20", "20-999"
+     
         [Column("code")]
         public string Code { get; set; }
 

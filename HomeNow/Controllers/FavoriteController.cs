@@ -20,7 +20,7 @@ namespace HomeNow.Controllers
             var obj = Session["CurrentUserId"];
             if (obj == null) return null;
 
-            // phòng trường hợp Session lưu string
+            
             int id;
             return int.TryParse(obj.ToString(), out id) ? (int?)id : null;
         }

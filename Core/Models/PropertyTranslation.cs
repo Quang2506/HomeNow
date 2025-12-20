@@ -14,7 +14,7 @@ namespace Core.Models
         public int PropertyId { get; set; }
 
         [Column("lang_code")]
-        public string LangCode { get; set; }   // "vi", "en", "zh"...
+        public string LangCode { get; set; }   
 
         [Column("title")]
         public string Title { get; set; }

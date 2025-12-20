@@ -7,9 +7,6 @@ namespace Services.Interfaces
 {
     public interface IPropertyService
     {
-        /// <summary>
-        /// Tìm kiếm / lọc danh sách nhà.
-        /// </summary>
         Task<List<PropertyListViewModel>> SearchAsync(
             string langCode,
             string listingType,
@@ -18,9 +15,16 @@ namespace Services.Interfaces
             string propertyType,
             string keyword);
 
-        /// <summary>
-        /// Lấy chi tiết 1 căn nhà (dùng cho VR / Detail).
-        /// </summary>
+        Task<PagedResult<PropertyListViewModel>> SearchPagedAsync(
+            string langCode,
+            string listingType,
+            int? cityId,
+            string priceRange,
+            string propertyType,
+            string keyword,
+            int page,
+            int pageSize);
+
         Task<Property> GetByIdAsync(int id);
     }
 }

@@ -59,6 +59,8 @@
     <Compile Include="Models\VrScene.cs" />
     <Compile Include="Models\VrSceneTranslation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModels\PagedResult.cs" />
+    <Compile Include="ViewModels\PropertyDetailViewModel.cs" />
     <Compile Include="ViewModels\PropertyListViewModel.cs" />
   </ItemGroup>
   <ItemGroup>

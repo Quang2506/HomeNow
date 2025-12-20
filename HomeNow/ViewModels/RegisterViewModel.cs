@@ -6,7 +6,7 @@ namespace HomeNow.ViewModels
     {
         [Display(Name = "Số điện thoại")]
         [Required(ErrorMessage = "Vui lòng nhập số điện thoại.")]
-        // 9–11 số, bạn chỉnh pattern nếu cần
+       
         [RegularExpression(@"^[0-9]{9,11}$", ErrorMessage = "Số điện thoại không hợp lệ.")]
         public string PhoneNumber { get; set; }
 

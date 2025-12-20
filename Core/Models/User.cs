@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Core.Models
 {
-    // THÊM Schema = "public"
+   
     [Table("users", Schema = "public")]
     public class User
     {

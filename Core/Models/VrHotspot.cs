@@ -19,7 +19,7 @@ namespace Core.Models
         public double Yaw { get; set; }
 
         [Column("text")]
-        public string Text { get; set; }                // Chữ mặc định
+        public string Text { get; set; }               
 
         [Column("target_scene_key")]
         public string TargetSceneKey { get; set; }

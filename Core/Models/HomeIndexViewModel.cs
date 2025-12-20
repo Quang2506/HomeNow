@@ -6,10 +6,10 @@ namespace Core.Models
     public class HomeIndexViewModel
     {
         // --- Filter từ form search ---
-        public string TransactionType { get; set; }  // rent / sale
+        public string TransactionType { get; set; }  
         public int? CityId { get; set; }
-        public string PriceRange { get; set; }       // "0-10", "10-20", ...
-        public string PropertyType { get; set; }     // apartment / house / villa ...
+        public string PriceRange { get; set; }       
+        public string PropertyType { get; set; }     
         public string Keyword { get; set; }
 
         // --- Kết quả tìm kiếm ---
@@ -25,11 +25,11 @@ namespace Core.Models
         public List<PriceFilterDropDownItem> PriceFilters { get; set; }
         public List<PropertyTypeDropDownItem> PropertyTypes { get; set; }
 
-        // --- Phân trang cho kết quả search ---
-        public int Page { get; set; }          // trang hiện tại
-        public int PageSize { get; set; }      // số item / trang (20)
-        public int TotalItems { get; set; }    // tổng số kết quả
-        public int TotalPages { get; set; }    // tổng số trang
+        // --- Phân trang 
+        public int Page { get; set; }       
+        public int PageSize { get; set; }    
+        public int TotalItems { get; set; }    
+        public int TotalPages { get; set; }   
     }
 
     /// <summary>

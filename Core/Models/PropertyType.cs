@@ -8,7 +8,7 @@ namespace Core.Models
         [Column("id")]
         public int Id { get; set; }
 
-        // Mã: 'apartment', 'house', 'villa', 'office', ...
+  
         [Column("code")]
         public string Code { get; set; }
 

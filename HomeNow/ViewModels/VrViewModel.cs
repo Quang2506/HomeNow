@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Core.Models;   // để dùng VrScene
+using Core.Models; 
 
 namespace HomeNow.ViewModels
 {

@@ -6,10 +6,7 @@ using Services.Implementations;
 
 namespace HomeNow.Filters
 {
-    /// <summary>
-    /// Nếu đã đăng nhập (FormsAuth cookie còn) nhưng Session mất (do restart app)
-    /// thì tự restore lại Session CurrentUserId/CurrentUserName từ DB theo userId trong cookie.
-    /// </summary>
+   
     public class RestoreUserSessionAttribute : ActionFilterAttribute
     {
         public override void OnActionExecuting(ActionExecutingContext filterContext)
