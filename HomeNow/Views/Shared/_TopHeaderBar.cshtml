@@ -1,0 +1,493 @@
+﻿@using HomeNow.Resources
+@using System.Web
+@using Core.ViewModels
+
+@model object
+
+@{
+    // ===== Helper resx an toàn =====
+    Func<string, string, string> R = (key, fallback) =>
+    {
+        var s = HomeTexts.ResourceManager.GetString(key, System.Threading.Thread.CurrentThread.CurrentUICulture);
+        return string.IsNullOrWhiteSpace(s) ? fallback : s;
+    };
+
+    
+    var vm = Model as HeaderBarViewModel;
+
+    var currentLang = vm?.CurrentLang ?? System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
+
+    var favCount = vm?.FavoriteCount ?? (int)(ViewBag.FavoriteCount ?? 0);
+    var favCountText = favCount > 99 ? "99+" : favCount.ToString();
+
+    var cityName =
+        !string.IsNullOrWhiteSpace(vm?.HeaderCityName) ? vm.HeaderCityName
+        : (!string.IsNullOrWhiteSpace(ViewBag.HeaderCityName as string) ? (string)ViewBag.HeaderCityName : HomeTexts.CityName);
+
+    var name =
+        !string.IsNullOrWhiteSpace(vm?.CurrentUserName) ? vm.CurrentUserName
+        : (Session["CurrentUserName"] as string ?? HomeTexts.Account_Default);
+
+    var returnUrl = vm?.ReturnUrl ?? (Request?.RawUrl ?? "/");
+
+    var JS_FavNeedLogin = HttpUtility.JavaScriptStringEncode(HomeTexts.Favorite_NeedLogin);
+    var JS_FavUpdateFail = HttpUtility.JavaScriptStringEncode(HomeTexts.Favorite_UpdateFailed);
+    var JS_FeatureComingSoon = HttpUtility.JavaScriptStringEncode(R("Common_FeatureComingSoon", "Tính năng đang phát triển"));
+}
+
+<style>
+    .img_logo {
+        height: 3rem;
+        width: auto;
+    }
+    .home-header-left-box {
+        display: flex;
+        align-items: center;
+        gap: 0.2rem;
+    }
+    .home-hero {
+        /*background: none !important;*/
+    }
+
+    .list-hero {
+        position: relative;
+        background: #8f8f8f; 
+        padding: 7px 0 3px;
+    }
+
+        .list-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            /*background: rgba(0,0,0,.12);*/
+        }
+
+        .list-hero .home-hero-shell {
+            position: relative;
+            z-index: 1;
+            width: 97%;
+            margin: 0 auto;
+            padding: 0 !important;
+        }
+
+    .home-hero-header {
+        margin: 0;
+    }
+
+    .home-header-right-top a {
+        margin: 0;
+    }
+
+    .account-hover {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        padding-bottom: 14px;
+        z-index: 99999;
+    }
+
+    .account-trigger {
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+        color: #fff;
+        border-radius: 999px;
+        background: rgba(15,23,42,0);
+        border: 0;
+        outline: 0;
+        padding: 4px 8px;
+        gap: 6px;
+        user-select: none;
+    }
+
+        .account-trigger:hover {
+            background: rgba(15,23,42,.55);
+        }
+
+    /*  Overlay account menu  */
+    .hn-acc-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.35);
+        z-index: 200000;
+    }
+
+    .hn-acc-panel {
+        position: absolute;
+        top: 43px;
+        right: 12px;
+        width: 280px;
+        max-width: calc(100vw - 24px);
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 18px 40px rgba(0,0,0,.18);
+        border: 1px solid rgba(15,23,42,.10);
+        overflow: hidden;
+    }
+
+    .hn-acc-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 14px;
+        color: #0f172a !important;
+        text-decoration: none !important;
+        font-weight: 0;
+        line-height: 1;
+        background: #fff;
+    }
+
+        .hn-acc-item i {
+            width: 18px;
+            text-align: center;
+            opacity: .9;
+        }
+
+        .hn-acc-item:hover {
+            background: #f1f5f9;
+        }
+
+    .hn-acc-divider {
+        height: 1px;
+        background: rgba(15,23,42,.08);
+        margin: 0;
+    }
+
+    .hn-acc-item.logout {
+        color: #dc2626 !important;
+    }
+
+        .hn-acc-item.logout:hover {
+            background: #fef2f2;
+        }
+
+    /* Favorite badge */
+    .fav-wrap {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        color: #fff;
+    }
+
+        .fav-wrap.has-badge i {
+            color: #ff4d6d;
+        }
+
+    .fav-badge {
+        position: absolute;
+        top: -4px;
+        right: -6px;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 5px;
+        border-radius: 999px;
+        background: #22c55e;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+    }
+    .home-header-left-tagline {
+        
+        display: flex;
+        align-items: end;
+    }
+    @@media(max-width:500px) {
+        .hn-acc-panel {
+            top: 39px;
+            right: 10px;
+            width: 53vw;
+        }
+
+        .fav-badge {
+            top: -1px;
+            right: -4px;
+            min-width: 15px;
+            height: 15px;
+        }
+    }
+</style>
+
+<div class="home-hero list-hero">
+    <div class="home-hero-shell">
+        <div class="home-hero-header">
+            <a href="@Url.Action("Index", "Home")" class="home-header-left-box">
+                @*<div class="home-logo-icon"></div>*@
+                <img class="img_logo" src="~/Assets/Cities/logo.png" />
+                <div class="home-header-left">
+                    <div class="home-header-left-top"><span>NhàWow</span></div>
+                    <div class="home-header-left-tagline">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                            <path d="M12 2.5C8.96 2.5 6.5 4.96 6.5 8c0 3.74 3.39 7.47 4.96 9.15.29.31.77.31 1.06 0C14.11 15.47 17.5 11.74 17.5 8c0-3.04-2.46-5.5-5.5-5.5zm0 6.5A2 2 0 1 1 12 5a2 2 0 0 1 0 4z" />
+                        </svg>
+                        @*@cityName*@
+                        @HomeTexts.CityName
+                    </div>
+                </div>
+            </a>
+
+            <div class="home-header-right-box">
+                <div class="home-header-right-top">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <a href="@Url.Action("Favorites", "Property")"
+                           class="js-fav-top fav-wrap @(favCount > 0 ? "has-badge" : "")"
+                           data-return="@returnUrl">
+                            <i class="fa-solid fa-heart"></i>
+                            @if (favCount > 0)
+                            {<span id="headerFavBadge" class="fav-badge">@favCountText</span>}
+                        </a>
+
+                        <a href="javascript:void(0)" class="js-bell"><i class="fa-solid fa-bell"></i></a>
+
+                        <div class="account-hover" id="hnAccountHover">
+                            <div class="account-trigger" id="hnAccountTrigger" aria-haspopup="menu" aria-expanded="false">
+                                <i class="fa-solid fa-user"></i>
+                                <span>@name</span>
+                                <i class="fa-solid fa-caret-down" style="font-size:12px; opacity:.8;"></i>
+                            </div>
+                        </div>
+
+                        <div id="hnAccountMenuOverlay" class="hn-acc-overlay" aria-hidden="true">
+                            <div class="hn-acc-panel" role="menu" aria-label="@R("Account_MenuLabel","Account menu")">
+                                <a class="hn-acc-item js-open-profile" href="javascript:void(0)">
+                                    <i class="fa-regular fa-user"></i>
+                                    @R("Account_Profile", "Thay đổi thông tin cá nhân")
+                                </a>
+
+                                <a class="hn-acc-item js-open-change-password" href="javascript:void(0)">
+                                    <i class="fa-solid fa-lock"></i>
+                                    @R("Account_ChangePassword", "Thay đổi mật khẩu")
+                                </a>
+
+                                <div class="hn-acc-divider"></div>
+
+                                <a class="hn-acc-item logout" href="@Url.Action("Logout","Account")">
+                                    <i class="fa-solid fa-right-from-bracket"></i>
+                                    @R("Account_Logout", "Đăng xuất")
+                                </a>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <a href="@Url.Action("Favorites", "Property")"
+                           class="js-fav-top fav-wrap"
+                           data-return="@returnUrl">
+                            <i class="fa-solid fa-heart"></i>
+                        </a>
+
+                        <a href="javascript:void(0)" class="js-bell"><i class="fa-solid fa-bell"></i></a>
+
+                        <a href="javascript:void(0)" class="js-open-login">@HomeTexts.Login</a>
+                    }
+
+                    <a href="@Url.Action("Request", "Landlord")" class="nav-post">@HomeTexts.Menu_Post</a>
+                </div>
+
+                <div class="home-header-right-bottom">
+                    <a href="@Url.Action("Set", "Language", new { lang = "vi-VN", returnUrl = returnUrl })"
+                       class="@(currentLang.StartsWith("vi") ? "lang-active" : "")">VI</a>
+                    |
+                    <a href="@Url.Action("Set", "Language", new { lang = "en-US", returnUrl = returnUrl })"
+                       class="@(currentLang.StartsWith("en") ? "lang-active" : "")">EN</a>
+                    |
+                    <a href="@Url.Action("Set", "Language", new { lang = "zh-CN", returnUrl = returnUrl })"
+                       class="@(currentLang.StartsWith("zh") ? "lang-active" : "")">中文</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    //  tránh init nhiều lần nếu header render lại
+    if (window.__TopHeaderBarInited) return;
+    window.__TopHeaderBarInited = true;
+
+    var MSG_COMING = '@JS_FeatureComingSoon';
+    var MSG_NEED_LOGIN = '@JS_FavNeedLogin';
+    var MSG_UPDATE_FAIL = '@JS_FavUpdateFail';
+
+    // Account overlay 
+    (function () {
+        var trigger = document.getElementById('hnAccountTrigger');
+        var overlay = document.getElementById('hnAccountMenuOverlay');
+        if (!trigger || !overlay) return;
+
+        function openMenu() {
+            overlay.style.display = 'block';
+            overlay.setAttribute('aria-hidden', 'false');
+            trigger.setAttribute('aria-expanded', 'true');
+        }
+        function closeMenu() {
+            overlay.style.display = 'none';
+            overlay.setAttribute('aria-hidden', 'true');
+            trigger.setAttribute('aria-expanded', 'false');
+        }
+        window.__closeAccountMenu = closeMenu;
+
+        trigger.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (overlay.style.display === 'block') closeMenu();
+            else openMenu();
+        });
+
+        overlay.addEventListener('click', function (e) {
+            if (e.target === overlay) closeMenu();
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeMenu();
+        });
+
+        document.addEventListener('click', function () {
+            closeMenu();
+        });
+    })();
+
+    // ===== Bell
+    document.addEventListener('click', function(e){
+        var el = e.target.closest && e.target.closest('.js-bell');
+        if (!el) return;
+        e.preventDefault();
+        alert(MSG_COMING);
+    });
+
+    // Favorites header realtime (dùng chung toàn site) 
+    window.__isAuth = @User.Identity.IsAuthenticated.ToString().ToLower();
+    window.__favIds = window.__favIds || [];
+
+    window.updateHeaderFavBadge = window.updateHeaderFavBadge || function (count) {
+        count = parseInt(count || 0, 10);
+        var $wrap = window.jQuery ? $('.js-fav-top.fav-wrap') : null;
+        if (!$wrap || $wrap.length === 0) return;
+
+        var $badge = $('#headerFavBadge');
+
+        if (count > 0) {
+            var text = count > 99 ? '99+' : String(count);
+            $wrap.addClass('has-badge');
+            if ($badge.length === 0) $wrap.append('<span id="headerFavBadge" class="fav-badge">' + text + '</span>');
+            else $badge.text(text);
+        } else {
+            $wrap.removeClass('has-badge');
+            if ($badge.length) $badge.remove();
+        }
+    };
+
+    window.applyFavoriteIds = window.applyFavoriteIds || function (ids, $scope) {
+        if (!window.jQuery) return;
+        ids = ids || [];
+        var set = {};
+        for (var i = 0; i < ids.length; i++) set[ids[i]] = true;
+
+        var $root = ($scope && $scope.length) ? $scope : $(document);
+        $root.find('.js-fav-toggle').each(function () {
+            var pid = $(this).data('id');
+            $(this).toggleClass('is-fav', !!set[pid]);
+        });
+    };
+
+    window.refreshHeaderFav = window.refreshHeaderFav || function () {
+        if (!window.jQuery) return;
+        return $.get('@Url.Action("HeaderFavoriteInfo", "Property")')
+            .done(function (res) {
+                if (!res) return;
+                window.__isAuth = !!res.isAuth;
+                window.updateHeaderFavBadge(res.favoriteCount || 0);
+                window.__favIds = res.favoriteIds || [];
+                window.applyFavoriteIds(window.__favIds);
+            });
+    };
+
+    if (window.jQuery) {
+        $(function () {
+            window.refreshHeaderFav();
+            document.addEventListener('visibilitychange', function () {
+                if (!document.hidden) window.refreshHeaderFav();
+            });
+        });
+
+        // click heart header: chưa login -> mở login modal
+        $(document).on('click', '.js-fav-top', function (e) {
+            if (window.__isAuth) return;
+
+            e.preventDefault();
+            var returnUrl = $(this).data('return') || (window.location.pathname + window.location.search);
+
+            if (window.loginModal && typeof window.loginModal.open === 'function') {
+                window.loginModal.open(returnUrl);
+            } else {
+                window.location.href = '@Url.Action("Login", "Account")' + '?returnUrl=' + encodeURIComponent(returnUrl);
+            }
+        });
+
+        // open profile/change password
+        $(document).on('click', '.js-open-profile', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (window.__closeAccountMenu) window.__closeAccountMenu();
+
+            if (window.profileModal && typeof window.profileModal.open === 'function') window.profileModal.open();
+            else alert(MSG_COMING);
+        });
+
+        $(document).on('click', '.js-open-change-password', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (window.__closeAccountMenu) window.__closeAccountMenu();
+
+            if (window.changePasswordModal && typeof window.changePasswordModal.open === 'function') window.changePasswordModal.open();
+            else alert(MSG_COMING);
+        });
+
+        // Toggle favorite
+        $(document).on('click', '.js-fav-toggle', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var $btn = $(this);
+            var propertyId = $btn.data('id');
+
+            $.ajax({
+                url: '@Url.Action("ToggleFavorite", "Property")',
+                type: 'POST',
+                data: { propertyId: propertyId },
+                success: function (res) {
+                    if (!res) return;
+
+                    if (res.needLogin) {
+                        if (window.loginModal && typeof window.loginModal.open === 'function') {
+                            window.loginModal.open(window.location.pathname + window.location.search);
+                        } else {
+                            alert(MSG_NEED_LOGIN);
+                        }
+                        return;
+                    }
+
+                    if (res.success) {
+                        $btn.toggleClass('is-fav', !!res.isFavorite);
+
+                        if (typeof res.favoriteCount !== 'undefined') window.updateHeaderFavBadge(res.favoriteCount);
+                        else window.refreshHeaderFav();
+
+                        window.__isAuth = true;
+                    }
+                },
+                error: function () { alert(MSG_UPDATE_FAIL); }
+            });
+        });
+    }
+})();
+</script>

@@ -1,39 +1,531 @@
-﻿@* Popup đăng nhập dùng chung mọi trang *@
-<div id="loginOverlay" class="login-overlay" style="display:none;">
-    <div class="login-modal">
-        <span class="login-close" id="btnCloseLogin">&times;</span>
-        <div class="login-modal-title">Đăng nhập</div>
+﻿@using Core.Resources
 
-        <div id="loginError" class="login-error-text"></div>
+<style>
+    /* Modal base */
+    .hn-auth-modal {
+        position: fixed;
+        inset: 0;
+        display: none;
+        z-index: 200000;
+    }
 
-        <form id="loginForm" method="post" action="@Url.Action("Login", "Account")">
+        .hn-auth-modal.show {
+            display: block;
+        }
+
+    .hn-auth-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(15,23,42,.55);
+        backdrop-filter: blur(2px);
+    }
+
+    .hn-auth-panel {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: min(420px, calc(100vw - 24px));
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0,0,0,.25);
+        overflow: hidden;
+    }
+
+    .hn-auth-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 14px 16px;
+        border-bottom: 1px solid rgba(15,23,42,.10);
+    }
+
+    .hn-auth-title {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 900;
+    }
+
+    .hn-auth-close {
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        background: rgba(15,23,42,.08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+        .hn-auth-close:hover {
+            background: rgba(15,23,42,.12);
+        }
+
+    .hn-auth-body {
+        padding: 14px 16px 16px;
+    }
+
+    .hn-field {
+        margin-bottom: 10px;
+    }
+
+        .hn-field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 6px;
+        }
+
+        .hn-field input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(15,23,42,.12);
+            outline: none;
+        }
+
+    .hn-row {
+        display: flex;
+        gap: 10px;
+    }
+
+        .hn-row .hn-field {
+            flex: 1;
+        }
+
+    .hn-btn {
+        width: 100%;
+        border: 0;
+        border-radius: 12px;
+        padding: 10px 12px;
+        font-weight: 900;
+        cursor: pointer;
+        background: #0f172a;
+        color: #fff;
+    }
+
+        .hn-btn:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+        }
+
+    .hn-link {
+        color: #0f172a;
+        font-weight: 800;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .hn-foot {
+        margin-top: 10px;
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        font-size: 13px;
+        color: #334155;
+    }
+
+    .hn-msg {
+        margin: 10px 0 0;
+        font-size: 13px;
+        font-weight: 700;
+        color: #ef4444;
+        display: none;
+    }
+
+        .hn-msg.ok {
+            color: #16a34a;
+        }
+</style>
+
+<!-- LOGIN MODAL -->
+<div id="hnLoginModal" class="hn-auth-modal" aria-hidden="true">
+    <div class="hn-auth-backdrop"></div>
+    <div class="hn-auth-panel" role="dialog" aria-modal="true">
+        <div class="hn-auth-head">
+            <h3 class="hn-auth-title">@AuthTexts.Login_Title</h3>
+            <div class="hn-auth-close js-hn-close"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="hn-auth-body">
             @Html.AntiForgeryToken()
-            @* ReturnUrl sẽ được JS set = url hiện tại *@
-            <input type="hidden" name="ReturnUrl" id="loginReturnUrl" />
-
-            <div class="login-form-group">
-                <label for="LoginName">Email / Số điện thoại</label>
-                <input type="text" name="LoginName" id="LoginName" />
+            <div class="hn-field">
+                <label>@AuthTexts.Label_LoginName</label>
+                <input id="hnLoginName" type="text" autocomplete="username" />
+            </div>
+            <div class="hn-field">
+                <label>@AuthTexts.Label_Password</label>
+                <input id="hnLoginPass" type="password" autocomplete="current-password" />
             </div>
 
-            <div class="login-form-group">
-                <label for="Password">Mật khẩu</label>
-                <input type="password" name="Password" id="Password" />
+            <div class="hn-field" style="display:flex; align-items:center; gap:8px;">
+                <input id="hnRemember" type="checkbox" style="width:auto;" />
+                <label style="margin:0; font-size:13px; font-weight:700;">Remember me</label>
             </div>
 
-            <div class="login-remember">
-                <label>
-                    <input type="checkbox" name="RememberMe" value="true" />
-                    Ghi nhớ đăng nhập
-                </label>
+            <button id="hnBtnLogin" class="hn-btn">@AuthTexts.Btn_Login</button>
+
+            <div id="hnLoginMsg" class="hn-msg"></div>
+
+            <div class="hn-foot">
+                <span class="hn-link" id="hnOpenRegister">@AuthTexts.Register_Title</span>
+                <span class="hn-link" id="hnOpenForgot">@AuthTexts.Forgot_Title</span>
             </div>
-
-            <button type="submit" class="login-btn-submit">Đăng nhập</button>
-        </form>
-
-        <div class="login-footer-text">
-            Chưa có tài khoản?
-            <a href="@Url.Action("Register", "Account")">Đăng ký ngay</a>
         </div>
     </div>
 </div>
+
+<!-- REGISTER MODAL -->
+<div id="hnRegisterModal" class="hn-auth-modal" aria-hidden="true">
+    <div class="hn-auth-backdrop"></div>
+    <div class="hn-auth-panel" role="dialog" aria-modal="true">
+        <div class="hn-auth-head">
+            <h3 class="hn-auth-title">@AuthTexts.Register_Title</h3>
+            <div class="hn-auth-close js-hn-close"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="hn-auth-body">
+            @Html.AntiForgeryToken()
+            <div class="hn-field">
+                <label>@AuthTexts.Label_Email</label>
+                <input id="hnRegEmail" type="email" autocomplete="email" />
+            </div>
+
+            <div class="hn-row">
+                <div class="hn-field">
+                    <label>@AuthTexts.Label_Phone</label>
+                    <input id="hnRegPhone" type="text" autocomplete="tel" />
+                </div>
+                <div class="hn-field">
+                    <label>@AuthTexts.Label_DisplayName</label>
+                    <input id="hnRegDisplayName" type="text" />
+                </div>
+            </div>
+
+            <div class="hn-row">
+                <div class="hn-field">
+                    <label>@AuthTexts.Label_Password</label>
+                    <input id="hnRegPass" type="password" autocomplete="new-password" />
+                </div>
+                <div class="hn-field">
+                    <label>@AuthTexts.Label_ConfirmPassword</label>
+                    <input id="hnRegPass2" type="password" autocomplete="new-password" />
+                </div>
+            </div>
+
+            <button id="hnBtnRegister" class="hn-btn">@AuthTexts.Btn_Register</button>
+
+            <div id="hnRegMsg" class="hn-msg"></div>
+
+            <div class="hn-foot">
+                <span class="hn-link" id="hnBackToLogin">@AuthTexts.Login_Title</span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- VERIFY OTP MODAL -->
+<div id="hnVerifyModal" class="hn-auth-modal" aria-hidden="true">
+    <div class="hn-auth-backdrop"></div>
+    <div class="hn-auth-panel" role="dialog" aria-modal="true">
+        <div class="hn-auth-head">
+            <h3 class="hn-auth-title">@AuthTexts.Verify_Title</h3>
+            <div class="hn-auth-close js-hn-close"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="hn-auth-body">
+            @Html.AntiForgeryToken()
+            <input type="hidden" id="hnVerifyEmail" />
+
+            <div class="hn-field">
+                <label>@AuthTexts.Label_Otp</label>
+                <input id="hnVerifyOtp" type="text" inputmode="numeric" />
+            </div>
+
+            <button id="hnBtnVerify" class="hn-btn">@AuthTexts.Btn_Verify</button>
+
+            <div style="margin-top:10px; display:flex; justify-content:space-between; gap:10px;">
+                <span class="hn-link" id="hnResendOtp">@AuthTexts.Btn_Resend</span>
+                <span class="hn-link" id="hnVerifyToRegister">@AuthTexts.Register_Title</span>
+            </div>
+
+            <div id="hnVerifyMsg" class="hn-msg"></div>
+        </div>
+    </div>
+</div>
+
+<!-- FORGOT PASSWORD MODAL -->
+<div id="hnForgotModal" class="hn-auth-modal" aria-hidden="true">
+    <div class="hn-auth-backdrop"></div>
+    <div class="hn-auth-panel" role="dialog" aria-modal="true">
+        <div class="hn-auth-head">
+            <h3 class="hn-auth-title">@AuthTexts.Forgot_Title</h3>
+            <div class="hn-auth-close js-hn-close"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="hn-auth-body">
+            @Html.AntiForgeryToken()
+
+            <div class="hn-field">
+                <label>@AuthTexts.Label_Email</label>
+                <input id="hnForgotEmail" type="email" autocomplete="email" />
+            </div>
+
+            <div class="hn-row">
+                <div class="hn-field">
+                    <label>@AuthTexts.Label_Otp</label>
+                    <input id="hnForgotOtp" type="text" inputmode="numeric" />
+                </div>
+                <div class="hn-field" style="display:flex; align-items:flex-end;">
+                    <button id="hnBtnForgotSend" class="hn-btn" style="width:auto; padding:10px 14px;">@AuthTexts.Btn_SendOtp</button>
+                </div>
+            </div>
+
+            <div class="hn-row">
+                <div class="hn-field">
+                    <label>@AuthTexts.Label_Password</label>
+                    <input id="hnForgotPass" type="password" autocomplete="new-password" />
+                </div>
+                <div class="hn-field">
+                    <label>@AuthTexts.Label_ConfirmPassword</label>
+                    <input id="hnForgotPass2" type="password" autocomplete="new-password" />
+                </div>
+            </div>
+
+            <button id="hnBtnForgotReset" class="hn-btn">@AuthTexts.Btn_ResetPassword</button>
+
+            <div id="hnForgotMsg" class="hn-msg"></div>
+
+            <div class="hn-foot">
+                <span class="hn-link" id="hnForgotToLogin">@AuthTexts.Login_Title</span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        function showMsg($el, text, ok) {
+            $el.removeClass('ok');
+            if (ok) $el.addClass('ok');
+            $el.text(text || '').show();
+        }
+        function hideMsg($el) { $el.hide().text('').removeClass('ok'); }
+
+        function openModal(id) {
+            $('.hn-auth-modal').removeClass('show').attr('aria-hidden', 'true');
+            $(id).addClass('show').attr('aria-hidden', 'false');
+            $('body').css('overflow', 'hidden');
+        }
+        function closeAll() {
+            $('.hn-auth-modal').removeClass('show').attr('aria-hidden', 'true');
+            $('body').css('overflow', '');
+        }
+
+        // expose for other pages
+        window.loginModal = {
+            open: function () { openModal('#hnLoginModal'); },
+            close: function () { closeAll(); }
+        };
+
+        // close handlers
+        $(document).on('click', '.js-hn-close, .hn-auth-backdrop', function () { closeAll(); });
+        $(document).on('keydown', function (e) { if (e.key === 'Escape') closeAll(); });
+
+        // open from header
+        $(document).on('click', '.js-open-login', function (e) {
+            e.preventDefault();
+            openModal('#hnLoginModal');
+        });
+
+        // switch modals
+        $('#hnOpenRegister').on('click', function () { openModal('#hnRegisterModal'); });
+        $('#hnBackToLogin').on('click', function () { openModal('#hnLoginModal'); });
+        $('#hnOpenForgot').on('click', function () { openModal('#hnForgotModal'); });
+        $('#hnForgotToLogin').on('click', function () { openModal('#hnLoginModal'); });
+        $('#hnVerifyToRegister').on('click', function () { openModal('#hnRegisterModal'); });
+
+        // tokens (each modal has token)
+        function tokenFrom(modalId) {
+            var $m = $(modalId);
+            var v = $m.find('input[name="__RequestVerificationToken"]').val();
+            return v || $('input[name="__RequestVerificationToken"]').first().val();
+        }
+
+        // LOGIN
+        $('#hnBtnLogin').on('click', function () {
+            var $msg = $('#hnLoginMsg');
+            hideMsg($msg);
+
+            $.ajax({
+                url: '@Url.Action("Login", "Account")',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    __RequestVerificationToken: tokenFrom('#hnLoginModal'),
+                    LoginName: $('#hnLoginName').val(),
+                    Password: $('#hnLoginPass').val(),
+                    RememberMe: $('#hnRemember').is(':checked')
+                }
+            }).done(function (res) {
+                if (!res || !res.success) {
+                    if (res && res.needVerify) {
+                        // open verify modal
+                        $('#hnVerifyEmail').val($('#hnLoginName').val());
+                        openModal('#hnVerifyModal');
+                    }
+                    showMsg($msg, (res && res.message) || '@AuthTexts.Err_LoginInvalid', false);
+                    return;
+                }
+                closeAll();
+                location.reload();
+            }).fail(function () {
+                showMsg($msg, '@AuthTexts.Err_InvalidData', false);
+            });
+        });
+
+        // REGISTER
+        $('#hnBtnRegister').on('click', function () {
+            var $msg = $('#hnRegMsg');
+            hideMsg($msg);
+
+            var email = $('#hnRegEmail').val();
+
+            $.ajax({
+                url: '@Url.Action("Register", "Account")',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    __RequestVerificationToken: tokenFrom('#hnRegisterModal'),
+                    Email: email,
+                    PhoneNumber: $('#hnRegPhone').val(),
+                    DisplayName: $('#hnRegDisplayName').val(),
+                    Password: $('#hnRegPass').val(),
+                    ConfirmPassword: $('#hnRegPass2').val()
+                }
+            }).done(function (res) {
+                if (!res || !res.success) {
+                    showMsg($msg, (res && res.message) || '@AuthTexts.Err_InvalidData', false);
+                    return;
+                }
+
+                // open verify modal
+                $('#hnVerifyEmail').val(res.email || email);
+                $('#hnVerifyOtp').val('');
+                openModal('#hnVerifyModal');
+
+                if (res.warning) showMsg($('#hnVerifyMsg'), res.warning, false);
+                else if (res.message) showMsg($('#hnVerifyMsg'), res.message, true);
+            }).fail(function () {
+                showMsg($msg, '@AuthTexts.Err_InvalidData', false);
+            });
+        });
+
+        // VERIFY OTP
+        $('#hnBtnVerify').on('click', function () {
+            var $msg = $('#hnVerifyMsg');
+            hideMsg($msg);
+
+            $.ajax({
+                url: '@Url.Action("VerifyRegisterOtp", "Account")',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    __RequestVerificationToken: tokenFrom('#hnVerifyModal'),
+                    email: $('#hnVerifyEmail').val(),
+                    otp: $('#hnVerifyOtp').val()
+                }
+            }).done(function (res) {
+                if (!res || !res.success) {
+                    showMsg($msg, (res && res.message) || '@AuthTexts.Err_OtpInvalid', false);
+                    return;
+                }
+
+                showMsg($msg, (res && res.message) || '@AuthTexts.Msg_VerifySuccess', true);
+                setTimeout(function () {
+                    closeAll();
+                    location.reload();
+                }, 500);
+            }).fail(function () {
+                showMsg($msg, '@AuthTexts.Err_InvalidData', false);
+            });
+        });
+
+        // RESEND OTP
+        $('#hnResendOtp').on('click', function () {
+            var $msg = $('#hnVerifyMsg');
+            hideMsg($msg);
+
+            $.ajax({
+                url: '@Url.Action("ResendVerifyOtp", "Account")',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    __RequestVerificationToken: tokenFrom('#hnVerifyModal'),
+                    email: $('#hnVerifyEmail').val()
+                }
+            }).done(function (res) {
+                if (!res || !res.success) {
+                    showMsg($msg, (res && res.message) || '@AuthTexts.Err_SendEmailFailed', false);
+                    return;
+                }
+                showMsg($msg, (res && res.message) || '@AuthTexts.Hint_VerifySent', true);
+            }).fail(function () {
+                showMsg($msg, '@AuthTexts.Err_SendEmailFailed', false);
+            });
+        });
+
+        // FORGOT: SEND OTP
+        $('#hnBtnForgotSend').on('click', function (e) {
+            e.preventDefault();
+            var $msg = $('#hnForgotMsg');
+            hideMsg($msg);
+
+            $.ajax({
+                url: '@Url.Action("ForgotSendOtp", "Account")',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    __RequestVerificationToken: tokenFrom('#hnForgotModal'),
+                    email: $('#hnForgotEmail').val()
+                }
+            }).done(function (res) {
+                if (!res || !res.success) {
+                    showMsg($msg, (res && res.message) || '@AuthTexts.Err_SendEmailFailed', false);
+                    return;
+                }
+                showMsg($msg, (res && res.message) || '@AuthTexts.Hint_VerifySent', true);
+            }).fail(function () {
+                showMsg($msg, '@AuthTexts.Err_SendEmailFailed', false);
+            });
+        });
+
+        // FORGOT: RESET
+        $('#hnBtnForgotReset').on('click', function () {
+            var $msg = $('#hnForgotMsg');
+            hideMsg($msg);
+
+            $.ajax({
+                url: '@Url.Action("ForgotReset", "Account")',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    __RequestVerificationToken: tokenFrom('#hnForgotModal'),
+                    email: $('#hnForgotEmail').val(),
+                    otp: $('#hnForgotOtp').val(),
+                    newPassword: $('#hnForgotPass').val(),
+                    confirmPassword: $('#hnForgotPass2').val()
+                }
+            }).done(function (res) {
+                if (!res || !res.success) {
+                    showMsg($msg, (res && res.message) || '@AuthTexts.Err_InvalidData', false);
+                    return;
+                }
+                showMsg($msg, (res && res.message) || '@AuthTexts.Msg_ResetSuccess', true);
+                setTimeout(function () { openModal('#hnLoginModal'); }, 700);
+            }).fail(function () {
+                showMsg($msg, '@AuthTexts.Err_InvalidData', false);
+            });
+        });
+    })();
+</script>

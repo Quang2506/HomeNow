@@ -7,602 +7,378 @@
 @model Core.Models.HomeIndexViewModel
 
 @{
+
+    Func<string, string, string> R = (key, fallback) =>
+    {
+        var s = HomeTexts.ResourceManager.GetString(key, System.Threading.Thread.CurrentThread.CurrentUICulture);
+        return string.IsNullOrWhiteSpace(s) ? fallback : s;
+    };
+
     var mode = string.IsNullOrWhiteSpace(Model.TransactionType) ? "rent" : Model.TransactionType;
     mode = mode.ToLower();
 
-    ViewBag.Title = (mode == "rent") ? "Tất cả căn cho thuê" : "Tất cả căn bán";
+  
+    ViewBag.Title = (mode == "rent")
+        ? R("List_Title_AllRent", "Tất cả căn cho thuê")
+        : R("List_Title_AllSale", "Tất cả căn bán");
+
     Layout = "~/Views/Shared/_Layout.cshtml";
-
-    var JS_FavNeedLogin = HttpUtility.JavaScriptStringEncode(HomeTexts.Favorite_NeedLogin);
-    var JS_FavUpdateFail = HttpUtility.JavaScriptStringEncode(HomeTexts.Favorite_UpdateFailed);
-
-    var favCount = (int)(ViewBag.FavoriteCount ?? 0);
-    var favCountText = favCount > 99 ? "99+" : favCount.ToString();
-
-    var currentLang = System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
 
     var selectedCity = Model.CityId.HasValue
         ? (Model.Cities ?? new List<CityDropDownItem>()).FirstOrDefault(x => x.CityId == Model.CityId.Value)
         : (Model.Cities ?? new List<CityDropDownItem>()).FirstOrDefault();
 
     var headerCityName = selectedCity?.Name ?? HomeTexts.CityName;
-    var heroBg = selectedCity?.BackgroundUrl ?? (ViewBag.HeroBackground ?? "/Assets/Banner.jpg");
+
+    // ✅ Header dùng chung sẽ đọc ViewBag này
+    ViewBag.HeaderCityName = headerCityName;
 
     var ROW_PARTIAL = "~/Views/Home/_PropertyRowList.cshtml";
 }
 
-<link rel="stylesheet" href="~/Content/font-awesome/all.min.css">
-<link rel="stylesheet" href="~/Content/style/Property/List.css" />
+@section PageHeader{
+    @Html.Partial("~/Views/Shared/_TopHeaderBar.cshtml")
+}
 
-<style>
-    .home-hero{
-        background:none
-    }
-    .fa-heart {
-        font-size: 14px;
-    }
-    .list-hero {
-        position: relative;
-        background-size: cover;
-        background-position: center;
-        padding: 7px 0 3px;
-    }
+@section Styles{
+    <link rel="stylesheet" href="~/Content/font-awesome/all.min.css">
+    <link rel="stylesheet" href="~/Content/style/Property/List.css" />
 
-        .list-hero::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: rgba(0,0,0,.45);
-        }
-
-        .list-hero .home-hero-shell {
-            position: relative;
-            z-index: 1;
-            width: 97%;
-            margin: 0 auto;
-            padding: 0 !important;
-        }
-
-    .home-hero-header {
-        margin: 0;
-    }
-
-    .home-header-right-top a {
-        margin: 0;
-    }
-
-    .account-hover {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        padding-bottom: 14px;
-        z-index: 99999;
-    }
-
-    .account-trigger {
-        display: inline-flex;
-        align-items: center;
-        /* gap: 6px; */
-        cursor: pointer;
-        color: #fff;
-        /* padding: 6px 10px; */
-        border-radius: 999px;
-        background: rgba(15, 23, 42, 0);
-        border: 0;
-        outline: 0;
-    }
-
-        .account-trigger:hover {
-            background: rgba(15, 23, 42, 0.55);
-        }
-
-    .account-dropdown {
-        position: absolute;
-        top: 100%;
-        right: 0;
-        margin-top: 8px;
-        min-width: 160px;
-        background: rgba(15,23,42,.95);
-        border-radius: 12px;
-        overflow: hidden;
-        opacity: 0;
-        transform: translateY(-6px);
-        pointer-events: none;
-        transition: opacity .15s ease, transform .15s ease;
-        box-shadow: 0 12px 24px rgba(0,0,0,.25);
-    }
-
-        .account-dropdown::before {
-            content: "";
-            position: absolute;
-            top: -12px;
-            left: 0;
-            right: 0;
-            height: 12px;
-        }
-
-    .account-hover.open .account-dropdown {
-        opacity: 1;
-        transform: translateY(0);
-        pointer-events: auto;
-    }
-
-    .account-dropdown a {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px 12px;
-        color: #fff;
-        text-decoration: none;
-        white-space: nowrap;
-    }
-
-        .account-dropdown a:hover {
-            background: rgba(255,255,255,.08);
-        }
-
-    .fav-wrap {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 34px;
-        height: 34px;
-        border-radius: 999px;
-        color: #fff;
-    }
-
-        .fav-wrap.has-badge i {
-            color: #ff4d6d;
-        }
-
-    .fav-badge {
-        position: absolute;
-        top: -4px;
-        right: -6px;
-        min-width: 18px;
-        height: 18px;
-        padding: 0 5px;
-        border-radius: 999px;
-        background: #22c55e;
-        color: #fff;
-        font-size: 11px;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        line-height: 1;
-    }
-
-    .home-search-wrapper {
-        background: #fff;
-        border-radius: 5px;
-        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.35);
-        padding: 8px 10px 6px;
-        width: 80%;
-        margin: 0 auto;
-        box-sizing: border-box;
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    .list-shell {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 16px;
-    }
-
-    .list-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin: auto;
-        width: 79%;
-    }
-
-        .list-head h2 {
-            margin: 0;
-            font-size: 20px;
-        }
-
-    .list-results_class {
-        width: 80%;
-        margin: auto;
-    }
-
-    .p-row {
-        display: flex;
-        gap: 16px;
-        padding: 14px;
-        border-bottom: 1px solid #eee;
-        background: #fff;
-        flex-wrap: nowrap;
-        align-items: flex-start;
-    }
-
-    .p-img {
-        width: 240px;
-        height: 150px;
-        border-radius: 10px;
-        overflow: hidden;
-        flex: 0 0 240px;
-        background: #f3f4f6;
-        display: block;
-    }
-
-        .p-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-    .p-main {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .p-title {
-        display: block;
-        font-size: 20px;
-        font-weight: 700;
-        color: #111827;
-        margin-bottom: 8px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .p-line {
-        color: #334155;
-        font-size: 14px;
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        margin-bottom: 8px;
-    }
-
-    .p-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 14px;
-        color: #475569;
-        font-size: 13px;
-    }
-
-        .p-meta i {
-            margin-right: 6px;
-            opacity: .9;
-        }
-
-    .p-actions {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding-top:10px
-    }
-
-    .p-price-mobile {
-        display: none;
-        margin-left: auto;
-    }
-
-    .p-price {
-        width: 210px;
-        flex: 0 0 210px;
-        text-align: right;
-        padding-top: 6px;
-    }
-
-    .p-price-main {
-        font-size: 18px;
-        font-weight: 600;
-        color: #ef4444;
-        line-height: 1.1;
-    }
-
-    .list-shell .js-fav-toggle {
-        width: 24px;
-        height: 24px;
-        border-radius: 999px;
-        border: none !important;
-        outline: none;
-        cursor: pointer;
-        background: rgba(15, 23, 42, .08);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        /* flex: 0 0 20px; */
-    }
-
-        .list-shell .js-fav-toggle i {
-            color: #64748b !important;
-        }
-
-        .list-shell .js-fav-toggle.is-fav {
-            background: #ef4444 !important;
-        }
-
-            .list-shell .js-fav-toggle.is-fav i {
-                color: #fff !important;
-            }
-
-    @@media(max-width:900px) {
+    <style>
+        /* ===== LIST PAGE (body) ===== */
         .home-search-wrapper {
-            width: 97%;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.35);
+            padding: 8px 10px 6px;
+            width: 80%;
+            margin: 0 auto;
+            box-sizing: border-box;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .list-shell {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px;
         }
 
         .list-head {
-            width: 97%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: auto;
+            width: 79%;
         }
 
+            .list-head h2 {
+                margin: 0;
+                font-size: 20px;
+            }
+
         .list-results_class {
-            width: 97%;
+            width: 80%;
+            margin: auto;
         }
 
         .p-row {
-            flex-direction: row;
+            display: flex;
+            gap: 16px;
+            padding: 14px;
+            border-bottom: 1px solid #eee;
+            background: #fff;
             flex-wrap: nowrap;
-            gap: 12px;
-            padding: 12px;
+            align-items: flex-start;
         }
 
         .p-img {
-            width: 140px;
-            height: 100px;
-            flex: 0 0 140px;
+            width: 240px;
+            height: 150px;
+            border-radius: 10px;
+            overflow: hidden;
+            flex: 0 0 240px;
+            background: #f3f4f6;
+            display: block;
+        }
+
+            .p-img img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
+        .p-main {
+            flex: 1;
+            min-width: 0;
         }
 
         .p-title {
-            font-size: 14px;
-            white-space: normal;
+            display: block;
+            font-size: 20px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 8px;
+            white-space: nowrap;
             overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-        }
-
-        .p-price-main {
-            font-size: 16px;
-        }
-
-        .p-meta {
-            gap: 10px;
-            font-size: 12px;
+            text-overflow: ellipsis;
         }
 
         .p-line {
-            font-size: 12px;
+            color: #334155;
+            font-size: 14px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 8px;
         }
 
-        .home-header-right-top {
-            margin-bottom: 0;
+        .p-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            color: #475569;
+            font-size: 13px;
         }
 
-        .account-trigger {
-            padding: 0;
-            background: none;
-        }
-    }
+            .p-meta i {
+                margin-right: 6px;
+                opacity: .9;
+            }
 
-    @@media(max-width:677px) {
-        .p-price {
-            display: none !important;
-        }
-
-        .p-price-mobile {
-            display: block !important;
-        }
         .p-actions {
             display: flex;
             align-items: center;
             gap: 10px;
-            padding-top: 5px
-        }
-    }
-
-    .scroll-top-btn {
-        position: fixed;
-        right: 18px;
-        bottom: 18px;
-        width: 40px;
-        height: 40px;
-        border-radius: 999px;
-        background: rgba(15,23,42,.85);
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 6px 16px rgba(0,0,0,.25);
-        cursor: pointer;
-        z-index: 9999;
-        opacity: 0;
-        pointer-events: none;
-        transform: translateY(10px);
-        transition: opacity .2s ease, transform .2s ease;
-        text-decoration: none;
-    }
-
-        .scroll-top-btn.show {
-            opacity: 1;
-            pointer-events: auto;
-            transform: translateY(0);
+            padding-top: 10px
         }
 
-    @@media(max-width:500px) {
-        .scroll-top-btn {
-            right: 12px;
-            bottom: 12px;
+        .p-price-mobile {
+            display: none;
+            margin-left: auto;
         }
 
-        .list-shell {
-            padding: 0px;
-        }
-
-        .p-row {
-            gap: 10px;
-        }
-
-        .p-img {
-            width: 110px;
-            height: 80px;
-            flex: 0 0 110px;
-        }
-
-        .fav-badge {
-            top: -1px;
-            right: -4px;
-            min-width: 15px;
-            height: 15px;
+        .p-price {
+            width: 210px;
+            flex: 0 0 210px;
+            text-align: right;
+            padding-top: 6px;
         }
 
         .p-price-main {
-            font-size: 15px !important;
-            white-space: nowrap;
+            font-size: 18px;
+            font-weight: 600;
+            color: #ef4444;
+            line-height: 1.1;
         }
-    }
 
-    /* Spinner load more */
-    #listLoadMoreSpinner {
-        display: none;
-        text-align: center;
-        padding: 12px;
-        opacity: .7;
-    }
-</style>
+        .list-shell .js-fav-toggle {
+            width: 24px;
+            height: 24px;
+            border-radius: 999px;
+            border: none !important;
+            outline: none;
+            cursor: pointer;
+            background: rgba(15, 23, 42, .08);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-<!-- ===== HERO HEADER ===== -->
-<div class="home-hero list-hero">
-    <div class="home-hero-shell">
-        <div class="home-hero-header">
-            <a href="@Url.Action("Index", "Home")" class="home-header-left-box">
-                <div class="home-logo-icon"></div>
-                <div class="home-header-left">
-                    <div class="home-header-left-top"><span>NhàNow</span></div>
-                    <div class="home-header-left-tagline">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                            <path d="M12 2.5C8.96 2.5 6.5 4.96 6.5 8c0 3.74 3.39 7.47 4.96 9.15.29.31.77.31 1.06 0C14.11 15.47 17.5 11.74 17.5 8c0-3.04-2.46-5.5-5.5-5.5zm0 6.5A2 2 0 1 1 12 5a2 2 0 0 1 0 4z" />
-                        </svg>
-                        @headerCityName
-                    </div>
-                </div>
-            </a>
+            .list-shell .js-fav-toggle i {
+                color: #64748b !important;
+            }
 
-            <div class="home-header-right-box">
-                <div class="home-header-right-top">
-                    @if (User.Identity.IsAuthenticated)
-                    {
-                        var name = Session["CurrentUserName"] as string ?? HomeTexts.Account_Default;
+            .list-shell .js-fav-toggle.is-fav {
+                background: #ef4444 !important;
+            }
 
-                    <a href="@Url.Action("Favorites", "Property")"
-                       class="js-fav-top fav-wrap @(favCount > 0 ? "has-badge" : "")"
-                       data-return="@Url.Action("Favorites", "Property")">
-                        <i class="fa-solid fa-heart"></i>
-                        @if (favCount > 0)
-                            {<span id="headerFavBadge" class="fav-badge">@favCountText</span>}
-                    </a>
+                .list-shell .js-fav-toggle.is-fav i {
+                    color: #fff !important;
+                }
 
-                    <a href="javascript:void(0)"><i class="fa-solid fa-bell"></i></a>
+        @@media(max-width:900px) {
+            .home-search-wrapper {
+                width: 97%;
+            }
 
-                    <div class="account-hover" id="accountMenu">
-                        <button type="button" class="account-trigger" aria-haspopup="menu" aria-expanded="false">
-                            <i class="fa-solid fa-user"></i>
-                            <span>@name</span>
-                            <i class="fa-solid fa-caret-down" style="font-size:12px; opacity:.8;"></i>
-                        </button>
-                        <div class="account-dropdown" role="menu">
-                            <a href="@Url.Action("Logout","Account")" role="menuitem">
-                                <i class="fa-solid fa-right-from-bracket"></i> @HomeTexts.Logout
-                            </a>
-                        </div>
-                    </div>
-                    }
-                    else
-                    {
-                    <a href="@Url.Action("Favorites", "Property")"
-                       class="js-fav-top fav-wrap"
-                       data-return="@Url.Action("Favorites", "Property")">
-                        <i class="fa-solid fa-heart"></i>
-                    </a>
+            .list-head {
+                width: 97%;
+            }
 
-                    <a href="javascript:void(0)"><i class="fa-solid fa-bell"></i></a>
+            .list-results_class {
+                width: 97%;
+            }
 
-                    <a href="javascript:void(0)" class="js-open-login">@HomeTexts.Login</a>
-                    }
+            .p-row {
+                flex-direction: row;
+                flex-wrap: nowrap;
+                gap: 12px;
+                padding: 12px;
+            }
 
-                    <a href="@Url.Action("Request", "Landlord")" class="nav-post">@HomeTexts.Menu_Post</a>
-                </div>
+            .p-img {
+                width: 140px;
+                height: 100px;
+                flex: 0 0 140px;
+            }
 
-                <div class="home-header-right-bottom">
-                    <a href="@Url.Action("Set", "Language", new { lang = "vi-VN", returnUrl = Request.RawUrl })"
-                       class="@(currentLang.StartsWith("vi") ? "lang-active" : "")">VI</a>
-                    |
-                    <a href="@Url.Action("Set", "Language", new { lang = "en-US", returnUrl = Request.RawUrl })"
-                       class="@(currentLang.StartsWith("en") ? "lang-active" : "")">EN</a>
-                    |
-                    <a href="@Url.Action("Set", "Language", new { lang = "zh-CN", returnUrl = Request.RawUrl })"
-                       class="@(currentLang.StartsWith("zh") ? "lang-active" : "")">中文</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+            .p-title {
+                font-size: 14px;
+                white-space: normal;
+                overflow: hidden;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+            }
+
+            .p-price-main {
+                font-size: 16px;
+            }
+
+            .p-meta {
+                gap: 10px;
+                font-size: 12px;
+            }
+
+            .p-line {
+                font-size: 12px;
+            }
+        }
+
+        @@media(max-width:677px) {
+            .p-price {
+                display: none !important;
+            }
+
+            .p-price-mobile {
+                display: block !important;
+            }
+
+            .p-actions {
+                padding-top: 5px
+            }
+        }
+
+        .scroll-top-btn {
+            position: fixed;
+            right: 18px;
+            bottom: 18px;
+            width: 40px;
+            height: 40px;
+            border-radius: 999px;
+            background: rgba(15,23,42,.85);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 16px rgba(0,0,0,.25);
+            cursor: pointer;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(10px);
+            transition: opacity .2s ease, transform .2s ease;
+            text-decoration: none;
+        }
+
+            .scroll-top-btn.show {
+                opacity: 1;
+                pointer-events: auto;
+                transform: translateY(0);
+            }
+
+        @@media(max-width:500px) {
+            .scroll-top-btn {
+                right: 12px;
+                bottom: 12px;
+            }
+
+            .list-shell {
+                padding: 0px;
+            }
+
+            .p-row {
+                gap: 10px;
+            }
+
+            .p-img {
+                width: 110px;
+                height: 80px;
+                flex: 0 0 110px;
+            }
+
+            .p-price-main {
+                font-size: 15px !important;
+                white-space: nowrap;
+            }
+        }
+
+        #listLoadMoreSpinner {
+            display: none;
+            text-align: center;
+            padding: 12px;
+            opacity: .7;
+        }
+    </style>
+}
 
 <div class="list-shell">
 
     @using (Html.BeginForm("List", "Property", FormMethod.Get, new { id = "listSearchForm", @class = "home-search-form" }))
     {
-    <div class="home-search-wrapper" style="margin-bottom:12px;">
-        <div class="home-search-top">
-            <div class="home-search-tabs">
-                <button type="button" class="home-search-tab-btn @(mode == "rent" ? "active" : "")" data-value="rent">@HomeTexts.Tab_Rent</button>
-                <span style="color:#aaa">|</span>
-                <button type="button" class="home-search-tab-btn @(mode == "sale" ? "active" : "")" data-value="sale">@HomeTexts.Tab_Sale</button>
+        <div class="home-search-wrapper" style="margin-bottom:12px;">
+            <div class="home-search-top">
+                <div class="home-search-tabs">
+                    <button type="button" class="home-search-tab-btn @(mode == "rent" ? "active" : "")" data-value="rent">@HomeTexts.Tab_Rent</button>
+                    <span style="color:#aaa">|</span>
+                    <button type="button" class="home-search-tab-btn @(mode == "sale" ? "active" : "")" data-value="sale">@HomeTexts.Tab_Sale</button>
+                </div>
+
+                <div class="home-search-input-wrap">
+                    <input type="text" name="keyword" value="@(Model.Keyword ?? "")" placeholder="@HomeTexts.Search_Placeholder" />
+                </div>
+
+                <button type="submit" class="home-search-btn-main">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
             </div>
 
-            <div class="home-search-input-wrap">
-                <input type="text" name="keyword" value="@(Model.Keyword ?? "")" placeholder="@HomeTexts.Search_Placeholder" />
-            </div>
+            <input type="hidden" name="mode" id="modeInput" value="@mode" />
 
-            <button type="submit" class="home-search-btn-main">
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </button>
+            <div class="home-search-bottom">
+                <div class="home-search-filter">
+                    <select name="cityId" id="cityId" class="home-search-filter-select">
+                        <option value="">@HomeTexts.Filter_City</option>
+                        @foreach (var c in (Model.Cities ?? new List<CityDropDownItem>()))
+                        {
+                            <option value="@c.CityId" @(Model.CityId == c.CityId ? "selected" : "")>@c.Name</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="home-search-filter">
+                    <select name="priceRange" id="priceRange" class="home-search-filter-select">
+                        <option value="">@HomeTexts.Filter_Price</option>
+                        @foreach (var pf in (Model.PriceFilters ?? new List<PriceFilterDropDownItem>()))
+                        {
+                            <option value="@pf.Code" @(Model.PriceRange == pf.Code ? "selected" : "")>@pf.Name</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="home-search-filter">
+                    <select name="propertyType" id="propertyType" class="home-search-filter-select">
+                        <option value="">@HomeTexts.Filter_PropertyType</option>
+                        @foreach (var pt in (Model.PropertyTypes ?? new List<PropertyTypeDropDownItem>()))
+                        {
+                            <option value="@pt.Code" @(Model.PropertyType == pt.Code ? "selected" : "")>@pt.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
         </div>
-
-        <input type="hidden" name="mode" id="modeInput" value="@mode" />
-
-        <div class="home-search-bottom">
-            <div class="home-search-filter">
-                <select name="cityId" id="cityId" class="home-search-filter-select">
-                    <option value="">@HomeTexts.Filter_City</option>
-                    @foreach (var c in (Model.Cities ?? new List<CityDropDownItem>()))
-                        {
-                    <option value="@c.CityId" @(Model.CityId == c.CityId ? "selected" : "")>@c.Name</option>
-                        }
-                </select>
-            </div>
-
-            <div class="home-search-filter">
-                <select name="priceRange" id="priceRange" class="home-search-filter-select">
-                    <option value="">@HomeTexts.Filter_Price</option>
-                    @foreach (var pf in (Model.PriceFilters ?? new List<PriceFilterDropDownItem>()))
-                        {
-                    <option value="@pf.Code" @(Model.PriceRange == pf.Code ? "selected" : "")>@pf.Name</option>
-                        }
-                </select>
-            </div>
-
-            <div class="home-search-filter">
-                <select name="propertyType" id="propertyType" class="home-search-filter-select">
-                    <option value="">@HomeTexts.Filter_PropertyType</option>
-                    @foreach (var pt in (Model.PropertyTypes ?? new List<PropertyTypeDropDownItem>()))
-                        {
-                    <option value="@pt.Code" @(Model.PropertyType == pt.Code ? "selected" : "")>@pt.Name</option>
-                        }
-                </select>
-            </div>
-        </div>
-    </div>
     }
 
     <div class="list-head">
@@ -621,103 +397,12 @@
 </div>
 
 <!--Scroll to top button -->
-<a href="#" id="scrollTopBtn" class="scroll-top-btn" aria-label="Về đầu trang">
+<a href="#" id="scrollTopBtn" class="scroll-top-btn" aria-label="@R("Common_ScrollTop","Về đầu trang")">
     <i class="fa-solid fa-angles-up"></i>
 </a>
 
 @section Scripts{
     <script>
-    // account dropdown: PC hover + mobile click
-    (function () {
-        var menu = document.getElementById('accountMenu');
-        if (!menu) return;
-
-        var trigger = menu.querySelector('.account-trigger');
-        if (trigger) {
-            trigger.addEventListener('click', function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-                menu.classList.toggle('open');
-            });
-        }
-        document.addEventListener('click', function () { menu.classList.remove('open'); });
-
-        var timer = null;
-        menu.addEventListener('mouseenter', function () {
-            if (timer) clearTimeout(timer);
-            menu.classList.add('open');
-        });
-        menu.addEventListener('mouseleave', function () {
-            timer = setTimeout(function () { menu.classList.remove('open'); }, 200);
-        });
-    })();
-
-    // header favorites realtime (cache favIds global để dùng lại, không spam gọi)
-    window.__isAuth = @User.Identity.IsAuthenticated.ToString().ToLower();
-    window.__favIds = window.__favIds || [];
-
-    function updateHeaderFavBadge(count) {
-        count = parseInt(count || 0, 10);
-        var $wrap = $('.js-fav-top.fav-wrap');
-        if ($wrap.length === 0) return;
-
-        var $badge = $('#headerFavBadge');
-
-        if (count > 0) {
-            var text = count > 99 ? '99+' : String(count);
-            $wrap.addClass('has-badge');
-            if ($badge.length === 0) $wrap.append('<span id="headerFavBadge" class="fav-badge">' + text + '</span>');
-            else $badge.text(text);
-        } else {
-            $wrap.removeClass('has-badge');
-            if ($badge.length) $badge.remove();
-        }
-    }
-
-    function applyFavoriteIds(ids, $scope) {
-        ids = ids || [];
-        var set = {};
-        for (var i = 0; i < ids.length; i++) set[ids[i]] = true;
-
-        var $root = $scope && $scope.length ? $scope : $(document);
-        $root.find('.js-fav-toggle').each(function () {
-            var pid = $(this).data('id');
-            $(this).toggleClass('is-fav', !!set[pid]);
-        });
-    }
-
-    window.refreshHeaderFav = function () {
-        return $.get('@Url.Action("HeaderFavoriteInfo", "Property")')
-            .done(function (res) {
-                if (!res) return;
-                window.__isAuth = !!res.isAuth;
-                updateHeaderFavBadge(res.favoriteCount || 0);
-                window.__favIds = res.favoriteIds || [];
-                applyFavoriteIds(window.__favIds);
-            });
-    };
-
-    $(function () {
-        window.refreshHeaderFav();
-        document.addEventListener('visibilitychange', function () {
-            if (!document.hidden) window.refreshHeaderFav();
-        });
-    });
-
-    // click heart header: chưa login -> mở login modal
-    $(document).on('click', '.js-fav-top', function (e) {
-        if (window.__isAuth) return;
-
-        e.preventDefault();
-        var returnUrl = $(this).data('return') || (window.location.pathname + window.location.search);
-
-        if (window.loginModal && typeof window.loginModal.open === 'function') {
-            window.loginModal.open(returnUrl);
-        } else {
-            window.location.href = '@Url.Action("Login", "Account")' + '?returnUrl=' + encodeURIComponent(returnUrl);
-        }
-    });
-
     // tabs rent/sale
     (function () {
         var buttons = document.querySelectorAll(".home-search-tab-btn");
@@ -734,7 +419,7 @@
         });
     })();
 
-    // ✅ Infinite scroll (mượt: unobserve khi load, observe lại; stop khi hết trang; có spinner)
+    // Infinite scroll
     (function () {
         var $results = $('#list-results');
         if ($results.length === 0) return;
@@ -759,14 +444,15 @@
             };
         }
 
-        function stop() {
-            if (io) io.disconnect();
-        }
-        function observe() {
-            if (io && sentinel) io.observe(sentinel);
-        }
-        function unobserve() {
-            if (io && sentinel) io.unobserve(sentinel);
+        function stop() { if (io) io.disconnect(); }
+        function observe() { if (io && sentinel) io.observe(sentinel); }
+        function unobserve() { if (io && sentinel) io.unobserve(sentinel); }
+
+        function applyFavOnScope() {
+            // ✅ function này nằm trong _TopHeaderBar.cshtml
+            if (window.__isAuth && window.__favIds && window.__favIds.length && typeof window.applyFavoriteIds === 'function') {
+                window.applyFavoriteIds(window.__favIds, $results);
+            }
         }
 
         function loadNextPage() {
@@ -778,27 +464,19 @@
             unobserve();
             $spinner.show();
 
-            var data = buildQuery(currentPage);
-
-            $.get('@Url.Action("LoadMoreList", "Property")', data)
+            $.get('@Url.Action("LoadMoreList", "Property")', buildQuery(currentPage))
                 .done(function (html) {
                     if (html && $.trim(html).length > 0) {
-                        // append mượt
                         var $chunk = $('<div/>').html(html);
                         $results.append($chunk.contents());
 
                         $('#currentPage').val(currentPage);
-
-                        // nếu user login sau đó -> đảm bảo chunk mới cũng sync fav (không gọi server)
-                        if (window.__isAuth && window.__favIds && window.__favIds.length) {
-                            applyFavoriteIds(window.__favIds, $results);
-                        }
+                        applyFavOnScope();
                     } else {
                         currentPage = totalPages;
                     }
                 })
                 .fail(function () {
-                    // lỗi mạng: rollback để không “mất trang”
                     currentPage--;
                 })
                 .always(function () {
@@ -819,7 +497,6 @@
 
             observe();
         } else {
-            // fallback scroll (throttle bằng rAF)
             var ticking = false;
             $(window).on('scroll', function () {
                 if (ticking) return;
@@ -833,50 +510,6 @@
                 });
             });
         }
-    })();
-
-    // toggle favorite + update badge (KHÔNG cần GET HeaderFavoriteInfo mỗi lần)
-    (function () {
-        var MSG_NEED_LOGIN = '@JS_FavNeedLogin';
-        var MSG_UPDATE_FAIL = '@JS_FavUpdateFail';
-
-        $(document).on('click', '.js-fav-toggle', function (e) {
-            e.preventDefault();
-
-            var $btn = $(this);
-            var propertyId = $btn.data('id');
-
-            $.ajax({
-                url: '@Url.Action("ToggleFavorite", "Property")',
-                type: 'POST',
-                data: { propertyId: propertyId },
-                success: function (res) {
-                    if (!res) return;
-
-                    if (res.needLogin) {
-                        if (window.loginModal && typeof window.loginModal.open === 'function') {
-                            window.loginModal.open(window.location.pathname + window.location.search);
-                        } else {
-                            alert(MSG_NEED_LOGIN);
-                        }
-                        return;
-                    }
-
-                    if (res.success) {
-                        $btn.toggleClass('is-fav', !!res.isFavorite);
-
-                        // update badge ngay (giảm 1 request)
-                        if (typeof res.favoriteCount !== 'undefined') {
-                            updateHeaderFavBadge(res.favoriteCount);
-                        } else {
-                            // fallback nếu server không trả count
-                            window.refreshHeaderFav();
-                        }
-                    }
-                },
-                error: function () { alert(MSG_UPDATE_FAIL); }
-            });
-        });
     })();
 
     // scroll to top

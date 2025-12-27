@@ -86,9 +86,23 @@ namespace HomeNow.Controllers
 
         private static string DetailKey(string lang, int id) => $"hn:prop:detail:{lang}:{id}";
 
-        // ✅ Similar key gồm listingType + propertyType + relaxed để không cache sai
-        private static string SimilarKey(string lang, int? cityId, string listingType, string propertyType, bool relaxed)
-            => $"hn:prop:similar:{lang}:{cityId}:{NormalizeKeyPart(listingType)}:{NormalizeKeyPart(propertyType)}:relax:{(relaxed ? 1 : 0)}";
+        // ✅ Similar cache key theo "bucket giá" (Cách 2)
+        private static string SimilarKey(
+            string lang,
+            int? cityId,
+            string listingType,
+            string propertyType,
+            long priceBucket,
+            bool relaxed)
+            => $"hn:prop:similar:{lang}:{cityId}:{NormalizeKeyPart(listingType)}:{NormalizeKeyPart(propertyType)}:pb:{priceBucket}:relax:{(relaxed ? 1 : 0)}";
+
+        // ✅ Tier 2: cùng city + listingType + propertyType (KHÔNG giá)
+        private static string SimilarKeyCityType(string lang, int? cityId, string listingType, string propertyType)
+            => $"hn:prop:similar:ct:{lang}:{cityId}:{NormalizeKeyPart(listingType)}:{NormalizeKeyPart(propertyType)}";
+
+        // ✅ Tier 3: cùng city + listingType (giữ rent/sale, bỏ propertyType)
+        private static string SimilarKeyCityListing(string lang, int? cityId, string listingType)
+            => $"hn:prop:similar:cl:{lang}:{cityId}:{NormalizeKeyPart(listingType)}";
 
         // per-request memoization keys
         private static string ReqFavIdsKey(int userId) => $"__req:fav:ids:{userId}";
@@ -367,6 +381,26 @@ namespace HomeNow.Controllers
         public Task<ActionResult> FavoriteSummary() => HeaderFavoriteInfo();
 
         // ------------------ DETAIL + VR ------------------
+
+        // ✅ bucket step cho Cách 2:
+        // - rent: 1,000,000 VND
+        // - sale: 100,000,000 VND
+        private static decimal GetBucketStep(string listingType)
+        {
+            return string.Equals((listingType ?? "").Trim(), "rent", StringComparison.OrdinalIgnoreCase)
+                ? 1_000_000m
+                : 100_000_000m;
+        }
+
+        private static long ToPriceBucket(decimal price, decimal step)
+        {
+            if (step <= 0m) step = 1m;
+            if (price <= 0m) return 0;
+            // làm tròn về bucket gần nhất
+            var k = (long)Math.Round(price / step, MidpointRounding.AwayFromZero);
+            return k;
+        }
+
         [HttpGet]
         [AllowAnonymous]
         public async Task<ActionResult> Detail(int id)
@@ -374,10 +408,10 @@ namespace HomeNow.Controllers
             var lang = GetLang2();
             var userId = GetCurrentUserId();
 
-            // ✅ để header hiển thị số tim ngay lúc render (không phải đợi ajax)
+            //  để header hiển thị số tim ngay lúc render (không phải đợi ajax)
             ViewBag.FavoriteCount = await GetFavoriteCountCachedAsync(userId, lang);
 
-            // 1) detail cache (user-agnostic)
+            // detail cache (user-agnostic)
             PropertyDetailViewModel vm = await CacheGetJsonAsync<PropertyDetailViewModel>(DetailKey(lang, id));
 
             if (vm == null)
@@ -413,9 +447,6 @@ namespace HomeNow.Controllers
                             cityName = lang == "en" ? (city.NameEn ?? city.NameVi)
                                      : lang == "zh" ? (city.NameZh ?? city.NameVi)
                                      : city.NameVi;
-
-                            // nếu bạn muốn hero background theo city giống list:
-                            // ViewBag.HeroBackground = city.BackgroundUrl;
                         }
                     }
 
@@ -427,44 +458,122 @@ namespace HomeNow.Controllers
                     var mapEmbedUrl = BuildMapEmbedUrl(mapQuery);
                     var mapClickUrl = BuildMapDirectionsUrl(mapQuery);
 
-                    // Similar (cache riêng)
+                    // ===================== SIMILAR (đủ 3 theo 3-tier) =====================
                     var listingTypeKey = NormalizeKeyPart(p.ListingType);
                     var propertyTypeKey = NormalizeKeyPart(p.PropertyType);
 
-                    // strict: city + listingType + propertyType
-                    var strictKey = SimilarKey(lang, p.CityId, listingTypeKey, propertyTypeKey, relaxed: false);
-                    var similar = await CacheGetJsonAsync<List<PropertyListItemViewModel>>(strictKey);
+                    var step = GetBucketStep(p.ListingType);
+                    var bucket = ToPriceBucket(price, step);
 
-                    if (similar == null)
+                    var dict = new Dictionary<int, PropertyListItemViewModel>();
+
+                    // Tier 1: city + listingType + propertyType + approx price
+                    if (price > 0m)
                     {
-                        similar = await QuerySimilarAsync(db, lang, p, strictPropertyType: true, take: SimilarTake);
-                        await CacheSetJsonAsync(strictKey, similar, SimilarTtl);
-                    }
+                        var k1 = SimilarKey(lang, p.CityId, listingTypeKey, propertyTypeKey, bucket, relaxed: false);
+                        var tier1 = await CacheGetJsonAsync<List<PropertyListItemViewModel>>(k1);
 
-                    // fallback relax nếu thiếu
-                    if ((similar?.Count ?? 0) < SimilarTake)
-                    {
-                        var relaxKey = SimilarKey(lang, p.CityId, listingTypeKey, propertyTypeKey, relaxed: true);
-                        var relax = await CacheGetJsonAsync<List<PropertyListItemViewModel>>(relaxKey);
-
-                        if (relax == null)
+                        if (tier1 == null)
                         {
-                            relax = await QuerySimilarAsync(db, lang, p, strictPropertyType: false, take: SimilarTake);
-                            await CacheSetJsonAsync(relaxKey, relax, SimilarTtl);
+                            tier1 = await QuerySimilarTierAsync(
+                                db: db,
+                                lang: lang,
+                                current: p,
+                                filterListingType: true,
+                                filterPropertyType: true,
+                                filterApproxPrice: true,
+                                basePrice: price,
+                                step: step,
+                                bucket: bucket,
+                                take: SimilarTake * 4);
+
+                            await CacheSetJsonAsync(k1, tier1, SimilarTtl);
                         }
 
-                        var dict = new Dictionary<int, PropertyListItemViewModel>();
-                        foreach (var x in (similar ?? new List<PropertyListItemViewModel>()))
-                            if (!dict.ContainsKey(x.PropertyId)) dict.Add(x.PropertyId, x);
-
-                        foreach (var x in (relax ?? new List<PropertyListItemViewModel>()))
+                        foreach (var x in (tier1 ?? new List<PropertyListItemViewModel>()))
                         {
                             if (dict.Count >= SimilarTake) break;
                             if (!dict.ContainsKey(x.PropertyId)) dict.Add(x.PropertyId, x);
                         }
-
-                        similar = dict.Values.Take(SimilarTake).ToList();
                     }
+
+                    // Tier 2: city + listingType + propertyType (no price)
+                    if (dict.Count < SimilarTake)
+                    {
+                        var k2 = SimilarKeyCityType(lang, p.CityId, listingTypeKey, propertyTypeKey);
+                        var tier2 = await CacheGetJsonAsync<List<PropertyListItemViewModel>>(k2);
+
+                        if (tier2 == null)
+                        {
+                            tier2 = await QuerySimilarTierAsync(
+                                db: db,
+                                lang: lang,
+                                current: p,
+                                filterListingType: true,
+                                filterPropertyType: true,
+                                filterApproxPrice: false,
+                                basePrice: price,
+                                step: step,
+                                bucket: bucket,
+                                take: SimilarTake * 6);
+
+                            await CacheSetJsonAsync(k2, tier2, SimilarTtl);
+                        }
+
+                        foreach (var x in (tier2 ?? new List<PropertyListItemViewModel>()))
+                        {
+                            if (dict.Count >= SimilarTake) break;
+                            if (!dict.ContainsKey(x.PropertyId)) dict.Add(x.PropertyId, x);
+                        }
+                    }
+
+                    // Tier 3: city + listingType (no propertyType)
+                    if (dict.Count < SimilarTake)
+                    {
+                        var k3 = SimilarKeyCityListing(lang, p.CityId, listingTypeKey);
+                        var tier3 = await CacheGetJsonAsync<List<PropertyListItemViewModel>>(k3);
+
+                        if (tier3 == null)
+                        {
+                            tier3 = await QuerySimilarTierAsync(
+                                db: db,
+                                lang: lang,
+                                current: p,
+                                filterListingType: true,
+                                filterPropertyType: false,
+                                filterApproxPrice: false,
+                                basePrice: price,
+                                step: step,
+                                bucket: bucket,
+                                take: SimilarTake * 8);
+
+                            await CacheSetJsonAsync(k3, tier3, SimilarTtl);
+                        }
+
+                        foreach (var x in (tier3 ?? new List<PropertyListItemViewModel>()))
+                        {
+                            if (dict.Count >= SimilarTake) break;
+                            if (!dict.ContainsKey(x.PropertyId)) dict.Add(x.PropertyId, x);
+                        }
+                    }
+
+                    var similar = dict.Values.ToList();
+
+                    // ưu tiên “gần giá” nếu có giá, sau đó giữ thứ tự featured/created/id
+                    if (price > 0m && similar.Count > 1)
+                    {
+                        similar = similar
+                            .OrderBy(x => (x.Price > 0m) ? Math.Abs(x.Price - price) : decimal.MaxValue)
+                            .ThenByDescending(x => x.Price > 0m)
+                            .ThenByDescending(x => x.PropertyId)
+                            .Take(SimilarTake)
+                            .ToList();
+                    }
+                    else
+                    {
+                        similar = similar.Take(SimilarTake).ToList();
+                    }
+                    // ===================== END SIMILAR =====================
 
                     vm = new PropertyDetailViewModel
                     {
@@ -499,7 +608,7 @@ namespace HomeNow.Controllers
                 }
             }
 
-            // ✅ Set IsFavorite cho Similar theo user (không phá cache detail)
+            // set fav flag for similar
             if (userId.HasValue && vm?.Similar != null && vm.Similar.Count > 0)
             {
                 var favSet = await GetFavoriteSetCachedAsync(userId, lang);
@@ -513,8 +622,18 @@ namespace HomeNow.Controllers
             return View(vm);
         }
 
-        private async Task<List<PropertyListItemViewModel>> QuerySimilarAsync(
-            AppDbContext db, string lang, Property p, bool strictPropertyType, int take)
+        // ✅ Query theo tier (dùng chung cho tier1/2/3, không đụng logic khác)
+        private async Task<List<PropertyListItemViewModel>> QuerySimilarTierAsync(
+            AppDbContext db,
+            string lang,
+            Property current,
+            bool filterListingType,
+            bool filterPropertyType,
+            bool filterApproxPrice,
+            decimal basePrice,
+            decimal step,
+            long bucket,
+            int take)
         {
             var q =
                 from pp in db.Properties.AsNoTracking()
@@ -524,22 +643,35 @@ namespace HomeNow.Controllers
                     into gj
                 from tr2 in gj.DefaultIfEmpty()
                 where pp.Status == "published"
-                   && pp.PropertyId != p.PropertyId
-                   && pp.CityId == p.CityId
-                   && pp.ListingType == p.ListingType
+                   && pp.PropertyId != current.PropertyId
+                   && pp.CityId == current.CityId
                 select new { pp, tr2 };
 
-            if (strictPropertyType)
-                q = q.Where(x => x.pp.PropertyType == p.PropertyType);
+            if (filterListingType)
+                q = q.Where(x => x.pp.ListingType == current.ListingType);
+
+            if (filterPropertyType)
+                q = q.Where(x => x.pp.PropertyType == current.PropertyType);
+
+            if (filterApproxPrice && basePrice > 0m)
+            {
+                var bucketValue = bucket * step;
+                var min = Math.Max(0m, bucketValue - (2m * step));
+                var max = bucketValue + (2m * step);
+
+                q = q.Where(x => x.pp.Price.HasValue
+                              && x.pp.Price.Value >= min
+                              && x.pp.Price.Value <= max);
+            }
 
             var rows = await q
                 .OrderByDescending(x => x.pp.IsFeatured)
                 .ThenByDescending(x => x.pp.CreatedAt)
                 .ThenByDescending(x => x.pp.PropertyId)
-                .Take(take)
+                .Take(Math.Max(60, take))
                 .ToListAsync();
 
-            return rows.Select(x =>
+            var mapped = rows.Select(x =>
             {
                 var pp = x.pp;
                 var tr2 = x.tr2;
@@ -550,21 +682,55 @@ namespace HomeNow.Controllers
 
                 var tAddr = (tr2 != null && !string.IsNullOrEmpty(tr2.AddressLine)) ? tr2.AddressLine : pp.AddressLine;
 
-                return new PropertyListItemViewModel
+                var price = pp.Price ?? 0m;
+
+                // tránh lỗi kiểu ?? giữa int?/bool (CS0019)
+                var isFeaturedBool = (pp.IsFeatured ?? 0) > 0;
+                var createdAt = pp.CreatedAt ?? DateTime.MinValue;
+
+                return new
                 {
-                    PropertyId = pp.PropertyId,
-                    Title = tTitle,
-                    Address = tAddr,
-                    ThumbnailUrl = pp.CoverImageUrl,
-                    Bed = pp.BedroomCount,
-                    Bath = pp.BathroomCount,
-                    Area = pp.AreaSqm ?? 0f,
-                    PriceLabel = (pp.Price.HasValue && pp.Price.Value > 0m) ? FormatPriceLabel(pp.Price.Value, pp.ListingType) : "",
-                    ListingType = pp.ListingType,
-                    PropertyType = pp.PropertyType,
-                    IsFavorite = false
+                    Item = new PropertyListItemViewModel
+                    {
+                        PropertyId = pp.PropertyId,
+                        Title = tTitle,
+                        Address = tAddr,
+                        ThumbnailUrl = pp.CoverImageUrl,
+                        Bed = pp.BedroomCount,
+                        Bath = pp.BathroomCount,
+                        Area = pp.AreaSqm ?? 0f,
+
+                        Price = price,
+                        PriceLabel = (price > 0m) ? FormatPriceLabel(price, pp.ListingType) : "",
+
+                        ListingType = pp.ListingType,
+                        PropertyType = pp.PropertyType,
+                        IsFavorite = false
+                    },
+                    IsFeatured = isFeaturedBool,
+                    CreatedAt = createdAt
                 };
             }).ToList();
+
+            if (basePrice > 0m)
+            {
+                mapped = mapped
+                    .OrderBy(x => (x.Item.Price > 0m) ? Math.Abs(x.Item.Price - basePrice) : decimal.MaxValue)
+                    .ThenByDescending(x => x.IsFeatured)
+                    .ThenByDescending(x => x.CreatedAt)
+                    .ThenByDescending(x => x.Item.PropertyId)
+                    .ToList();
+            }
+            else
+            {
+                mapped = mapped
+                    .OrderByDescending(x => x.IsFeatured)
+                    .ThenByDescending(x => x.CreatedAt)
+                    .ThenByDescending(x => x.Item.PropertyId)
+                    .ToList();
+            }
+
+            return mapped.Select(x => x.Item).Take(take).ToList();
         }
 
         [HttpGet]
@@ -717,7 +883,7 @@ namespace HomeNow.Controllers
                     ? (vm.Cities ?? new List<CityDropDownItem>()).FirstOrDefault(c => c.CityId == vm.CityId.Value)
                     : (vm.Cities ?? new List<CityDropDownItem>()).FirstOrDefault();
 
-                ViewBag.HeroBackground = cityForBg?.BackgroundUrl ?? "/Assets/Banner.jpg";
+                ViewBag.HeroBackground = cityForBg?.BackgroundUrl ?? "/Assets/Cities/Banner.png";
                 return;
             }
 
@@ -769,7 +935,7 @@ namespace HomeNow.Controllers
                     ? cList.FirstOrDefault(c => c.CityId == vm.CityId.Value)
                     : cList.FirstOrDefault();
 
-                ViewBag.HeroBackground = cityForBg?.BackgroundUrl ?? "/Assets/Banner.jpg";
+                ViewBag.HeroBackground = cityForBg?.BackgroundUrl ?? "/Assets/Cities/Banner.png";
             }
 
             if (CacheEnabled)

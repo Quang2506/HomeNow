@@ -1,0 +1,194 @@
+﻿@using Core.Resources
+
+<style>
+    /*  SCOPE TO PROFILE ONLY (không ảnh hưởng .row-actions/.msg của popup khác) */
+    #profileOverlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.55);
+        z-index: 10002; /* cao hơn changePw (10001) để tránh bị đè */
+        justify-content: center;
+        align-items: center;
+    }
+
+        #profileOverlay #profileBox {
+            background: #fff;
+            padding: 18px;
+            border-radius: 12px;
+            width: 420px;
+            max-width: 92%;
+            position: relative;
+        }
+
+        #profileOverlay #profileClose {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            color: #999;
+        }
+
+        #profileOverlay #profileBox h3 {
+            margin: 0 0 10px 0;
+            font-weight: 900;
+        }
+
+        #profileOverlay #profileBox label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin: 10px 0 6px;
+            color: #111827;
+        }
+
+        #profileOverlay #profileBox input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+            #profileOverlay #profileBox input[disabled] {
+                background: #f1f5f9;
+                color: #64748b;
+                cursor: not-allowed;
+            }
+
+        /*  đổi class actions để không đè .row-actions global */
+        #profileOverlay .pf-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+            #profileOverlay .pf-actions button {
+                width: 50%;
+                padding: 10px;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 800;
+            }
+
+        #profileOverlay .pf-cancel {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+            #profileOverlay .pf-cancel:hover {
+                background: #cbd5e1;
+            }
+
+        #profileOverlay .pf-save {
+            background: #ef4444;
+            color: #fff;
+        }
+
+            #profileOverlay .pf-save:hover {
+                background: #dc2626;
+            }
+
+        /*  msg riêng của profile */
+        #profileOverlay #profileMsg {
+            font-size: 13px;
+            font-weight: 700;
+            margin: 10px 0 0;
+            display: none;
+        }
+
+            #profileOverlay #profileMsg.ok {
+                color: #16a34a;
+            }
+
+            #profileOverlay #profileMsg.err {
+                color: #ef4444;
+            }
+</style>
+
+<div id="profileOverlay">
+    <div id="profileBox">
+        <span id="profileClose">&times;</span>
+        <h3>Quản lý tài khoản</h3>
+
+        <div id="profileMsg"></div>
+
+        <label>Họ và tên</label>
+        <input type="text" id="pfDisplayName" placeholder="Nhập họ và tên" />
+
+        <label>Thông tin liên hệ</label>
+        <label style="margin-top:6px; font-weight:700;">Số điện thoại</label>
+        <input type="text" id="pfPhone" placeholder="Nhập số điện thoại" />
+
+        <label>Email</label>
+        <input type="text" id="pfEmail" disabled />
+
+        <div class="pf-actions">
+            <button type="button" id="btnProfileCancel" class="pf-cancel">Hủy</button>
+            <button type="button" id="btnProfileSave" class="pf-save">Lưu thay đổi</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        function showPfMsg(text, ok) {
+            var $el = $("#profileMsg");
+            $el.removeClass("ok err").addClass(ok ? "ok" : "err").text(text).show();
+        }
+
+        function openProfile() {
+            $("#profileMsg").hide();
+            $("#pfDisplayName,#pfPhone,#pfEmail").val("");
+            $("#profileOverlay").css("display", "flex");
+
+            $.get("@Url.Action("GetProfileAjax", "Account")", function (res) {
+                if (res && res.success) {
+                    $("#pfDisplayName").val(res.displayName || "");
+                    $("#pfPhone").val(res.phoneNumber || "");
+                    $("#pfEmail").val(res.email || "");
+                    return;
+                }
+                showPfMsg((res && res.message) ? res.message : "Không lấy được thông tin user.", false);
+            });
+        }
+
+        function closeProfile() { $("#profileOverlay").hide(); }
+
+        $(document).on("click", ".js-open-profile", function (e) {
+            e.preventDefault();
+            openProfile();
+        });
+
+        $("#profileClose").on("click", closeProfile);
+        $("#btnProfileCancel").on("click", closeProfile);
+
+        $("#btnProfileSave").on("click", function () {
+            $("#profileMsg").hide();
+
+            var name = $("#pfDisplayName").val();
+            var phone = $("#pfPhone").val();
+
+            $.post("@Url.Action("UpdateProfileAjax", "Account")", {
+                displayName: name,
+                phoneNumber: phone
+            }, function (res) {
+                if (res && res.success) {
+                    showPfMsg(res.message || "Lưu thay đổi thành công.", true);
+
+                    // update tên trên header (không reload) - giữ logic cũ
+                    var newName = (name || "").trim();
+                    if (newName.length > 0) {
+                        $(".account-trigger span").first().text(newName);
+                    }
+
+                    setTimeout(closeProfile, 400);
+                    return;
+                }
+                showPfMsg((res && res.message) ? res.message : "Lưu thay đổi thất bại.", false);
+            });
+        });
+    })();
+</script>

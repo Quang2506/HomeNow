@@ -19,13 +19,22 @@ namespace Core.Models
         public double Yaw { get; set; }
 
         [Column("text")]
-        public string Text { get; set; }               
+        public string Text { get; set; }
 
         [Column("target_scene_key")]
         public string TargetSceneKey { get; set; }
 
-        public virtual VrScene Scene { get; set; }
+        // NEW: view ở scene đích để chuyển “tự nhiên”
+        [Column("target_pitch")]
+        public double? TargetPitch { get; set; }
 
+        [Column("target_yaw")]
+        public double? TargetYaw { get; set; }
+
+        [Column("target_hfov")]
+        public double? TargetHfov { get; set; }
+
+        public virtual VrScene Scene { get; set; }
         public virtual ICollection<VrHotspotTranslation> Translations { get; set; }
     }
 }

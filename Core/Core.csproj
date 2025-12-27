@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\MoneyText.cs" />
     <Compile Include="Models\City.cs" />
     <Compile Include="Models\HomeIndexViewModel.cs" />
     <Compile Include="Models\LandlordRequest.cs" />
@@ -59,12 +60,37 @@
     <Compile Include="Models\VrScene.cs" />
     <Compile Include="Models\VrSceneTranslation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resources\AuthTexts.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AuthTexts.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\MoneyTexts.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MoneyTexts.resx</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModels\HeaderBarViewModel.cs" />
     <Compile Include="ViewModels\PagedResult.cs" />
     <Compile Include="ViewModels\PropertyDetailViewModel.cs" />
     <Compile Include="ViewModels\PropertyListViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\AuthTexts.en-US.resx" />
+    <EmbeddedResource Include="Resources\AuthTexts.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>AuthTexts.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\AuthTexts.zh-CN.resx" />
+    <EmbeddedResource Include="Resources\MoneyTexts.en-US.resx" />
+    <EmbeddedResource Include="Resources\MoneyTexts.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>MoneyTexts.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\MoneyTexts.zh-CN.resx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

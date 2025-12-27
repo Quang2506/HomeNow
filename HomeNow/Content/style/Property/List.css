@@ -6,7 +6,7 @@
     position: relative;
     width: 100%;
     /*min-height: 75vh;*/
-    background: url('/Assets/Banner.jpg') center center no-repeat;
+    background: url('/Assets/Cities/Banner.png') center center no-repeat;
     background-size: cover;
     color: #fff;
 }

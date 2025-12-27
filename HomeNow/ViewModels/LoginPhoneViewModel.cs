@@ -1,19 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Core.Resources;
+using System.ComponentModel.DataAnnotations;
 
 namespace HomeNow.ViewModels
 {
     public class LoginPhoneViewModel
     {
-        [Required]
-        [Display(Name = "Email / Số điện thoại")]
+        [Required(ErrorMessageResourceType = typeof(AuthTexts), ErrorMessageResourceName = "Msg_Required")]
+        [Display(ResourceType = typeof(AuthTexts), Name = "Login_EmailOrPhone")]
         public string LoginName { get; set; }
 
-        [Required]
-        [DataType(DataType.Password)]
-        [Display(Name = "Mật khẩu")]
+        [Required(ErrorMessageResourceType = typeof(AuthTexts), ErrorMessageResourceName = "Msg_Required")]
+        [Display(ResourceType = typeof(AuthTexts), Name = "Login_Password")]
         public string Password { get; set; }
-
-        [Display(Name = "Ghi nhớ đăng nhập")]
-        public bool RememberMe { get; set; }
     }
 }

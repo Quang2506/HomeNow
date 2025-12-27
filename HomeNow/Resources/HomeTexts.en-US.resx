@@ -325,4 +325,31 @@
   <data name="Favorite_UpdateFailed" xml:space="preserve">
     <value>Could not update Favorites. Please try again.</value>
   </data>
+  <data name="Account_Profile" xml:space="preserve">
+    <value>Edit profile</value>
+  </data>
+  <data name="Account_ChangePassword" xml:space="preserve">
+    <value>Change password</value>
+  </data>
+  <data name="Account_Logout" xml:space="preserve">
+    <value>Logout</value>
+  </data>
+  <data name="Favorite_Title" xml:space="preserve">
+    <value>Favorites</value>
+  </data>
+  <data name="Common_Loading" xml:space="preserve">
+    <value>Loading…</value>
+  </data>
+  <data name="Favorite_Empty" xml:space="preserve">
+    <value>No favorites yet.</value>
+  </data>
+  <data name="Favorite_LoadFailed" xml:space="preserve">
+    <value>Failed to load favorites.</value>
+  </data>
+  <data name="Account_MenuLabel" xml:space="preserve">
+    <value>Account menu</value>
+  </data>
+  <data name="Common_FeatureComingSoon" xml:space="preserve">
+    <value>Coming soon</value>
+  </data>
 </root>

@@ -12,7 +12,7 @@ namespace Core.Models
         public int HotspotId { get; set; }
 
         [Column("lang_code")]
-        public string LangCode { get; set; }      
+        public string LangCode { get; set; }
 
         [Column("text")]
         public string Text { get; set; }

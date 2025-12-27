@@ -209,8 +209,12 @@
     <Compile Include="ViewModels\VrViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\Cities\Banner.png" />
+    <Content Include="Assets\Cities\logo.png" />
     <Content Include="Assets\Properties\house\21.jpg" />
     <Content Include="Assets\Cities\hanoi.jpg" />
+    <Content Include="Assets\Vr\1221\Bep.png" />
+    <Content Include="Assets\Vr\1221\living.png" />
     <Content Include="Content\style\Bootstrap\bootstrap-grid.css" />
     <Content Include="Content\style\Bootstrap\bootstrap-grid.min.css" />
     <Content Include="Content\style\Bootstrap\bootstrap-grid.rtl.css" />
@@ -299,13 +303,14 @@
     <Content Include="Views\Property\List.cshtml" />
     <Content Include="Views\Property\Vr.cshtml" />
     <Content Include="Views\Landlord\Request.cshtml" />
-    <Content Include="Views\Account\Login.cshtml" />
-    <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Shared\_LoginModal.cshtml" />
     <Content Include="Views\Property\Favorites.cshtml" />
     <Content Include="Views\Home\_PropertyCardList.cshtml" />
     <Content Include="Views\Home\_PropertyRowList.cshtml" />
     <Content Include="Views\Property\Detail.cshtml" />
+    <Content Include="Views\Shared\_ChangePasswordModal.cshtml" />
+    <Content Include="Views\Shared\_ProfilePopup.cshtml" />
+    <Content Include="Views\Shared\_TopHeaderBar.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -358,6 +363,7 @@
     <EmbeddedResource Include="Resources\HomeTexts.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>HomeTexts.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

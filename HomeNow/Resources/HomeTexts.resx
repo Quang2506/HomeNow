@@ -330,4 +330,31 @@
   <data name="Favorite_UpdateFailed" xml:space="preserve">
     <value>Không thể cập nhật Yêu thích. Vui lòng thử lại.</value>
   </data>
+  <data name="Account_Profile" xml:space="preserve">
+    <value>Thay đổi thông tin cá nhân</value>
+  </data>
+  <data name="Account_ChangePassword" xml:space="preserve">
+    <value>Thay đổi mật khẩu</value>
+  </data>
+  <data name="Account_Logout" xml:space="preserve">
+    <value>Đăng xuất</value>
+  </data>
+  <data name="Favorite_Title" xml:space="preserve">
+    <value>Yêu thích</value>
+  </data>
+  <data name="Common_Loading" xml:space="preserve">
+    <value>Đang tải…</value>
+  </data>
+  <data name="Favorite_Empty" xml:space="preserve">
+    <value>Chưa có căn nào trong danh sách yêu thích.</value>
+  </data>
+  <data name="Favorite_LoadFailed" xml:space="preserve">
+    <value>Tải danh sách yêu thích thất bại.</value>
+  </data>
+  <data name="Account_MenuLabel" xml:space="preserve">
+    <value>Menu tài khoản</value>
+  </data>
+  <data name="Common_FeatureComingSoon" xml:space="preserve">
+    <value>Tính năng đang phát triển</value>
+  </data>
 </root>

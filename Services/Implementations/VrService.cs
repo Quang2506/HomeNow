@@ -20,9 +20,12 @@ namespace HomeNow.Services.Implementations
         public async Task<IList<VrScene>> GetScenesForPropertyAsync(int propertyId)
         {
             return await _db.VrScenes
+                .AsNoTracking()
                 .Where(s => s.PropertyId == propertyId)
-                .Include(s => s.Hotspots.Select(h => h.Translations))
                 .Include(s => s.Translations)
+                .Include(s => s.Hotspots.Select(h => h.Translations))
+                .OrderByDescending(s => s.IsDefault)
+                .ThenBy(s => s.Id)
                 .ToListAsync();
         }
     }

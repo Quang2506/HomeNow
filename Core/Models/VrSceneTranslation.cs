@@ -12,7 +12,7 @@ namespace Core.Models
         public int SceneId { get; set; }
 
         [Column("lang_code")]
-        public string LangCode { get; set; }      
+        public string LangCode { get; set; }
 
         [Column("title")]
         public string Title { get; set; }

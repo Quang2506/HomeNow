@@ -1,5 +1,4 @@
-﻿using Core.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Core.ViewModels
 {
@@ -25,12 +24,12 @@ namespace Core.ViewModels
 
         public string Description { get; set; }
         public string MapEmbedUrl { get; set; }
-        
         public string MapClickUrl { get; set; }
 
+        // ✅ ADD
+        public bool IsFavorite { get; set; }
 
         public List<Core.Models.PropertyListItemViewModel> Similar { get; set; } = new List<Core.Models.PropertyListItemViewModel>();
-
         public List<string> Amenities { get; set; } = new List<string>();
     }
 }

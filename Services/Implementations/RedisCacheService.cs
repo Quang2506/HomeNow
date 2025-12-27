@@ -160,7 +160,7 @@ namespace Services.Implementations
             }
         }
 
-        // Bạn không cần KeyExists nữa -> giảm 1 RTT mỗi lần check
+        //  không cần KeyExists nữa -> giảm 1 RTT mỗi lần check
         public Task<bool> KeyExistsAsync(string key) => Task.FromResult(false);
         public bool IsAvailable => false; // tránh gọi connect trong getter
     }

@@ -1,0 +1,297 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Account_Default" xml:space="preserve">
+    <value>Tài khoản</value>
+  </data>
+  <data name="Btn_Login" xml:space="preserve">
+    <value>Đăng nhập</value>
+  </data>
+  <data name="Btn_Register" xml:space="preserve">
+    <value>Đăng ký</value>
+  </data>
+  <data name="Btn_Resend" xml:space="preserve">
+    <value>Gửi lại</value>
+  </data>
+  <data name="Btn_ResetPassword" xml:space="preserve">
+    <value>Đổi mật khẩu</value>
+  </data>
+  <data name="Btn_SendOtp" xml:space="preserve">
+    <value>Gửi OTP</value>
+  </data>
+  <data name="Btn_Verify" xml:space="preserve">
+    <value>Xác nhận</value>
+  </data>
+  <data name="Email_Subject_Reset" xml:space="preserve">
+    <value>NhàNow - Đặt lại mật khẩu</value>
+  </data>
+  <data name="Email_Subject_Verify" xml:space="preserve">
+    <value>NhàNow - Mã xác thực email</value>
+  </data>
+  <data name="Err_InvalidData" xml:space="preserve">
+    <value>Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.</value>
+  </data>
+  <data name="Err_LoginInvalid" xml:space="preserve">
+    <value>Sai tài khoản hoặc mật khẩu.</value>
+  </data>
+  <data name="Err_OtpInvalid" xml:space="preserve">
+    <value>Mã OTP không hợp lệ.</value>
+  </data>
+  <data name="Err_SendEmailFailed" xml:space="preserve">
+    <value>Gửi email thất bại. Vui lòng thử lại.</value>
+  </data>
+  <data name="Forgot_ConfirmNewPassword" xml:space="preserve">
+    <value>Nhập lại mật khẩu mới</value>
+  </data>
+  <data name="Forgot_Email" xml:space="preserve">
+    <value>Email đăng ký</value>
+  </data>
+  <data name="Forgot_NewPassword" xml:space="preserve">
+    <value>Mật khẩu mới</value>
+  </data>
+  <data name="Forgot_ResetButton" xml:space="preserve">
+    <value>Đổi mật khẩu</value>
+  </data>
+  <data name="Forgot_SendOtp" xml:space="preserve">
+    <value>Gửi mã</value>
+  </data>
+  <data name="Forgot_Title" xml:space="preserve">
+    <value>Đặt lại mật khẩu</value>
+  </data>
+  <data name="Hint_VerifySent" xml:space="preserve">
+    <value>Mã OTP đã được gửi. Vui lòng kiểm tra email.</value>
+  </data>
+  <data name="Label_ConfirmPassword" xml:space="preserve">
+    <value>Nhập lại mật khẩu</value>
+  </data>
+  <data name="Label_DisplayName" xml:space="preserve">
+    <value>Tên hiển thị</value>
+  </data>
+  <data name="Label_Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="Label_LoginName" xml:space="preserve">
+    <value>Email hoặc SĐT</value>
+  </data>
+  <data name="Label_Otp" xml:space="preserve">
+    <value>Mã OTP</value>
+  </data>
+  <data name="Label_Password" xml:space="preserve">
+    <value>Mật khẩu</value>
+  </data>
+  <data name="Label_Phone" xml:space="preserve">
+    <value>Số điện thoại</value>
+  </data>
+  <data name="Link_Forgot" xml:space="preserve">
+    <value>Quên mật khẩu?</value>
+  </data>
+  <data name="Login_Button" xml:space="preserve">
+    <value>Đăng nhập</value>
+  </data>
+  <data name="Login_EmailOrPhone" xml:space="preserve">
+    <value>Email hoặc SĐT</value>
+  </data>
+  <data name="Login_Forgot" xml:space="preserve">
+    <value>Quên mật khẩu?</value>
+  </data>
+  <data name="Login_Password" xml:space="preserve">
+    <value>Mật khẩu</value>
+  </data>
+  <data name="Login_Title" xml:space="preserve">
+    <value>Đăng nhập</value>
+  </data>
+  <data name="Msg_EmailExists" xml:space="preserve">
+    <value>Email đã tồn tại.</value>
+  </data>
+  <data name="Msg_EmailRequired" xml:space="preserve">
+    <value>Vui lòng nhập email.</value>
+  </data>
+  <data name="Msg_InvalidCredentials" xml:space="preserve">
+    <value>Sai email/SĐT hoặc mật khẩu.</value>
+  </data>
+  <data name="Msg_NeedVerify" xml:space="preserve">
+    <value>Tài khoản chưa xác thực email. Vui lòng nhập OTP.</value>
+  </data>
+  <data name="Msg_OtpExpired" xml:space="preserve">
+    <value>Mã OTP đã hết hạn. Vui lòng gửi lại mã.</value>
+  </data>
+  <data name="Msg_OtpExpiresIn5Min" xml:space="preserve">
+    <value>Mã OTP sẽ hết hạn sau 5 phút.</value>
+  </data>
+  <data name="Msg_OtpInvalid" xml:space="preserve">
+    <value>Mã OTP không hợp lệ.</value>
+  </data>
+  <data name="Msg_OtpResent" xml:space="preserve">
+    <value>Đã gửi lại OTP.</value>
+  </data>
+  <data name="Msg_OtpSendFail" xml:space="preserve">
+    <value>Gửi OTP thất bại. Vui lòng thử lại.</value>
+  </data>
+  <data name="Msg_OtpSent" xml:space="preserve">
+    <value>Đã gửi OTP về email.</value>
+  </data>
+  <data name="Msg_PasswordNotMatch" xml:space="preserve">
+    <value>Mật khẩu nhập lại không khớp.</value>
+  </data>
+  <data name="Msg_PhoneExists" xml:space="preserve">
+    <value>Số điện thoại đã tồn tại.</value>
+  </data>
+  <data name="Msg_ResetSuccess" xml:space="preserve">
+    <value>Đặt lại mật khẩu thành công.</value>
+  </data>
+  <data name="Msg_VerifySuccess" xml:space="preserve">
+    <value>Xác thực thành công.</value>
+  </data>
+  <data name="Otp_Code" xml:space="preserve">
+    <value>Mã OTP</value>
+  </data>
+  <data name="Otp_Resend" xml:space="preserve">
+    <value>Gửi lại mã</value>
+  </data>
+  <data name="Otp_Title" xml:space="preserve">
+    <value>Xác thực email</value>
+  </data>
+  <data name="Otp_VerifyButton" xml:space="preserve">
+    <value>Xác thực</value>
+  </data>
+  <data name="Register_Button" xml:space="preserve">
+    <value>Đăng ký</value>
+  </data>
+  <data name="Register_ConfirmPassword" xml:space="preserve">
+    <value>Nhập lại mật khẩu</value>
+  </data>
+  <data name="Register_DisplayName" xml:space="preserve">
+    <value>Tên hiển thị</value>
+  </data>
+  <data name="Register_Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="Register_Password" xml:space="preserve">
+    <value>Mật khẩu</value>
+  </data>
+  <data name="Register_Phone" xml:space="preserve">
+    <value>Số điện thoại</value>
+  </data>
+  <data name="Register_Title" xml:space="preserve">
+    <value>Đăng ký</value>
+  </data>
+  <data name="Verify_Title" xml:space="preserve">
+    <value> Xác thực email</value>
+  </data>
+</root>

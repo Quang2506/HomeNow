@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using Core.Helpers; // dùng MoneyText
 
 namespace Core.Models
 {
     public class HomeIndexViewModel
     {
         // --- Filter từ form search ---
-        public string TransactionType { get; set; }  
+        public string TransactionType { get; set; }
         public int? CityId { get; set; }
-        public string PriceRange { get; set; }       
-        public string PropertyType { get; set; }     
+        public string PriceRange { get; set; }
+        public string PropertyType { get; set; }
         public string Keyword { get; set; }
 
         // --- Kết quả tìm kiếm ---
@@ -25,11 +26,22 @@ namespace Core.Models
         public List<PriceFilterDropDownItem> PriceFilters { get; set; }
         public List<PropertyTypeDropDownItem> PropertyTypes { get; set; }
 
-        // --- Phân trang 
-        public int Page { get; set; }       
-        public int PageSize { get; set; }    
-        public int TotalItems { get; set; }    
-        public int TotalPages { get; set; }   
+        // --- Phân trang ---
+        public int Page { get; set; }
+        public int PageSize { get; set; }
+        public int TotalItems { get; set; }
+        public int TotalPages { get; set; }
+
+        public HomeIndexViewModel()
+        {
+            SearchResults = new List<PropertyListItemViewModel>();
+            FeaturedRent = new List<PropertyListItemViewModel>();
+            FeaturedSale = new List<PropertyListItemViewModel>();
+
+            Cities = new List<CityDropDownItem>();
+            PriceFilters = new List<PriceFilterDropDownItem>();
+            PropertyTypes = new List<PropertyTypeDropDownItem>();
+        }
     }
 
     /// <summary>
@@ -42,6 +54,8 @@ namespace Core.Models
         public string Address { get; set; }
 
         public decimal Price { get; set; }
+
+        // Giữ lại để không ảnh hưởng chỗ cũ đang dùng PriceLabel
         public string PriceLabel { get; set; }
 
         public float Area { get; set; }
@@ -54,22 +68,31 @@ namespace Core.Models
         public string PropertyType { get; set; }
         public int? CityId { get; set; }
         public bool IsFavorite { get; set; }
-       
+
+        /// <summary>
+        /// Computed property: hiển thị ngắn kiểu "25 triệu" / "2.5 tỷ"
+        /// - Nếu rent => thêm "/tháng"
+        /// </summary>
+        public string PriceShort
+        {
+            get { return MoneyText.ToPriceShort(Price, ListingType); }
+        }
+
     }
 
     public class CityDropDownItem
     {
         public int CityId { get; set; }
-        public string Name { get; set; }          // tên hiển thị
-        public string BackgroundUrl { get; set; } // ảnh background cho banner
+        public string Name { get; set; }         
+        public string BackgroundUrl { get; set; } 
     }
 
     public class PriceFilterDropDownItem
     {
-        // Chuỗi code dùng để gửi lên query: "0-10", "10-20", "20-999"...
+        
         public string Code { get; set; }
 
-        // Tên hiển thị theo ngôn ngữ
+     
         public string Name { get; set; }
 
         public decimal? MinPrice { get; set; }
@@ -78,10 +101,10 @@ namespace Core.Models
 
     public class PropertyTypeDropDownItem
     {
-        // Code: apartment / house / villa...
+        
         public string Code { get; set; }
 
-        // Tên hiển thị theo ngôn ngữ
+       
         public string Name { get; set; }
     }
 }

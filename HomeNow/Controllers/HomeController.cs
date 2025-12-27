@@ -156,11 +156,17 @@ namespace HomeNow.Controllers
                 vm.PriceFilters = prices;
                 vm.PropertyTypes = types;
 
-                var cityForBg = vm.CityId.HasValue
-                    ? vm.Cities.FirstOrDefault(c => c.CityId == vm.CityId.Value)
-                    : vm.Cities.FirstOrDefault();
+                // ✅ FIX: Chỉ đổi nền khi user chọn city. Không chọn -> luôn Banner.jpg
+                if (vm.CityId.HasValue)
+                {
+                    var cityForBg = vm.Cities.FirstOrDefault(c => c.CityId == vm.CityId.Value);
+                    ViewBag.HeroBackground = cityForBg?.BackgroundUrl ?? "/Assets/Cities/Banner.png";
+                }
+                else
+                {
+                    ViewBag.HeroBackground = "/Assets/Cities/Banner.png";
+                }
 
-                ViewBag.HeroBackground = cityForBg?.BackgroundUrl ?? "/Assets/Banner.jpg";
                 return;
             }
 
@@ -196,11 +202,16 @@ namespace HomeNow.Controllers
                          : t.NameVi
                 }).ToList();
 
-                var cityForBg = vm.CityId.HasValue
-                    ? cityEntities.FirstOrDefault(c => c.CityId == vm.CityId.Value)
-                    : cityEntities.FirstOrDefault();
-
-                ViewBag.HeroBackground = cityForBg?.BackgroundUrl ?? "/Assets/Banner.jpg";
+                // 
+                if (vm.CityId.HasValue)
+                {
+                    var cityForBg = cityEntities.FirstOrDefault(c => c.CityId == vm.CityId.Value);
+                    ViewBag.HeroBackground = cityForBg?.BackgroundUrl ?? "/Assets/Cities/Banner.png";
+                }
+                else
+                {
+                    ViewBag.HeroBackground = "/Assets/Cities/Banner.png";
+                }
             }
 
             if (CacheEnabled)
@@ -283,9 +294,7 @@ namespace HomeNow.Controllers
                     lang, listingType, vm.CityId, vm.PriceRange, vm.PropertyType, vm.Keyword,
                     vm.Page, vm.PageSize).ConfigureAwait(false);
 
-              
-
-        vm.TotalItems = paged.TotalItems;
+                vm.TotalItems = paged.TotalItems;
                 vm.TotalPages = (int)Math.Ceiling(vm.TotalItems / (double)vm.PageSize);
                 if (vm.TotalPages <= 0) vm.TotalPages = 1;
                 if (vm.Page > vm.TotalPages) vm.Page = vm.TotalPages;
@@ -306,13 +315,13 @@ namespace HomeNow.Controllers
 
         [HttpGet]
         public async Task<ActionResult> LoadMore(
-    string transactionType,
-    int? cityId,
-    string priceRange,
-    string propertyType,
-    string keyword,
-    int page = 2,
-    bool clientFav = false)
+            string transactionType,
+            int? cityId,
+            string priceRange,
+            string propertyType,
+            string keyword,
+            int page = 2,
+            bool clientFav = false)
         {
             const int PageSize = 16;
             var lang = GetLang2();
@@ -335,12 +344,11 @@ namespace HomeNow.Controllers
                 .Select(x => ToHomeItem(x, favoriteSet))
                 .ToList();
 
-            if (list.Count == 0) return Content(""); // stop infinite scroll
+            if (list.Count == 0) return Content("");
             return PartialView("_PropertyCardList", list);
         }
 
-        // Featured: lấy DB nhanh (top 4) – bạn muốn cache Redis mình thêm sau cũng được,
-        // nhưng ưu tiên “mượt” trước.
+        // Featured: lấy DB nhanh (top 4)
         private async Task<List<PropertyListItemViewModel>> GetFeaturedTop4DbAsync(string lang, string mode, ISet<int> favoriteSet)
         {
             var paged = await _propertyService.SearchPagedAsync(lang, mode, null, null, null, null, 1, 4).ConfigureAwait(false);
@@ -377,6 +385,27 @@ namespace HomeNow.Controllers
 
                 IsFavorite = favoriteIds != null && favoriteIds.Contains(x.Id)
             };
+        }
+
+        // Favorites Popup (AJAX)
+        [HttpGet]
+        public async Task<ActionResult> FavoritesPopup()
+        {
+            var userId = GetCurrentUserId();
+            if (!userId.HasValue)
+            {
+                // JS phía client sẽ thấy needLogin và mở modal login (giữ logic cũ)
+                return Json(new { needLogin = true }, JsonRequestBehavior.AllowGet);
+            }
+
+            var lang = GetLang2();
+
+            // Lấy list favorites để render popup
+            var list = await _favoriteService.GetFavoritesAsync(userId.Value, lang).ConfigureAwait(false);
+            var result = list ?? new List<PropertyListItemViewModel>();
+
+            // Dùng luôn partial card list sẵn có (không tạo view mới, không ảnh hưởng logic khác)
+            return PartialView("_PropertyCardList", result);
         }
 
         private string FormatPriceLabel(decimal price, string listingType)

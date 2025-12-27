@@ -326,4 +326,31 @@
   <data name="Favorite_UpdateFailed" xml:space="preserve">
     <value>无法更新收藏，请重试。</value>
   </data>
+  <data name="Account_Profile" xml:space="preserve">
+    <value>修改个人信息</value>
+  </data>
+  <data name="Account_ChangePassword" xml:space="preserve">
+    <value>修改密码</value>
+  </data>
+  <data name="Account_Logout" xml:space="preserve">
+    <value>退出登录</value>
+  </data>
+  <data name="Favorite_Title" xml:space="preserve">
+    <value>收藏</value>
+  </data>
+  <data name="Common_Loading" xml:space="preserve">
+    <value>加载中…</value>
+  </data>
+  <data name="Favorite_Empty" xml:space="preserve">
+    <value>收藏列表为空。</value>
+  </data>
+  <data name="Favorite_LoadFailed" xml:space="preserve">
+    <value>加载收藏失败。</value>
+  </data>
+  <data name="Account_MenuLabel" xml:space="preserve">
+    <value>账号菜单</value>
+  </data>
+  <data name="Common_FeatureComingSoon" xml:space="preserve">
+    <value>功能开发中</value>
+  </data>
 </root>

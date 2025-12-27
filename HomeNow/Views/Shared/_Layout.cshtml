@@ -1,371 +1,439 @@
-﻿@{
-    Layout = null;
-}
+﻿@using Core.Resources
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - My ASP.NET Application</title>
-
+    <title>@ViewBag.Title - NhàNow</title>
     @Styles.Render("~/Content/css")
-    @Scripts.Render("~/bundles/modernizr")
     <link rel="stylesheet" href="~/Content/font-awesome/all.min.css" />
+    @Scripts.Render("~/bundles/modernizr")
     @RenderSection("Styles", required: false)
     <style>
-        /* ====== LOGIN POPUP DÙNG CHUNG ====== */
-        .login-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(15,23,42,0.65);
-            backdrop-filter: blur(4px);
+        body {
+            margin: 0px !important;
+        }
+
+        #loginOverlay {
             display: none;
-            align-items: center;
-            justify-content: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
             z-index: 9999;
+            justify-content: center;
+            align-items: center;
         }
 
-        .login-modal {
-            width: 360px;
+        #loginBox {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            width: 350px;
             max-width: 90%;
-            background: rgba(255,255,255,0.98);
-            border-radius: 16px;
-            padding: 24px 24px 20px;
-            box-shadow: 0 20px 40px rgba(15,23,42,0.35);
             position: relative;
-            font-family: 'Roboto', sans-serif;
         }
 
-        .login-modal-title {
-            font-size: 1.4rem;
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 16px;
-        }
+            #loginBox h3 {
+                margin-bottom: 10px;
+            }
 
-        .login-close {
+            #loginBox input {
+                width: 93%;
+                padding: 10px;
+                margin-bottom: 10px;
+                border: 1px solid #ccc;
+                border-radius: 6px;
+            }
+
+            #loginBox button {
+                width: 100%;
+                padding: 10px;
+                border: none;
+                background: #0f172a;
+                color: #fff;
+                border-radius: 6px;
+                cursor: pointer;
+            }
+
+                #loginBox button:hover {
+                    background: #1e293b;
+                }
+
+        #closeLogin {
             position: absolute;
-            right: 14px;
             top: 10px;
+            right: 10px;
             cursor: pointer;
             font-size: 20px;
-            color: #6b7280;
+            color: #999;
         }
 
-        .login-form-group {
-            margin-bottom: 12px;
-        }
-
-            .login-form-group label {
-                display: block;
-                font-size: 0.85rem;
-                margin-bottom: 4px;
-                color: #4b5563;
+            #closeLogin:hover {
+                color: #000;
             }
 
-            .login-form-group input[type="text"],
-            .login-form-group input[type="password"] {
-                width: 100%;
-                height: 38px;
-                border-radius: 8px;
-                border: 1px solid #d1d5db;
-                padding: 6px 10px;
-                font-size: 0.9rem;
-            }
-
-        .login-remember {
-            margin: 6px 0 12px;
-            font-size: 0.85rem;
-            color: #4b5563;
-        }
-
-            .login-remember input {
-                margin-right: 4px;
-            }
-
-        .login-btn-submit {
-            width: 100%;
-            height: 40px;
-            border-radius: 999px;
-            border: none;
-            background: #2563eb;
-            color: #fff;
-            font-size: 0.95rem;
-            font-weight: 600;
+        #switchToRegister {
+            display: block;
+            margin-top: 10px;
+            text-align: center;
+            color: #0f172a;
             cursor: pointer;
         }
 
-        .login-error-text {
-            font-size: 0.8rem;
-            color: #ef4444;
-            margin-bottom: 4px;
-            min-height: 16px;
+        /* ===== OTP overlay ===== */
+        #otpOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.55);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
         }
 
-        .login-footer-text {
-            margin-top: 10px;
-            font-size: 0.8rem;
-            text-align: center;
-            color: #6b7280;
+        #otpBox {
+            background: #fff;
+            padding: 18px;
+            border-radius: 12px;
+            width: 350px;
+            max-width: 92%;
+            position: relative;
         }
 
-            .login-footer-text a {
-                color: #2563eb;
-                text-decoration: none;
+            #otpBox h3 {
+                margin: 0 0 10px 0;
+                font-weight: 900;
             }
 
-                .login-footer-text a:hover {
-                    text-decoration: underline;
+            #otpBox .otp-row {
+                display: flex;
+                gap: 10px;
+            }
+
+                #otpBox .otp-row button {
+                    width: auto;
+                    flex: 0 0 auto;
+                    padding: 10px 12px;
                 }
+
+        #otpClose {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            color: #999;
+        }
+
+        /* ===== Forgot overlay ===== */
+        #forgotOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.55);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #forgotBox {
+            background: #fff;
+            padding: 18px;
+            border-radius: 12px;
+            width: 350px;
+            max-width: 92%;
+            position: relative;
+        }
+
+        #forgotClose {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            color: #999;
+        }
+
+        .tiny-link {
+            font-size: 12px;
+            color: #0f172a;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .msg {
+            font-size: 13px;
+            font-weight: 700;
+            margin: 8px 0;
+        }
+
+            .msg.ok {
+                color: #16a34a;
+            }
+
+            .msg.err {
+                color: #ef4444;
+            }
     </style>
 </head>
+
 <body>
+    <div class="container body-content">
+        @RenderSection("PageHeader", required: false)
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - NhàNow</p>
+        </footer>
+    </div>
 
-    @RenderBody()
+    <!-- ===== Login/Register Overlay ===== -->
+    <div id="loginOverlay">
+        <div id="loginBox">
+            <span id="closeLogin">&times;</span>
 
-    <hr />
-    <footer>
-        <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
-    </footer>
+            <!-- Login Form -->
+            <div id="loginForm">
+                <h3>@AuthTexts.Login_Title</h3>
+                <input type="text" id="loginName" placeholder="@AuthTexts.Login_EmailOrPhone" />
+                <input type="password" id="loginPassword" placeholder="@AuthTexts.Login_Password" />
+                <button id="btnLogin">@AuthTexts.Login_Button</button>
 
-    <!-- LOGIN / REGISTER POPUP DÙNG CHUNG CHO MỌI TRANG -->
-    <div id="loginOverlay" class="login-overlay">
-        <div class="login-modal">
-            <span class="login-close" id="btnCloseLogin">&times;</span>
-            <div class="login-modal-title" id="loginModalTitle">Đăng nhập</div>
-
-            <div id="loginError" class="login-error-text"></div>
-            <div id="registerError" class="login-error-text" style="display:none;"></div>
-
-            <!-- FORM ĐĂNG NHẬP -->
-            <form id="loginForm" method="post" action="@Url.Action("Login", "Account")">
-                @Html.AntiForgeryToken()
-                <!-- returnUrl mặc định = URL hiện tại -->
-                <input type="hidden" name="ReturnUrl" id="loginReturnUrl" />
-
-                <div class="login-form-group">
-                    <label for="LoginName">Email / Số điện thoại</label>
-                    <input type="text" name="LoginName" id="LoginName" />
+                <div style="margin-top:8px; display:flex; justify-content:space-between; align-items:center;">
+                    <span class="tiny-link" id="openForgot">@AuthTexts.Login_Forgot</span>
+                    <span id="switchToRegister">@AuthTexts.Register_Title</span>
                 </div>
+            </div>
 
-                <div class="login-form-group">
-                    <label for="Password">Mật khẩu</label>
-                    <input type="password" name="Password" id="Password" />
-                </div>
+            <!-- Register Form -->
+            <div id="registerForm" style="display:none;">
+                <h3>@AuthTexts.Register_Title</h3>
+                <input type="text" id="regEmail" placeholder="@AuthTexts.Register_Email" />
+                <input type="text" id="regPhone" placeholder="@AuthTexts.Register_Phone" />
+                <input type="text" id="regDisplayName" placeholder="@AuthTexts.Register_DisplayName" />
+                <input type="password" id="regPassword" placeholder="@AuthTexts.Register_Password" />
+                <input type="password" id="regConfirmPassword" placeholder="@AuthTexts.Register_ConfirmPassword" />
+                <button id="btnRegister">@AuthTexts.Register_Button</button>
 
-                @*<div class="login-remember">
-                    <label>
-                        <input type="checkbox" name="RememberMe" value="true" />
-                        Ghi nhớ đăng nhập
-                    </label>
-                </div>*@
+                <span id="switchToLogin" style="display:block;margin-top:10px;text-align:center;color:#0f172a;cursor:pointer;">
+                    @AuthTexts.Login_Title
+                </span>
+            </div>
+        </div>
+    </div>
 
-                <button type="submit" class="login-btn-submit">Đăng nhập</button>
+    <!-- ===== OTP Overlay ===== -->
+    <div id="otpOverlay">
+        <div id="otpBox">
+            <span id="otpClose">&times;</span>
+            <h3>@AuthTexts.Otp_Title</h3>
 
-                <div class="login-footer-text">
-                    Chưa có tài khoản?
-                    <a style="color:black" href="javascript:void(0)" id="linkOpenRegister">Đăng ký ngay</a>
-                </div>
-            </form>
+            <div class="msg" id="otpMsg" style="display:none;"></div>
 
-            <!-- FORM ĐĂNG KÝ (SĐT) -->
-            <form id="registerForm" method="post" action="@Url.Action("Register", "Account")" style="display:none;">
-                @Html.AntiForgeryToken()
+            <input type="text" id="otpEmail" readonly />
+            <div class="otp-row">
+                <input type="text" id="otpCode" placeholder="@AuthTexts.Otp_Code" style="margin-bottom:0;" />
+                <button id="btnOtpVerify">@AuthTexts.Otp_VerifyButton</button>
+            </div>
 
-                <div class="login-form-group">
-                    <label for="RegisterPhone">Số điện thoại</label>
-                    <input type="text" name="PhoneNumber" id="RegisterPhone" />
-                </div>
+            <div style="margin-top:10px; display:flex; justify-content:space-between;">
+                <span class="tiny-link" id="btnOtpResend">@AuthTexts.Otp_Resend</span>
+            </div>
+        </div>
+    </div>
 
-                <div class="login-form-group">
-                    <label for="RegisterPassword">Mật khẩu</label>
-                    <input type="password" name="Password" id="RegisterPassword" />
-                </div>
+    <!-- ===== Forgot Overlay ===== -->
+    <div id="forgotOverlay">
+        <div id="forgotBox">
+            <span id="forgotClose">&times;</span>
+            <h3>@AuthTexts.Forgot_Title</h3>
 
-                <div class="login-form-group">
-                    <label for="RegisterConfirm">Xác nhận mật khẩu</label>
-                    <input type="password" name="ConfirmPassword" id="RegisterConfirm" />
-                </div>
+            <div class="msg" id="forgotMsg" style="display:none;"></div>
 
-                <button type="submit" class="login-btn-submit">Tạo tài khoản</button>
+            <input type="text" id="fgEmail" placeholder="@AuthTexts.Forgot_Email" />
+            <button id="btnSendResetOtp">@AuthTexts.Forgot_SendOtp</button>
 
-                <div class="login-footer-text">
-                    Đã có tài khoản?
-                    <a href="javascript:void(0)" id="linkOpenLogin">Đăng nhập</a>
-                </div>
-            </form>
+            <hr />
 
+            <input type="text" id="fgCode" placeholder="@AuthTexts.Otp_Code" />
+            <input type="password" id="fgNewPass" placeholder="@AuthTexts.Forgot_NewPassword" />
+            <input type="password" id="fgConfirmPass" placeholder="@AuthTexts.Forgot_ConfirmNewPassword" />
+            <button id="btnResetPass">@AuthTexts.Forgot_ResetButton</button>
         </div>
     </div>
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
 
-    <!-- JS LOGIN + REGISTER DÙNG CHUNG -->
+    <!--  ChangePasswordModal  -->
+    @Html.Partial("~/Views/Shared/_ChangePasswordModal.cshtml")
+    @Html.Partial("~/Views/Shared/_ProfilePopup.cshtml")
+
+
     <script>
-        (function () {
-            var overlay = document.getElementById('loginOverlay');
-            var btnClose = document.getElementById('btnCloseLogin');
+        // ========= helpers =========
+        function showMsg($el, text, ok) {
+            $el.removeClass('ok err');
+            $el.addClass(ok ? 'ok' : 'err');
+            $el.text(text).show();
+        }
 
-            var loginForm = document.getElementById('loginForm');
-            var registerForm = document.getElementById('registerForm');
+        // expose loginModal cho các trang khác gọi (favorites popup đang dùng)
+        window.loginModal = {
+            open: function () {
+                $("#loginOverlay").css("display", "flex");
+                $("#loginForm").show();
+                $("#registerForm").hide();
+            },
+            close: function () { $("#loginOverlay").hide(); }
+        };
 
-            var loginError = document.getElementById('loginError');
-            var registerError = document.getElementById('registerError');
-            var returnInput = document.getElementById('loginReturnUrl');
-            var title = document.getElementById('loginModalTitle');
+        // ===== Open login by class trigger .js-open-login =====
+        $(document).on("click", ".js-open-login", function (e) {
+            e.preventDefault();
+            window.loginModal.open();
+        });
 
-            var linkOpenRegister = document.getElementById('linkOpenRegister');
-            var linkOpenLogin = document.getElementById('linkOpenLogin');
+        // Close login
+        $("#closeLogin").click(function () {
+            $("#loginOverlay").hide();
+        });
 
-            if (!overlay || !loginForm) return;
+        // Switch forms
+        $("#switchToRegister").click(function () {
+            $("#loginForm").hide();
+            $("#registerForm").show();
+        });
 
-            function switchToLogin() {
-                title.textContent = 'Đăng nhập';
-                loginForm.style.display = 'block';
-                registerForm.style.display = 'none';
-                loginError.style.display = 'block';
-                registerError.style.display = 'none';
-                loginError.textContent = '';
-            }
+        $("#switchToLogin").click(function () {
+            $("#registerForm").hide();
+            $("#loginForm").show();
+        });
 
-            function switchToRegister() {
-                title.textContent = 'Đăng ký';
-                loginForm.style.display = 'none';
-                registerForm.style.display = 'block';
-                loginError.style.display = 'none';
-                registerError.style.display = 'block';
-                registerError.textContent = '';
+        // ===== OTP overlay open/close =====
+        function openOtp(email, msg) {
+            $("#otpEmail").val(email || "");
+            $("#otpCode").val("");
+            $("#otpMsg").hide();
 
-                var rp = document.getElementById('RegisterPhone');
-                if (rp) rp.focus();
-            }
+            if (msg) showMsg($("#otpMsg"), msg, true);
 
-            function openLogin(returnUrl) {
-                overlay.style.display = 'flex';
-                switchToLogin();
+            $("#otpOverlay").css("display", "flex");
+        }
+        function closeOtp() { $("#otpOverlay").hide(); }
 
-                if (returnInput) {
-                    returnInput.value = returnUrl || (window.location.pathname + window.location.search);
+        $("#otpClose").click(closeOtp);
+
+        // ===== Forgot overlay open/close =====
+        $("#openForgot").click(function () {
+            $("#forgotMsg").hide();
+            $("#forgotOverlay").css("display", "flex");
+        });
+        $("#forgotClose").click(function () { $("#forgotOverlay").hide(); });
+
+        // ===== Login Ajax =====
+        $("#btnLogin").click(function () {
+            $.post("@Url.Action("LoginAjax","Account")", {
+                loginName: $("#loginName").val(),
+                password: $("#loginPassword").val()
+            }, function (res) {
+                if (res && res.success) {
+                    location.reload();
+                    return;
                 }
 
-                var ln = document.getElementById('LoginName');
-                if (ln) ln.focus();
-            }
-
-            function closeLogin() {
-                overlay.style.display = 'none';
-            }
-
-            // cho view khác có thể gọi nếu muốn
-            window.loginModal = {
-                open: openLogin,
-                close: closeLogin
-            };
-
-            if (btnClose) {
-                btnClose.addEventListener('click', function () {
-                    closeLogin();
-                });
-            }
-
-            overlay.addEventListener('click', function (e) {
-                if (e.target === overlay) {
-                    closeLogin();
+                if (res && res.needVerify) {
+                    $("#loginOverlay").hide();
+                    openOtp(res.email, res.message);
+                    return;
                 }
-            });
 
-            // Bắt tất cả link có class js-open-login (ở Home, List,...)
-            document.addEventListener('click', function (e) {
-                var target = e.target;
-                if (target.classList && target.classList.contains('js-open-login')) {
-                    e.preventDefault();
-                    openLogin(window.location.pathname + window.location.search);
+                alert((res && res.message) ? res.message : "@AuthTexts.Msg_InvalidCredentials");
+            });
+        });
+
+        // ===== Register Ajax =====
+        $("#btnRegister").click(function () {
+            $.post("@Url.Action("RegisterAjax","Account")", {
+                email: $("#regEmail").val(),
+                phoneNumber: $("#regPhone").val(),
+                displayName: $("#regDisplayName").val(),
+                password: $("#regPassword").val(),
+                confirmPassword: $("#regConfirmPassword").val()
+            }, function (res) {
+                if (!res) { alert("Error"); return; }
+
+                if (res.success && res.needVerify) {
+                    $("#loginOverlay").hide();
+                    openOtp(res.email, res.message);
+                    return;
                 }
+
+                alert(res.message || "Register failed");
             });
+        });
 
-            // Mở form đăng ký trong popup
-            if (linkOpenRegister) {
-                linkOpenRegister.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    switchToRegister();
-                });
-            }
-
-            // Quay lại form đăng nhập
-            if (linkOpenLogin) {
-                linkOpenLogin.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    switchToLogin();
-                });
-            }
-
-            // Submit LOGIN bằng AJAX
-            loginForm.addEventListener('submit', function (e) {
-                e.preventDefault();
-
-                var formData = new FormData(loginForm);
-
-                fetch(loginForm.getAttribute('action'), {
-                    method: 'POST',
-                    body: formData,
-                    credentials: 'same-origin',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                    .then(function (res) {
-                        if (!res.ok) throw new Error('http ' + res.status);
-                        return res.json();
-                    })
-                    .then(function (data) {
-                        if (data && data.success) {
-                            window.location.reload();
-                        } else {
-                            loginError.textContent = data && data.message
-                                ? data.message
-                                : 'Đăng nhập thất bại.';
-                        }
-                    })
-                    .catch(function () {
-                        loginError.textContent = 'Không thể kết nối máy chủ.';
-                    });
+        // ===== OTP Verify =====
+        $("#btnOtpVerify").click(function () {
+            $.post("@Url.Action("VerifyEmailOtpAjax","Account")", {
+                email: $("#otpEmail").val(),
+                code: $("#otpCode").val()
+            }, function (res) {
+                if (res && res.success) {
+                    closeOtp();
+                    location.reload();
+                    return;
+                }
+                showMsg($("#otpMsg"), (res && res.message) ? res.message : "Verify failed", false);
             });
+        });
 
-            // Submit REGISTER bằng AJAX
-            registerForm.addEventListener('submit', function (e) {
-                e.preventDefault();
-
-                var formData = new FormData(registerForm);
-
-                fetch(registerForm.getAttribute('action'), {
-                    method: 'POST',
-                    body: formData,
-                    credentials: 'same-origin',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                    .then(function (res) {
-                        if (!res.ok) throw new Error('http ' + res.status);
-                        return res.json();
-                    })
-                    .then(function (data) {
-                        if (data && data.success) {
-                            window.location.reload();
-                        } else {
-                            registerError.textContent = data && data.message
-                                ? data.message
-                                : 'Đăng ký thất bại.';
-                        }
-                    })
-                    .catch(function () {
-                        registerError.textContent = 'Không thể kết nối máy chủ.';
-                    });
+        // ===== OTP Resend =====
+        $("#btnOtpResend").click(function () {
+            $.post("@Url.Action("ResendVerifyOtpAjax","Account")", {
+                email: $("#otpEmail").val()
+            }, function (res) {
+                if (res && res.success) {
+                    showMsg($("#otpMsg"), res.message || "@AuthTexts.Msg_OtpResent", true);
+                    return;
+                }
+                showMsg($("#otpMsg"), (res && res.message) ? res.message : "Resend failed", false);
             });
-        })();
+        });
+
+        // ===== Forgot send OTP =====
+        $("#btnSendResetOtp").click(function () {
+            $.post("@Url.Action("SendResetOtpAjax","Account")", {
+                email: $("#fgEmail").val()
+            }, function (res) {
+                if (res && res.success) {
+                    showMsg($("#forgotMsg"), res.message || "@AuthTexts.Msg_OtpSent", true);
+                    return;
+                }
+                showMsg($("#forgotMsg"), (res && res.message) ? res.message : "Send failed", false);
+            });
+        });
+
+        // ===== Reset password =====
+        $("#btnResetPass").click(function () {
+            $.post("@Url.Action("ResetPasswordByOtpAjax","Account")", {
+                email: $("#fgEmail").val(),
+                code: $("#fgCode").val(),
+                newPassword: $("#fgNewPass").val(),
+                confirmPassword: $("#fgConfirmPass").val()
+            }, function (res) {
+                if (res && res.success) {
+                    showMsg($("#forgotMsg"), res.message || "@AuthTexts.Msg_ResetSuccess", true);
+                    return;
+                }
+                showMsg($("#forgotMsg"), (res && res.message) ? res.message : "Reset failed", false);
+            });
+        });
     </script>
 
-    @RenderSection("Scripts", required: false)
+    @RenderSection("scripts", required: false)
 </body>
 </html>

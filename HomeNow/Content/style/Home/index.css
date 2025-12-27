@@ -1,15 +1,7 @@
-﻿/* =========================================
-   HOME – HERO BANNER
-   ========================================= */
+﻿
 
-.home-hero {
-    position: relative;
-    width: 100%;
-    /*min-height: 75vh;*/
-    background: url('/Assets/Banner.jpg') center center no-repeat;
-    background-size: cover;
-    color: #fff;
-}
+
+
 
     .home-hero::before {
         content: "";
@@ -33,9 +25,7 @@
     box-sizing: border-box;
 }
 
-/* =========================================
-   HEADER TRONG BANNER
-   ========================================= */
+
 
 .home-hero-header {
     display: flex;
@@ -49,7 +39,7 @@
 .home-header-left-box {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.2rem;
 }
 
 .home-logo-icon {
@@ -94,7 +84,7 @@
     margin-top: 0.15rem;
 }
 
-/* Menu phải + login + ngôn ngữ */
+
 
 .home-header-right-box {
     display: flex;
@@ -109,7 +99,7 @@
 }
 
     .home-header-right-top a {
-        color: #fff;
+        color: white;
         text-decoration: none;
         margin: 0 0.3rem;
     }
@@ -155,9 +145,7 @@
     text-decoration: underline;
 }
 
-/* =========================================
-   MAIN TEXT + SEARCH KHUNG TRONG BANNER
-   ========================================= */
+
 
 .home-hero-main {
     width: 100%;
@@ -174,20 +162,19 @@
     font-weight: 700;
     margin-bottom: 1%;
     text-align: center;
+    color:white
 }
 
 .home-sub-title {
     font-size: clamp(1rem, 2vw, 1.25rem);
     text-align: center;
+    color: white
 }
 
 .home-main-search {
     margin-top: 7%;
 }
 
-/* =========================================
-   Ô SEARCH 2 TẦNG (GIỐNG MẪU)
-   ========================================= */
 
 /* Khung tổng */
 
@@ -344,11 +331,7 @@
     margin-bottom: 12px;
 }
 
-    .home-section-header h2 {
-        font-size: 1.2rem;
-        font-weight: 600;
-        margin: 0;
-    }
+   
 
     .home-section-header a {
         font-size: 0.9rem;
@@ -449,12 +432,14 @@
         width: 75%;
         margin: 7% auto 0;
         text-align: center;
+       
     }
 
     .home-sub-title {
         font-size: 13px;
         padding: 1%;
         text-align: center;
+        
     }
 
     .home-search-wrapper {
@@ -509,7 +494,7 @@
         margin: 7% auto 0;
         text-align: center;
     }
-
+ 
     .home-sub-title {
         font-size: 11px;
         padding: 1%;

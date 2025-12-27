@@ -61,11 +61,47 @@ namespace HomeNow.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Thay đổi mật khẩu.
+        /// </summary>
+        public static string Account_ChangePassword {
+            get {
+                return ResourceManager.GetString("Account_ChangePassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Tài khoản.
         /// </summary>
         public static string Account_Default {
             get {
                 return ResourceManager.GetString("Account_Default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đăng xuất.
+        /// </summary>
+        public static string Account_Logout {
+            get {
+                return ResourceManager.GetString("Account_Logout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Menu tài khoản.
+        /// </summary>
+        public static string Account_MenuLabel {
+            get {
+                return ResourceManager.GetString("Account_MenuLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Thay đổi thông tin cá nhân.
+        /// </summary>
+        public static string Account_Profile {
+            get {
+                return ResourceManager.GetString("Account_Profile", resourceCulture);
             }
         }
         
@@ -108,6 +144,24 @@ namespace HomeNow.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Tính năng đang phát triển.
+        /// </summary>
+        public static string Common_FeatureComingSoon {
+            get {
+                return ResourceManager.GetString("Common_FeatureComingSoon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đang tải….
+        /// </summary>
+        public static string Common_Loading {
+            get {
+                return ResourceManager.GetString("Common_Loading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Khu vực Đăng ký &amp; Liên hệ
         ///.
         /// </summary>
@@ -127,11 +181,38 @@ namespace HomeNow.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Chưa có căn nào trong danh sách yêu thích..
+        /// </summary>
+        public static string Favorite_Empty {
+            get {
+                return ResourceManager.GetString("Favorite_Empty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tải danh sách yêu thích thất bại..
+        /// </summary>
+        public static string Favorite_LoadFailed {
+            get {
+                return ResourceManager.GetString("Favorite_LoadFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bạn cần đăng nhập để sử dụng chức năng Yêu thích..
         /// </summary>
         public static string Favorite_NeedLogin {
             get {
                 return ResourceManager.GetString("Favorite_NeedLogin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yêu thích.
+        /// </summary>
+        public static string Favorite_Title {
+            get {
+                return ResourceManager.GetString("Favorite_Title", resourceCulture);
             }
         }
         

@@ -22,23 +22,34 @@
     }
     else
     {
-        currentType = ""; // ✅ nổi bật thì KHÔNG active tab nào
+        currentType = "";
     }
 
     var JS_FavNeedLogin = HttpUtility.JavaScriptStringEncode(HomeTexts.Favorite_NeedLogin);
     var JS_FavUpdateFail = HttpUtility.JavaScriptStringEncode(HomeTexts.Favorite_UpdateFailed);
 
+    //  đa ngôn ngữ cho popup favorites
+    var JS_CommonLoading = HttpUtility.JavaScriptStringEncode(HomeTexts.Common_Loading);
+    var JS_FavEmpty = HttpUtility.JavaScriptStringEncode(HomeTexts.Favorite_Empty);
+    var JS_FavLoadFailed = HttpUtility.JavaScriptStringEncode(HomeTexts.Favorite_LoadFailed);
+
+    //  message fallback khi popup chưa có
+    var JS_FeatureComingSoon = HttpUtility.JavaScriptStringEncode(HomeTexts.Common_FeatureComingSoon);
+
     var favCount = (int)(ViewBag.FavoriteCount ?? 0);
     var favCountText = favCount > 99 ? "99+" : favCount.ToString();
+
+    //  
+    var DefaultHeroBg = (!Model.CityId.HasValue)
+        ? "/Assets/Cities/Banner.png"
+        : (ViewBag.HeroBackground ?? "/Assets/Cities/Banner.png").ToString();
 }
 
 @helper RenderPropertyCard(PropertyListItemViewModel item)
 {
     <div class="property-card">
         <div class="property-card-fav js-fav-toggle @(item.IsFavorite ? "is-fav" : "")"
-             data-id="@item.PropertyId"
-             @*title="@HomeTexts."*@
-             >
+             data-id="@item.PropertyId">
             <i class="fa-solid fa-heart"></i>
         </div>
 
@@ -58,273 +69,550 @@
                 </div>
                 <div class="property-card-price">
                     <i class="fa-solid fa-sack-dollar"></i>
-                    @item.PriceLabel @HomeTexts.Currency_VND
+                    @item.PriceShort
                 </div>
             </div>
         </a>
     </div>
 }
 
-<link rel="stylesheet" href="~/Content/font-awesome/all.min.css">
-<link rel="stylesheet" href="~/Content/style/Home/index.css" />
+@section Styles {
+    <link rel="stylesheet" href="~/Content/style/Home/index.css" />
 
-<style>
- /* ===== Fav badge ===== */
-.fav-wrap {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 34px;
-    height: 34px;
-    border-radius: 999px;
+    <style>
+        body {
+            background: white;
+        }
+        .img_logo{
+            height:3rem;
+            width:auto;
+        }
+        .home-header-left-box {
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+        .home-header-left-top {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+            font-size: clamp(1.2rem, 1.3vw, 1.6rem);
+            font-weight: 700;
+        }
+        .property-card-title {
+            color: black !important;
+        }
+
+        .home-hero {
+            background-image: var(--hero-bg, url('/Assets/Cities/Banner.png'));
+            position: relative;
+            width: 100%;
+            height: 75vh;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .home-hero-shell {
+            position: relative;
+            z-index: 3;
+        }
+
+        .home-hero::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .home-hero::before {
+            content: none;
+        }
+
+        /* iOS fixed fallback: tắt background element, dùng ::before render */
+        .home-hero.ios-fixed {
+            background-attachment: scroll !important;
+            background-image: none !important;
+        }
+
+            .home-hero.ios-fixed::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background-image: var(--hero-bg, url('/Assets/Cities/Banner.png'));
+                background-position: center center;
+                background-repeat: no-repeat;
+                background-size: cover;
+                transform: translate3d(0, var(--hero-ios-offset, 0px), 0);
+                will-change: transform;
+                z-index: 1;
+                pointer-events: none;
+            }
+
+        @@media (max-width: 768px) {
+            .home-hero {
+                background-attachment: scroll;
+            }
+        }
+
+        .home-section-header h2 {
+            font-size: 1.6rem;
+            font-weight: 1000;
+            margin: 0;
+            padding: 12px 0px;
+        }
+        .home-header-left-tagline {
+            display: flex;
+            align-items: self-end;
+        
+            font-size: 0.8rem;
+            opacity: 0.85;
+            margin-top: 0
+        
+        }
+        /* ===== Fav badge ===== */
+        .fav-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+        }
+
+            .fav-wrap.has-badge i {
+                color: #ff4d6d;
+            }
+
+        .fav-badge {
+            position: absolute;
+            top: 1px;
+            right: -4px;
+            min-width: 6px;
+            height: 15px;
+            padding: 0 5px;
+            border-radius: 999px;
+            background: #22c55e;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        /* ===== Section header ===== */
+        .home-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .home-header-right-top a {
+            color: white;
+            
+          
+        }
+        .home-section-more {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: #0f172a;
+            color: #fff !important;
+            text-decoration: none;
+            font-size: 13px;
+            white-space: nowrap;
+            opacity: .92;
+            transition: transform .15s ease, opacity .15s ease;
+        }
+
+            .home-section-more:hover {
+                opacity: 1;
+                transform: translateY(-1px);
+            }
+
+        /* ===== Scroll top ===== */
+        .scroll-top-btn {
+            position: fixed;
+            right: 40px;
+            bottom: 40px;
+            width: 40px;
+            height: 40px;
+            border-radius: 999px;
+            background: rgba(15,23,42,.85);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+            cursor: pointer;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(10px);
+            transition: opacity .2s ease, transform .2s ease;
+        }
+
+            .scroll-top-btn.show {
+                opacity: 1;
+                pointer-events: auto;
+                transform: translateY(0);
+            }
+
+        /* ===== Cards ===== */
+        .property-card {
+            position: relative;
+            border-radius: 0;
+        }
+
+        .property-card-fav {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            background: rgba(15,23,42,.65);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 0;
+        }
+
+            .property-card-fav i {
+                font-size: 14px;
+                color: #fff;
+            }
+
+            .property-card-fav.is-fav {
+                background: #ef4444;
+            }
+
+        .property-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-gap: 24px;
+        }
+
+        @@media (max-width: 991px) {
+            .property-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+
+        .home-body-container .property-card {
+            height: 100%;
+        }
+
+            .home-body-container .property-card a.property-card-link {
+                display: flex !important;
+                flex-direction: column;
+                height: 100%;
+            }
+
+                .home-body-container .property-card a.property-card-link,
+                .home-body-container .property-card a.property-card-link[style],
+                .home-body-container .property-card a.property-card-link *,
+                .home-body-container .property-card a.property-card-link:link {
+                    text-decoration: none;
+                }
+
+        .home-body-container .property-card-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .home-body-container .property-card-title {
+            font-weight: 700;
+            line-height: 1.25;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+            min-height: calc(1.25em * 2);
+        }
+
+        .home-body-container .property-card-address {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-height: 1.25em;
+        }
+
+        .home-body-container .property-card-meta {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            min-height: 1.25em;
+        }
+
+            .home-body-container .property-card-meta span {
+                min-width: 0;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+        .home-body-container .property-card-price {
+            margin-top: auto;
+        }
+
+        /* ===== Account trigger ===== */
+        .account-hover {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .account-trigger {
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            border-radius: 999px;
+            color: #fff;
+            user-select: none;
+            padding: 6px 10px;
+            gap: 8px;
+        }
+
+            .account-trigger:hover {
+                background: rgba(15,23,42,.55);
+            }
+
+        /* ===== Account popup overlay ===== */
+        .hn-acc-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.35);
+            z-index: 200000;
+        }
+
+        .hn-acc-panel {
+            position: absolute;
+            top: 70px;
+            right: 137px;
+            width: 280px;
+            max-width: calc(100vw - 24px);
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 18px 40px rgba(0,0,0,.18);
+            border: 1px solid rgba(15,23,42,.10);
+            overflow: hidden;
+        }
+
+        .hn-acc-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 14px;
+            color: black   !important;
+            text-decoration: none;
+         /*   font-weight: 800;*/
+            line-height: 1;
+            background: #fff;
+        }
+
+            .hn-acc-item i {
+                width: 18px;
+                text-align: center;
+                opacity: .9;
+            }
+
+            .hn-acc-item:hover {
+                background: #f1f5f9;
+            }
+
+        .hn-acc-divider {
+            height: 1px;
+            background: rgba(15,23,42,.08);
+            margin: 0;
+        }
+        .logout{
+            color:red !important;
+        }
+        @@media (max-width: 500px) {
+            .home-hero {
+                height: 40vh;
+            }
+
+            .hn-acc-panel {
+                top: 54px;
+                right: 12px;
+                width: 52vw;
+            }
+        }
+
+        /* ===== Favorites dropdown ===== */
+        .hn-fav-menu {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .hn-fav-dropdown {
+            position: absolute;
+            top: calc(100% + 3px);
+            right: -292px;
+            width: 26rem;
+            max-width: calc(100vw - 24px);
+            background: #fff;
+            border-radius: 16px;
+            border: 1px solid rgba(15, 23, 42, .10);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, .18);
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(-8px);
+            pointer-events: none;
+            z-index: 100000;
+        }
+
+        .hn-fav-menu.open .hn-fav-dropdown {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .hn-fav-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 14px 8px;
+        }
+
+        .hn-fav-title {
+            font-size: 22px;
+            font-weight: 900;
+            color: #0f172a;
+        }
+
+        .hn-fav-body {
+            max-height: 52vh;
+            overflow: auto;
+            padding: 0 8px 8px;
+        }
+
+        .hn-fav-loading {
+            padding: 14px;
+            color: #64748b;
+            font-weight: 700;
+        }
+
+        #hnFavDropdown .property-card {
+            border-radius: 14px;
+            overflow: hidden;
+            margin: 8px 8px;
+            border: 1px solid rgba(15,23,42,.08);
+            background: #fff;
+        }
+
+        #hnFavDropdown a.property-card-link {
+            display: grid !important;
+            grid-template-columns: 90px 1fr;
+            align-items: center;
+            padding: 2px 0 0 0;
+            height: auto !important;
+            text-decoration: none !important;
+        }
+
+        #hnFavDropdown .property-card img {
+            object-fit: cover;
+            width: 100%;
+            height: 90%;
+            display: block;
+            background: #e5e7eb;
+        }
+
+        #hnFavDropdown .property-card-body {
+            padding: 0 !important;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        #hnFavDropdown .property-card-meta {
+            display: none !important;
+        }
+
+        #hnFavDropdown .property-card-price {
+            text-align: left;
+            margin-top: 6px;
+            font-weight: 700;
+        }
+
+        #hnFavDropdown .property-card-fav {
+            top: 25% !important;
+            right: 20px !important;
+            transform: translateY(-50%) !important;
+            width: 30px;
+            height: 30px;
+            border-radius: 999px;
+            z-index: 5;
+        }
+
+        @@media (max-width: 768px) {
+            .hn-fav-dropdown {
+                position: fixed;
+                top: 70px;
+                left: 12px;
+                right: 12px;
+                width: auto;
+                max-width: none;
+            }
+
+            .hn-fav-body {
+                max-height: calc(100vh - 180px);
+            }
+
+            .property-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+        ._svg{
+        }
+        @@media (max-width: 520px) {
+            #hnFavDropdown a.property-card-link {
+                grid-template-columns: 68px 1fr;
+                padding-right: 52px;
+            }
+
+            #hnFavDropdown .property-card img {
+                width: 68px;
+                height: 68px;
+            }
+            .account-trigger {
+                padding: 0px;
+                gap: 3px;
+            }
+            .home-header-right-top a {
+               
+                margin: 0;
+            }
+        }
+    </style>
 }
-.fav-wrap.has-badge i { color: #ff4d6d; }
 
-.fav-badge {
-    position: absolute;
-    top: -4px;
-    right: -6px;
-    min-width: 18px;
-    height: 18px;
-    padding: 0 5px;
-    border-radius: 999px;
-    background: #22c55e;
-    color: #fff;
-    font-size: 11px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-}
-
-/* ===== Section header ===== */
-.home-section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-}
-.home-section-more {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    border-radius: 999px;
-    background: #0f172a;
-    color: #fff !important;
-    text-decoration: none;
-    font-size: 13px;
-    white-space: nowrap;
-    opacity: .92;
-    transition: transform .15s ease, opacity .15s ease;
-}
-.home-section-more:hover { opacity: 1; transform: translateY(-1px); }
-
-/* ===== Scroll top ===== */
-.scroll-top-btn {
-    position: fixed;
-    right: 40px;
-    bottom: 40px;
-    width: 40px;
-    height: 40px;
-    border-radius: 999px;
-    background: rgba(15,23,42,.85);
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-    cursor: pointer;
-    z-index: 9999;
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(10px);
-    transition: opacity .2s ease, transform .2s ease;
-}
-.scroll-top-btn.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
-
-/* ===== Cards ===== */
-.property-card { position: relative; border-radius: 0; }
-.property-card-fav {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 28px;
-    height: 28px;
-    border-radius: 999px;
-    background: rgba(15,23,42,.65);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 2;
-}
-.property-card-fav i { font-size: 14px; color: #fff; }
-.property-card-fav.is-fav { background: #ef4444; }
-
-.property-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    grid-gap: 24px;
-}
-@@media (max-width: 991px) {
-    .property-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
-
-.home-body-container .property-card { height: 100%; }
-
-/* override inline style display:block ở helper */
-.home-body-container .property-card a.property-card-link {
-    display: flex !important;
-    flex-direction: column;
-    height: 100%;
-}
-
-/* nếu _PropertyCardList có class khác, vẫn cover thêm */
-.home-body-container .property-card a.property-card-link,
-.home-body-container .property-card a.property-card-link[style],
-.home-body-container .property-card a.property-card-link *,
-.home-body-container .property-card a.property-card-link:link {
-    text-decoration: none;
-}
-
-.home-body-container .property-card-body {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.home-body-container .property-card-title {
-    font-weight: 900;
-    line-height: 1.25;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    overflow: hidden;
-    min-height: calc(1.25em * 2); /* luôn giữ chỗ 2 dòng */
-}
-
-.home-body-container .property-card-address {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    min-height: 1.25em;
-}
-
-/* desktop/tablet: meta 1 dòng, không làm card cao thấp */
-.home-body-container .property-card-meta {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    min-height: 1.25em;
-}
-.home-body-container .property-card-meta span {
-    min-width: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.home-body-container .property-card-price { margin-top: auto; }
-
-/* ===== Account dropdown fix (giữ nguyên logic cũ) ===== */
-.account-hover {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    z-index: 9999;
-}
-.account-trigger {
-    display: inline-flex;
-    align-items: center;
-    cursor: pointer;
-    border-radius: 999px;
-    color: #fff;
-    user-select: none;
-}
-.account-trigger:hover { background: rgba(15,23,42,.55); }
-
-.account-dropdown {
-    position: absolute;
-    right: -29px;
-    top: 21px;
-    min-width: 104px;
-    background: #fff;
-    border-radius: 14px;
-    box-shadow: 0 18px 40px rgba(0,0,0,.18);
-    border: 1px solid rgba(15,23,42,.10);
-    padding: 5px;
-    opacity: 0;
-    transform: translateY(-6px);
-    visibility: hidden;
-    pointer-events: none;
-}
-.account-hover:hover .account-dropdown,
-.account-hover.open .account-dropdown {
-    opacity: 1;
-    transform: translateY(0);
-    visibility: visible;
-    pointer-events: auto;
-}
-.account-dropdown a {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 0;
-    border-radius: 10px;
-    color: #0f172a;
-    text-decoration: none;
-    font-weight: 700;
-}
-
-
-@@media (max-width: 500px) {
-    .home-header-right-top a { margin: 0; }
-
-    .fav-badge {
-        top: 2px;
-        right: 0;
-        min-width: 13px;
-        height: 13px;
-        padding: 0 4px;
-        font-size: 9px;
-    }
-
-    /* Address 2 dòng cho dễ đọc, nhưng cố định chiều cao */
-    .home-body-container .property-card-address {
-        white-space: normal;
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-        overflow: hidden;
-        min-height: calc(1.25em * 2);
-    }
-
-    /* Meta xuống 2 dòng (2 hàng) => đọc dễ, vẫn đều nhau */
-    .home-body-container .property-card-meta {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 4px;
-        min-height: calc(1.25em * 2);
-    }
-    .home-body-container .property-card-meta span {
-        white-space: normal;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-}
-</style>
-
-<div class="home-hero" style="background-image:url('@(ViewBag.HeroBackground ?? "/Assets/Banner.jpg")');">
+<div class="home-hero" style="--hero-bg:url('@DefaultHeroBg');">
     <div class="home-hero-shell">
         <div class="home-hero-header">
             <a href="@Url.Action("Index", "Home")" class="home-header-left-box">
-                <div class="home-logo-icon"></div>
+                <img class="img_logo" src="~/Assets/Cities/logo.png" />
                 <div class="home-header-left">
-                    <div class="home-header-left-top"><span>NhàNow</span></div>
+                    <div class="home-header-left-top"><span>NhaWow</span></div>
                     <div class="home-header-left-tagline">
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
                             <path d="M12 2.5C8.96 2.5 6.5 4.96 6.5 8c0 3.74 3.39 7.47 4.96 9.15.29.31.77.31 1.06 0C14.11 15.47 17.5 11.74 17.5 8c0-3.04-2.46-5.5-5.5-5.5zm0 6.5A2 2 0 1 1 12 5a2 2 0 0 1 0 4z" />
@@ -340,31 +628,59 @@
                     {
                         var name = Session["CurrentUserName"] as string ?? HomeTexts.Account_Default;
 
-                        <a href="@Url.Action("Favorites", "Property")"
-                           class="hidden-xs js-fav-top fav-wrap @(favCount > 0 ? "has-badge" : "")"
-                           data-return="@Url.Action("Favorites", "Property")">
-                            <i class="fa-solid fa-heart"></i>
-                            @if (favCount > 0)
-                            {
-                                <span id="headerFavBadge" class="fav-badge">@favCountText</span>
-                            }
-                        </a>
+                        <div class="hidden-xs hn-fav-menu" id="hnFavMenu">
+                            <a href="@Url.Action("Favorites", "Property")"
+                               class="js-fav-top fav-wrap @(favCount > 0 ? "has-badge" : "")"
+                               data-return="@Url.Action("Favorites", "Property")"
+                               aria-haspopup="dialog"
+                               aria-expanded="false">
+                                <i class="fa-solid fa-heart"></i>
+                                @if (favCount > 0)
+                                {
+                                    <span id="headerFavBadge" class="fav-badge">@favCountText</span>
+                                }
+                            </a>
+
+                            <div class="hn-fav-dropdown" id="hnFavDropdown" role="dialog" aria-label="@HomeTexts.Favorite_Title">
+                                <div class="hn-fav-head">
+                                    <div class="hn-fav-title">@HomeTexts.Favorite_Title</div>
+                                </div>
+
+                                <div class="hn-fav-body" id="hnFavBody">
+                                    <div class="hn-fav-loading">@HomeTexts.Common_Loading</div>
+                                </div>
+                            </div>
+                        </div>
 
                         <a class="hidden-xs" href="javascript:void(0)">
                             <i class="fa-solid fa-bell"></i>
                         </a>
 
-                        <!--  dropdown -->
                         <div class="hidden-xs account-hover" id="hnAccountHover">
                             <div class="account-trigger" id="hnAccountTrigger">
                                 <i class="fa-solid fa-user"></i>
                                 <span>@name</span>
                                 <i class="fa-solid fa-caret-down" style="font-size:12px; opacity:.8;"></i>
                             </div>
+                        </div>
 
-                            <div class="account-dropdown" id="hnAccountDropdown">
-                                <a href="@Url.Action("Logout", "Account")">
-                                    <i class="fa-solid fa-right-from-bracket"></i> @HomeTexts.Logout
+                        <div id="hnAccountMenuOverlay" class="hn-acc-overlay" aria-hidden="true">
+                            <div class="hn-acc-panel" role="menu" aria-label="@HomeTexts.Account_MenuLabel">
+                               
+                                <a class="hn-acc-item js-open-profile" href="javascript:void(0)">
+                                    <i class="fa-regular fa-user"></i>
+                                    @HomeTexts.Account_Profile
+                                </a>
+
+                                <a class="hn-acc-item js-open-change-password" href="javascript:void(0)">
+                                    <i class="fa-solid fa-lock"></i>
+                                    @HomeTexts.Account_ChangePassword
+                                </a>
+
+                                <div class="hn-acc-divider"></div>
+                                <a class="hn-acc-item logout" href="@Url.Action("Logout", "Account")">
+                                    <i class="fa-solid fa-right-from-bracket"></i>
+                                    @HomeTexts.Account_Logout
                                 </a>
                             </div>
                         </div>
@@ -376,7 +692,6 @@
                            data-return="@Url.Action("Favorites", "Property")">
                             <i class="fa-solid fa-heart"></i>
                         </a>
-
                         <a class="hidden-xs" href="javascript:void(0)">
                             <i class="fa-solid fa-bell"></i>
                         </a>
@@ -549,26 +864,61 @@
 
 @section Scripts {
     <script>
-    // Fix dropdown account trên mobile (tap mở/đóng), PC hover vẫn chạy nhờ CSS
+    // Account popup overlay
     (function () {
-        var wrap = document.getElementById('hnAccountHover');
         var trigger = document.getElementById('hnAccountTrigger');
-        if (!wrap || !trigger) return;
+        var overlay = document.getElementById('hnAccountMenuOverlay');
+        if (!trigger || !overlay) return;
+
+        function openMenu() { overlay.style.display = 'block'; overlay.setAttribute('aria-hidden', 'false'); }
+        function closeMenu() { overlay.style.display = 'none'; overlay.setAttribute('aria-hidden', 'true'); }
+
+        // expose close function for other handlers
+        window.__closeAccountMenu = closeMenu;
 
         trigger.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            wrap.classList.toggle('open');
+            if (overlay.style.display === 'block') closeMenu();
+            else openMenu();
         });
 
-        document.addEventListener('click', function () {
-            wrap.classList.remove('open');
+        overlay.addEventListener('click', function (e) {
+            if (e.target === overlay) closeMenu();
         });
 
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') wrap.classList.remove('open');
-        });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeMenu(); });
+        document.addEventListener('click', function () { closeMenu(); });
     })();
+
+    // ✅ FIX: Click menu -> mở popup, KHÔNG chuyển trang
+    $(document).on('click', '.js-open-change-password', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (window.__closeAccountMenu) window.__closeAccountMenu();
+
+        if (window.changePasswordModal && typeof window.changePasswordModal.open === 'function') {
+            window.changePasswordModal.open();
+        } else {
+            alert('@JS_FeatureComingSoon');
+        }
+    });
+
+    $(document).on('click', '.js-open-profile', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (window.__closeAccountMenu) window.__closeAccountMenu();
+
+        // Nếu bạn đã làm profile popup -> expose window.profileModal.open()
+        if (window.profileModal && typeof window.profileModal.open === 'function') {
+            window.profileModal.open();
+        }
+        @*else {
+            alert('@JS_FeatureComingSoon');
+        }*@
+    });
 
     // Tabs
     (function () {
@@ -587,17 +937,56 @@
         });
     })();
 
+    // iOS fixed background fallback
+    (function () {
+        var hero = document.querySelector(".home-hero");
+        if (!hero) return;
+
+        var ua = navigator.userAgent || '';
+        var isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        if (!isIOS) return;
+
+        hero.classList.add('ios-fixed');
+
+        var ticking = false;
+        function updateOffset() {
+            var rect = hero.getBoundingClientRect();
+            hero.style.setProperty('--hero-ios-offset', (-rect.top) + 'px');
+        }
+
+        function onScroll() {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(function () {
+                updateOffset();
+                ticking = false;
+            });
+        }
+
+        window.__syncHeroBgIOS = function () { updateOffset(); };
+
+        updateOffset();
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', updateOffset);
+    })();
+
     // Hero BG
     (function () {
         var hero = document.querySelector(".home-hero");
         var citySelect = document.getElementById("citySelect");
         if (!hero || !citySelect) return;
 
+        var defaultBg = '@DefaultHeroBg';
+
         function applyCityBackground() {
             var opt = citySelect.options[citySelect.selectedIndex];
             if (!opt) return;
+
             var bg = opt.getAttribute("data-bg");
-            hero.style.backgroundImage = (bg && bg.length > 0) ? ("url('" + bg + "')") : "";
+            var url = (bg && bg.length > 0) ? ("url('" + bg + "')") : ("url('" + defaultBg + "')");
+
+            hero.style.setProperty('--hero-bg', url);
+            if (window.__syncHeroBgIOS) window.__syncHeroBgIOS();
         }
 
         citySelect.addEventListener("change", applyCityBackground);
@@ -642,21 +1031,82 @@
         });
     });
 
-    // click heart header: chưa login -> open login
-    $(document).on('click', '.js-fav-top', function (e) {
-        if (window.__isAuth) return;
+    // Favorites Dropdown
+    (function () {
+        var $menu = $('#hnFavMenu');
+        var $body = $('#hnFavBody');
 
-        e.preventDefault();
-        var returnUrl = $(this).data('return') || (window.location.pathname + window.location.search);
+        function openFavDropdown() {
+            if (!$menu.length) return;
 
-        if (window.loginModal && typeof window.loginModal.open === 'function') {
-            window.loginModal.open(returnUrl);
-        } else {
-            window.location.href = '@Url.Action("Login", "Account")' + '?returnUrl=' + encodeURIComponent(returnUrl);
+            $menu.addClass('open');
+            $menu.find('.js-fav-top').attr('aria-expanded', 'true');
+
+            if ($body.length) $body.html('<div class="hn-fav-loading">' + '@JS_CommonLoading' + '</div>');
+
+            $.ajax({
+                url: '@Url.Action("FavoritesPopup", "Home")',
+                type: 'GET',
+                dataType: 'text',
+                cache: false
+            })
+            .done(function (text) {
+                try {
+                    var obj = JSON.parse(text);
+                    if (obj && obj.needLogin) {
+                        closeFavDropdown();
+                        if (window.loginModal && typeof window.loginModal.open === 'function') {
+                            window.loginModal.open();
+                        } else {
+                            alert('@JS_FavNeedLogin');
+                        }
+                        return;
+                    }
+                } catch (e) { }
+
+                var html = (text || '').trim();
+                if (!html) {
+                    $body.html('<div class="hn-fav-loading">' + '@JS_FavEmpty' + '</div>');
+                    return;
+                }
+                $body.html(html);
+            })
+            .fail(function () {
+                $body.html('<div class="hn-fav-loading" style="color:#ef4444;">' + '@JS_FavLoadFailed' + '</div>');
+            });
         }
-    });
 
-    // Toggle favorite: update UI + update badge luôn
+        function closeFavDropdown() {
+            if (!$menu.length) return;
+            $menu.removeClass('open');
+            $menu.find('.js-fav-top').attr('aria-expanded', 'false');
+        }
+
+        $(document).on('click', '.js-fav-top', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (!window.__isAuth) {
+                if (window.loginModal && typeof window.loginModal.open === 'function') {
+                    window.loginModal.open();
+                } else {
+                    window.location.href = '@Url.Action("Login", "Account")';
+                }
+                return;
+            }
+
+            if ($menu.hasClass('open')) closeFavDropdown();
+            else openFavDropdown();
+        });
+
+        $(document).on('click', '#hnFavDropdown', function (e) { e.stopPropagation(); });
+        $(document).on('click', function () { closeFavDropdown(); });
+        $(document).on('keydown', function (e) { if (e.key === 'Escape') closeFavDropdown(); });
+
+        window.favDropdown = { open: openFavDropdown, close: closeFavDropdown };
+    })();
+
+    // Toggle favorite
     (function () {
         var MSG_NEED_LOGIN = '@JS_FavNeedLogin';
         var MSG_UPDATE_FAIL = '@JS_FavUpdateFail';
@@ -677,7 +1127,7 @@
 
                     if (res.needLogin) {
                         if (window.loginModal && typeof window.loginModal.open === 'function') {
-                            window.loginModal.open(window.location.pathname + window.location.search);
+                            window.loginModal.open();
                         } else {
                             alert(MSG_NEED_LOGIN);
                         }
@@ -688,6 +1138,10 @@
                         $btn.toggleClass('is-fav', !!res.isFavorite);
                         updateHeaderFavBadge(res.favoriteCount || 0);
                         window.__isAuth = true;
+
+                        if ($('#hnFavMenu').hasClass('open') && window.favDropdown && window.favDropdown.open) {
+                            window.favDropdown.open();
+                        }
                     }
                 },
                 error: function () { alert(MSG_UPDATE_FAIL); }
