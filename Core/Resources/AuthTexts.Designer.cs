@@ -124,6 +124,177 @@ namespace Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Xác nhận mật khẩu mới.
+        /// </summary>
+        public static string ChangePw_ConfirmNewPassword {
+            get {
+                return ResourceManager.GetString("ChangePw_ConfirmNewPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Xác nhận mật khẩu mới không khớp..
+        /// </summary>
+        public static string ChangePw_Msg_ConfirmNotMatch {
+            get {
+                return ResourceManager.GetString("ChangePw_Msg_ConfirmNotMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đổi mật khẩu thất bại..
+        /// </summary>
+        public static string ChangePw_Msg_Failed {
+            get {
+                return ResourceManager.GetString("ChangePw_Msg_Failed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Vui lòng nhập đầy đủ thông tin..
+        /// </summary>
+        public static string ChangePw_Msg_RequireAll {
+            get {
+                return ResourceManager.GetString("ChangePw_Msg_RequireAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đổi mật khẩu thành công..
+        /// </summary>
+        public static string ChangePw_Msg_Success {
+            get {
+                return ResourceManager.GetString("ChangePw_Msg_Success", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mật khẩu mới.
+        /// </summary>
+        public static string ChangePw_NewPassword {
+            get {
+                return ResourceManager.GetString("ChangePw_NewPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mật khẩu cũ.
+        /// </summary>
+        public static string ChangePw_OldPassword {
+            get {
+                return ResourceManager.GetString("ChangePw_OldPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Thay đổi mật khẩu.
+        /// </summary>
+        public static string ChangePw_Title {
+            get {
+                return ResourceManager.GetString("ChangePw_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cập nhật.
+        /// </summary>
+        public static string ChangePw_UpdateButton {
+            get {
+                return ResourceManager.GetString("ChangePw_UpdateButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WC.
+        /// </summary>
+        public static string Common_BathroomShort {
+            get {
+                return ResourceManager.GetString("Common_BathroomShort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PN.
+        /// </summary>
+        public static string Common_BedroomShort {
+            get {
+                return ResourceManager.GetString("Common_BedroomShort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hủy.
+        /// </summary>
+        public static string Common_Cancel {
+            get {
+                return ResourceManager.GetString("Common_Cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to XEM.
+        /// </summary>
+        public static string Common_Play {
+            get {
+                return ResourceManager.GetString("Common_Play", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to m².
+        /// </summary>
+        public static string Common_Unit_m2 {
+            get {
+                return ResourceManager.GetString("Common_Unit_m2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tiện ích / Nội thất.
+        /// </summary>
+        public static string Detail_Amenities {
+            get {
+                return ResourceManager.GetString("Detail_Amenities", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mô tả.
+        /// </summary>
+        public static string Detail_Description {
+            get {
+                return ResourceManager.GetString("Detail_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Vị trí trên bản đồ.
+        /// </summary>
+        public static string Detail_MapTitle {
+            get {
+                return ResourceManager.GetString("Detail_MapTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Căn hộ tương tự.
+        /// </summary>
+        public static string Detail_Similar {
+            get {
+                return ResourceManager.GetString("Detail_Similar", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to VR 360°.
+        /// </summary>
+        public static string Detail_VrBadge {
+            get {
+                return ResourceManager.GetString("Detail_VrBadge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to NhàNow - Đặt lại mật khẩu.
         /// </summary>
         public static string Email_Subject_Reset {
@@ -174,6 +345,51 @@ namespace Core.Resources {
         public static string Err_SendEmailFailed {
             get {
                 return ResourceManager.GetString("Err_SendEmailFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tầng 12, NamDinh,.
+        /// </summary>
+        public static string Footer_Address {
+            get {
+                return ResourceManager.GetString("Footer_Address", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NhaWow.
+        /// </summary>
+        public static string Footer_BrandName {
+            get {
+                return ResourceManager.GetString("Footer_BrandName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to LIÊN HỆ.
+        /// </summary>
+        public static string Footer_ContactTitle {
+            get {
+                return ResourceManager.GetString("Footer_ContactTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to © 2025 Công ty Cổ phần NhaNow.
+        /// </summary>
+        public static string Footer_Copyright {
+            get {
+                return ResourceManager.GetString("Footer_Copyright", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nhà thật – Thông tin thật – Trải nghiệm thật.
+        /// </summary>
+        public static string Footer_Slogan {
+            get {
+                return ResourceManager.GetString("Footer_Slogan", resourceCulture);
             }
         }
         
@@ -376,6 +592,15 @@ namespace Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Có lỗi xảy ra.
+        /// </summary>
+        public static string Msg_Error {
+            get {
+                return ResourceManager.GetString("Msg_Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sai email/SĐT hoặc mật khẩu..
         /// </summary>
         public static string Msg_InvalidCredentials {
@@ -466,11 +691,56 @@ namespace Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Đăng ký thất bại.
+        /// </summary>
+        public static string Msg_RegisterFailed {
+            get {
+                return ResourceManager.GetString("Msg_RegisterFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gửi lại thất bại.
+        /// </summary>
+        public static string Msg_ResendFailed {
+            get {
+                return ResourceManager.GetString("Msg_ResendFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đặt lại mật khẩu thất bại.
+        /// </summary>
+        public static string Msg_ResetFailed {
+            get {
+                return ResourceManager.GetString("Msg_ResetFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Đặt lại mật khẩu thành công..
         /// </summary>
         public static string Msg_ResetSuccess {
             get {
                 return ResourceManager.GetString("Msg_ResetSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gửi thất bại.
+        /// </summary>
+        public static string Msg_SendFailed {
+            get {
+                return ResourceManager.GetString("Msg_SendFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Xác minh thất bại.
+        /// </summary>
+        public static string Msg_VerifyFailed {
+            get {
+                return ResourceManager.GetString("Msg_VerifyFailed", resourceCulture);
             }
         }
         
@@ -516,6 +786,105 @@ namespace Core.Resources {
         public static string Otp_VerifyButton {
             get {
                 return ResourceManager.GetString("Otp_VerifyButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Thông tin liên hệ.
+        /// </summary>
+        public static string Profile_ContactInfo_Label {
+            get {
+                return ResourceManager.GetString("Profile_ContactInfo_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Họ và tên.
+        /// </summary>
+        public static string Profile_DisplayName_Label {
+            get {
+                return ResourceManager.GetString("Profile_DisplayName_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nhập họ và tên.
+        /// </summary>
+        public static string Profile_DisplayName_Placeholder {
+            get {
+                return ResourceManager.GetString("Profile_DisplayName_Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Email.
+        /// </summary>
+        public static string Profile_Email_Label {
+            get {
+                return ResourceManager.GetString("Profile_Email_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không lấy được thông tin user..
+        /// </summary>
+        public static string Profile_Msg_LoadFailed {
+            get {
+                return ResourceManager.GetString("Profile_Msg_LoadFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lưu thay đổi thất bại..
+        /// </summary>
+        public static string Profile_Msg_SaveFailed {
+            get {
+                return ResourceManager.GetString("Profile_Msg_SaveFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lưu thay đổi thành công..
+        /// </summary>
+        public static string Profile_Msg_SaveSuccess {
+            get {
+                return ResourceManager.GetString("Profile_Msg_SaveSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Số điện thoại.
+        /// </summary>
+        public static string Profile_Phone_Label {
+            get {
+                return ResourceManager.GetString("Profile_Phone_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nhập số điện thoại.
+        /// </summary>
+        public static string Profile_Phone_Placeholder {
+            get {
+                return ResourceManager.GetString("Profile_Phone_Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lưu thay đổi.
+        /// </summary>
+        public static string Profile_SaveButton {
+            get {
+                return ResourceManager.GetString("Profile_SaveButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Quản lý tài khoản.
+        /// </summary>
+        public static string Profile_Title {
+            get {
+                return ResourceManager.GetString("Profile_Title", resourceCulture);
             }
         }
         
@@ -579,6 +948,15 @@ namespace Core.Resources {
         public static string Register_Title {
             get {
                 return ResourceManager.GetString("Register_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NhàWow.
+        /// </summary>
+        public static string Site_Name {
+            get {
+                return ResourceManager.GetString("Site_Name", resourceCulture);
             }
         }
         

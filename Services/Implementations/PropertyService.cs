@@ -2,6 +2,7 @@
 using Core.ViewModels;
 using Data;
 using Services.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -19,20 +20,19 @@ namespace Services.Implementations
             string propertyType,
             string keyword)
         {
-            
             var paged = await SearchPagedAsync(langCode, listingType, cityId, priceRange, propertyType, keyword, 1, 1000000);
             return paged.Items ?? new List<PropertyListViewModel>();
         }
 
         public async Task<PagedResult<PropertyListViewModel>> SearchPagedAsync(
-        string langCode,
-        string listingType,
-        int? cityId,
-        string priceRange,
-        string propertyType,
-        string keyword,
-        int page,
-        int pageSize)
+            string langCode,
+            string listingType,
+            int? cityId,
+            string priceRange,
+            string propertyType,
+            string keyword,
+            int page,
+            int pageSize)
         {
             if (page <= 0) page = 1;
             if (pageSize <= 0) pageSize = 16;
@@ -84,15 +84,29 @@ namespace Services.Implementations
                 var total = await query.CountAsync();
 
               
+                // featuredFirst: (is_featured > 0) lên trước
+                // nonFeaturedScore = view_count / max(1, days_since_created)
+                // tie-break: created_at desc, property_id desc
+                var now = DateTime.UtcNow;
+
                 var pageRows = await query
-                    .OrderByDescending(x => x.p.IsFeatured)          // nếu IsFeatured là bool/int => OK
-                    .ThenByDescending(x => x.p.CreatedAt)            // tránh DateTime.MinValue trong query
+                    .OrderByDescending(x => (x.p.IsFeatured ?? 0) > 0) // featured lên trước
+                    .ThenByDescending(x =>
+                        // score chỉ áp cho non-featured; featured giữ nguyên ưu tiên, score vẫn ok làm phụ
+                        ((double)(x.p.ViewCount ?? 0)) /
+                        (double)(
+                            (DbFunctions.DiffDays(x.p.CreatedAt, now) ?? 0) < 1
+                                ? 1
+                                : (DbFunctions.DiffDays(x.p.CreatedAt, now) ?? 0)
+                        )
+                    )
+                    .ThenByDescending(x => x.p.CreatedAt)
                     .ThenByDescending(x => x.p.PropertyId)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .ToListAsync();
+                // ===== END NEW ORDER BY =====
 
-                
                 var items = pageRows.Select(x =>
                 {
                     var p = x.p;
@@ -109,7 +123,6 @@ namespace Services.Implementations
                         CoverImageUrl = p.CoverImageUrl,
                         Price = p.Price,
 
-                     
                         AreaM2 = p.AreaSqm.HasValue ? (decimal?)p.AreaSqm.Value : null,
                         AreaSqm = p.AreaSqm,
                         BedroomCount = p.BedroomCount,

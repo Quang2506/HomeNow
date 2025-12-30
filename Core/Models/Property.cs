@@ -30,19 +30,15 @@ namespace Core.Models
         [Column("description")]
         public string Description { get; set; }
 
-     
         [Column("listing_type")]
         public string ListingType { get; set; }
 
-      
         [Column("property_type")]
         public string PropertyType { get; set; }
 
-    
         [Column("price")]
         public decimal? Price { get; set; }
 
-       
         [Column("area_sqm")]
         public float? AreaSqm { get; set; }
 
@@ -58,11 +54,9 @@ namespace Core.Models
         [Column("kitchen")]
         public int? Kitchen { get; set; }
 
-     
         [Column("address_line")]
         public string AddressLine { get; set; }
 
-     
         [Column("status")]
         public string Status { get; set; }
 
@@ -78,6 +72,10 @@ namespace Core.Models
         [Column("cover_image_url")]
         public string CoverImageUrl { get; set; }
 
+        
+        [Column("view_count")]
+        public long? ViewCount { get; set; }
+
         [Column("created_at")]
         public DateTime? CreatedAt { get; set; }
 
@@ -90,10 +88,8 @@ namespace Core.Models
         [Column("updated_uid")]
         public string UpdatedUid { get; set; }
 
-        
         public virtual ICollection<PropertyTranslation> Translations { get; set; }
 
-    
         public virtual ICollection<VrScene> Scenes { get; set; }
     }
 }

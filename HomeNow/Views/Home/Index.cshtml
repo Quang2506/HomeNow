@@ -39,7 +39,7 @@
     var favCount = (int)(ViewBag.FavoriteCount ?? 0);
     var favCountText = favCount > 99 ? "99+" : favCount.ToString();
 
-    //  
+    //
     var DefaultHeroBg = (!Model.CityId.HasValue)
         ? "/Assets/Cities/Banner.png"
         : (ViewBag.HeroBackground ?? "/Assets/Cities/Banner.png").ToString();
@@ -80,18 +80,26 @@
     <link rel="stylesheet" href="~/Content/style/Home/index.css" />
 
     <style>
+        .lang-active {
+            font-weight: 700;
+            text-decoration: underline !important;
+        }
+
         body {
             background: white;
         }
-        .img_logo{
-            height:3rem;
-            width:auto;
+
+        .img_logo {
+            height: 3rem;
+            width: auto;
         }
+
         .home-header-left-box {
             display: flex;
             align-items: center;
             gap: 0.2rem;
         }
+
         .home-header-left-top {
             display: flex;
             align-items: baseline;
@@ -99,6 +107,7 @@
             font-size: clamp(1.2rem, 1.3vw, 1.6rem);
             font-weight: 700;
         }
+
         .property-card-title {
             color: black !important;
         }
@@ -154,6 +163,12 @@
                 pointer-events: none;
             }
 
+        .home-search-tab-btn.active {
+            background: #00B1FE;
+            box-shadow: 0 0 0 1px #e5e7eb;
+            color: white;
+        }
+
         @@media (max-width: 768px) {
             .home-hero {
                 background-attachment: scroll;
@@ -166,14 +181,13 @@
             margin: 0;
             padding: 12px 0px;
         }
+
         .home-header-left-tagline {
             display: flex;
             align-items: self-end;
-        
             font-size: 0.8rem;
             opacity: 0.85;
             margin-top: 0
-        
         }
         /* ===== Fav badge ===== */
         .fav-wrap {
@@ -194,7 +208,7 @@
             position: absolute;
             top: 1px;
             right: -4px;
-            min-width: 6px;
+            min-width: 9px;
             height: 15px;
             padding: 0 5px;
             border-radius: 999px;
@@ -215,11 +229,11 @@
             justify-content: space-between;
             gap: 12px;
         }
+
         .home-header-right-top a {
             color: white;
-            
-          
         }
+
         .home-section-more {
             display: inline-flex;
             align-items: center;
@@ -418,9 +432,9 @@
             align-items: center;
             gap: 12px;
             padding: 14px 14px;
-            color: black   !important;
+            color: black !important;
             text-decoration: none;
-         /*   font-weight: 800;*/
+            /*   font-weight: 800;*/
             line-height: 1;
             background: #fff;
         }
@@ -440,9 +454,11 @@
             background: rgba(15,23,42,.08);
             margin: 0;
         }
-        .logout{
-            color:red !important;
+
+        .logout {
+            color: red !important;
         }
+
         @@media (max-width: 500px) {
             .home-hero {
                 height: 40vh;
@@ -452,6 +468,23 @@
                 top: 54px;
                 right: 12px;
                 width: 52vw;
+            }
+            .fav-badge {
+                position: absolute;
+                top: 3px;
+                right: 3px;
+                min-width: 6px;
+                height: 12px;
+                padding: 0 3px;
+                border-radius: 999px;
+                background: #22c55e;
+                color: #fff;
+                font-size: 11px;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                line-height: 1;
             }
         }
 
@@ -542,6 +575,8 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            align-items: flex-start;
+            margin-left: 3px;
         }
 
         #hnFavDropdown .property-card-meta {
@@ -582,8 +617,10 @@
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
         }
-        ._svg{
+
+        ._svg {
         }
+
         @@media (max-width: 520px) {
             #hnFavDropdown a.property-card-link {
                 grid-template-columns: 68px 1fr;
@@ -594,12 +631,13 @@
                 width: 68px;
                 height: 68px;
             }
+
             .account-trigger {
                 padding: 0px;
                 gap: 3px;
             }
+
             .home-header-right-top a {
-               
                 margin: 0;
             }
         }
@@ -652,9 +690,9 @@
                             </div>
                         </div>
 
-                        <a class="hidden-xs" href="javascript:void(0)">
-                            <i class="fa-solid fa-bell"></i>
-                        </a>
+                        @*<a class="hidden-xs" href="javascript:void(0)">
+                                <i class="fa-solid fa-bell"></i>
+                            </a>*@
 
                         <div class="hidden-xs account-hover" id="hnAccountHover">
                             <div class="account-trigger" id="hnAccountTrigger">
@@ -666,7 +704,7 @@
 
                         <div id="hnAccountMenuOverlay" class="hn-acc-overlay" aria-hidden="true">
                             <div class="hn-acc-panel" role="menu" aria-label="@HomeTexts.Account_MenuLabel">
-                               
+
                                 <a class="hn-acc-item js-open-profile" href="javascript:void(0)">
                                     <i class="fa-regular fa-user"></i>
                                     @HomeTexts.Account_Profile
@@ -692,9 +730,9 @@
                            data-return="@Url.Action("Favorites", "Property")">
                             <i class="fa-solid fa-heart"></i>
                         </a>
-                        <a class="hidden-xs" href="javascript:void(0)">
-                            <i class="fa-solid fa-bell"></i>
-                        </a>
+                        @*<a class="hidden-xs" href="javascript:void(0)">
+                                <i class="fa-solid fa-bell"></i>
+                            </a>*@
 
                         <a href="javascript:void(0)" class="hidden-xs js-open-login">@HomeTexts.Login</a>
                     }
@@ -864,7 +902,7 @@
 
 @section Scripts {
     <script>
-    // Account popup overlay
+    // Account popup overlay (giữ)
     (function () {
         var trigger = document.getElementById('hnAccountTrigger');
         var overlay = document.getElementById('hnAccountMenuOverlay');
@@ -873,7 +911,6 @@
         function openMenu() { overlay.style.display = 'block'; overlay.setAttribute('aria-hidden', 'false'); }
         function closeMenu() { overlay.style.display = 'none'; overlay.setAttribute('aria-hidden', 'true'); }
 
-        // expose close function for other handlers
         window.__closeAccountMenu = closeMenu;
 
         trigger.addEventListener('click', function (e) {
@@ -891,36 +928,7 @@
         document.addEventListener('click', function () { closeMenu(); });
     })();
 
-    // ✅ FIX: Click menu -> mở popup, KHÔNG chuyển trang
-    $(document).on('click', '.js-open-change-password', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        if (window.__closeAccountMenu) window.__closeAccountMenu();
-
-        if (window.changePasswordModal && typeof window.changePasswordModal.open === 'function') {
-            window.changePasswordModal.open();
-        } else {
-            alert('@JS_FeatureComingSoon');
-        }
-    });
-
-    $(document).on('click', '.js-open-profile', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        if (window.__closeAccountMenu) window.__closeAccountMenu();
-
-        // Nếu bạn đã làm profile popup -> expose window.profileModal.open()
-        if (window.profileModal && typeof window.profileModal.open === 'function') {
-            window.profileModal.open();
-        }
-        @*else {
-            alert('@JS_FeatureComingSoon');
-        }*@
-    });
-
-    // Tabs
+    // Tabs (giữ)
     (function () {
         var buttons = document.querySelectorAll(".home-search-tab-btn");
         var hiddenInput = document.getElementById("transactionTypeInput");
@@ -937,7 +945,7 @@
         });
     })();
 
-    // iOS fixed background fallback
+    // iOS fixed background fallback (giữ)
     (function () {
         var hero = document.querySelector(".home-hero");
         if (!hero) return;
@@ -970,7 +978,7 @@
         window.addEventListener('resize', updateOffset);
     })();
 
-    // Hero BG
+    // Hero BG (giữ)
     (function () {
         var hero = document.querySelector(".home-hero");
         var citySelect = document.getElementById("citySelect");
@@ -993,8 +1001,18 @@
         applyCityBackground();
     })();
 
-    // Header fav badge
+    // ====================== FAVORITES (FIX) ======================
     window.__isAuth = @User.Identity.IsAuthenticated.ToString().ToLower();
+    window.__favIds = window.__favIds || [];
+
+    function normalizeIds(ids) {
+        ids = ids || [];
+        var map = {};
+        for (var i = 0; i < ids.length; i++) map[String(ids[i])] = true;
+        var out = [];
+        for (var k in map) out.push(parseInt(k, 10));
+        return out;
+    }
 
     function updateHeaderFavBadge(count) {
         count = parseInt(count || 0, 10);
@@ -1015,12 +1033,26 @@
         }
     }
 
+    function applyFavoriteIds(ids, $scope) {
+        ids = normalizeIds(ids || []);
+        var set = {};
+        for (var i = 0; i < ids.length; i++) set[String(ids[i])] = true;
+
+        var $root = ($scope && $scope.length) ? $scope : $(document);
+        $root.find('.js-fav-toggle').each(function () {
+            var pid = $(this).data('id');
+            $(this).toggleClass('is-fav', !!set[String(pid)]);
+        });
+    }
+
     window.refreshHeaderFav = function () {
         return $.get('@Url.Action("HeaderFavoriteInfo", "Property")')
             .done(function (res) {
                 if (!res) return;
                 window.__isAuth = !!res.isAuth;
+                window.__favIds = normalizeIds(res.favoriteIds || []);
                 updateHeaderFavBadge(res.favoriteCount || 0);
+                applyFavoriteIds(window.__favIds);
             });
     };
 
@@ -1031,7 +1063,7 @@
         });
     });
 
-    // Favorites Dropdown
+    // Favorites Dropdown (FIX: applyFavoriteIds)
     (function () {
         var $menu = $('#hnFavMenu');
         var $body = $('#hnFavBody');
@@ -1070,6 +1102,9 @@
                     return;
                 }
                 $body.html(html);
+
+                // ✅ quan trọng: tô tim đúng theo __favIds
+                applyFavoriteIds(window.__favIds, $body);
             })
             .fail(function () {
                 $body.html('<div class="hn-fav-loading" style="color:#ef4444;">' + '@JS_FavLoadFailed' + '</div>');
@@ -1082,7 +1117,8 @@
             $menu.find('.js-fav-top').attr('aria-expanded', 'false');
         }
 
-        $(document).on('click', '.js-fav-top', function (e) {
+        $(document).off('click.hnFavTopHome', '.js-fav-top')
+                   .on('click.hnFavTopHome', '.js-fav-top', function (e) {
             e.preventDefault();
             e.stopPropagation();
 
@@ -1099,19 +1135,25 @@
             else openFavDropdown();
         });
 
-        $(document).on('click', '#hnFavDropdown', function (e) { e.stopPropagation(); });
-        $(document).on('click', function () { closeFavDropdown(); });
-        $(document).on('keydown', function (e) { if (e.key === 'Escape') closeFavDropdown(); });
+        $(document).off('click.hnFavInsideHome', '#hnFavDropdown')
+                   .on('click.hnFavInsideHome', '#hnFavDropdown', function (e) { e.stopPropagation(); });
+
+        $(document).off('click.hnFavDocHome')
+                   .on('click.hnFavDocHome', function () { closeFavDropdown(); });
+
+        $(document).off('keydown.hnFavEscHome')
+                   .on('keydown.hnFavEscHome', function (e) { if (e.key === 'Escape') closeFavDropdown(); });
 
         window.favDropdown = { open: openFavDropdown, close: closeFavDropdown };
     })();
 
-    // Toggle favorite
+    // Toggle favorite (FIX: update __favIds để không bị revert)
     (function () {
         var MSG_NEED_LOGIN = '@JS_FavNeedLogin';
         var MSG_UPDATE_FAIL = '@JS_FavUpdateFail';
 
-        $(document).on('click', '.js-fav-toggle', function (e) {
+        $(document).off('click.hnFavToggleHome', '.js-fav-toggle')
+                   .on('click.hnFavToggleHome', '.js-fav-toggle', function (e) {
             e.preventDefault();
             e.stopPropagation();
 
@@ -1135,9 +1177,24 @@
                     }
 
                     if (res.success) {
-                        $btn.toggleClass('is-fav', !!res.isFavorite);
-                        updateHeaderFavBadge(res.favoriteCount || 0);
                         window.__isAuth = true;
+
+                        // ✅ dùng favoriteIds server trả về để state luôn đúng
+                        if (res.favoriteIds) window.__favIds = normalizeIds(res.favoriteIds);
+                        else {
+                            // fallback tự add/remove
+                            var ids = normalizeIds(window.__favIds);
+                            var set = {};
+                            for (var i = 0; i < ids.length; i++) set[String(ids[i])] = true;
+                            if (res.isFavorite) set[String(propertyId)] = true;
+                            else delete set[String(propertyId)];
+                            var out = [];
+                            for (var k in set) out.push(parseInt(k, 10));
+                            window.__favIds = normalizeIds(out);
+                        }
+
+                        applyFavoriteIds(window.__favIds);
+                        updateHeaderFavBadge(typeof res.favoriteCount !== 'undefined' ? res.favoriteCount : window.__favIds.length);
 
                         if ($('#hnFavMenu').hasClass('open') && window.favDropdown && window.favDropdown.open) {
                             window.favDropdown.open();
@@ -1149,7 +1206,7 @@
         });
     })();
 
-    // Infinite scroll
+    // Infinite scroll (FIX: append xong thì applyFavoriteIds cho card mới)
     (function () {
         var $results = $('#search-results');
         if ($results.length === 0) return;
@@ -1188,7 +1245,12 @@
             $.get('@Url.Action("LoadMore", "Home")', buildQuery(nextPage))
                 .done(function (html) {
                     if (html && $.trim(html).length > 0) {
-                        $results.append(html);
+                        var $chunk = $(html);
+                        $results.append($chunk);
+
+                        // ✅ tô tim đúng cho chunk mới
+                        applyFavoriteIds(window.__favIds, $chunk);
+
                         currentPage = nextPage;
                         $('#currentPage').val(currentPage);
                     } else {
@@ -1215,7 +1277,7 @@
         }
     })();
 
-    // Scroll top
+    // Scroll top (giữ)
     (function () {
         var $btn = $('#scrollTopBtn');
         if ($btn.length === 0) return;

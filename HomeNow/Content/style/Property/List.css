@@ -105,7 +105,7 @@
 
 .home-header-right-top {
     font-size: clamp(0.9rem, 1.4vw, 1rem);
-    margin-bottom: 0.3rem;
+    margin-bottom: 0px;
 }
 
     .home-header-right-top a {
@@ -138,6 +138,7 @@
     display: flex;
     align-items: center;
     gap: 0.3rem;
+    margin-right: 0.8rem;
 }
 
     .home-header-right-bottom a {

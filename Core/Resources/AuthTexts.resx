@@ -138,6 +138,63 @@
   <data name="Btn_Verify" xml:space="preserve">
     <value>Xác nhận</value>
   </data>
+  <data name="ChangePw_ConfirmNewPassword" xml:space="preserve">
+    <value>Xác nhận mật khẩu mới</value>
+  </data>
+  <data name="ChangePw_Msg_ConfirmNotMatch" xml:space="preserve">
+    <value>Xác nhận mật khẩu mới không khớp.</value>
+  </data>
+  <data name="ChangePw_Msg_Failed" xml:space="preserve">
+    <value>Đổi mật khẩu thất bại.</value>
+  </data>
+  <data name="ChangePw_Msg_RequireAll" xml:space="preserve">
+    <value>Vui lòng nhập đầy đủ thông tin.</value>
+  </data>
+  <data name="ChangePw_Msg_Success" xml:space="preserve">
+    <value>Đổi mật khẩu thành công.</value>
+  </data>
+  <data name="ChangePw_NewPassword" xml:space="preserve">
+    <value>Mật khẩu mới</value>
+  </data>
+  <data name="ChangePw_OldPassword" xml:space="preserve">
+    <value>Mật khẩu cũ</value>
+  </data>
+  <data name="ChangePw_Title" xml:space="preserve">
+    <value>Thay đổi mật khẩu</value>
+  </data>
+  <data name="ChangePw_UpdateButton" xml:space="preserve">
+    <value>Cập nhật</value>
+  </data>
+  <data name="Common_BathroomShort" xml:space="preserve">
+    <value>WC</value>
+  </data>
+  <data name="Common_BedroomShort" xml:space="preserve">
+    <value>PN</value>
+  </data>
+  <data name="Common_Cancel" xml:space="preserve">
+    <value>Hủy</value>
+  </data>
+  <data name="Common_Play" xml:space="preserve">
+    <value>XEM</value>
+  </data>
+  <data name="Common_Unit_m2" xml:space="preserve">
+    <value>m²</value>
+  </data>
+  <data name="Detail_Amenities" xml:space="preserve">
+    <value>Tiện ích / Nội thất</value>
+  </data>
+  <data name="Detail_Description" xml:space="preserve">
+    <value>Mô tả</value>
+  </data>
+  <data name="Detail_MapTitle" xml:space="preserve">
+    <value>Vị trí trên bản đồ</value>
+  </data>
+  <data name="Detail_Similar" xml:space="preserve">
+    <value>Căn hộ tương tự</value>
+  </data>
+  <data name="Detail_VrBadge" xml:space="preserve">
+    <value>VR 360°</value>
+  </data>
   <data name="Email_Subject_Reset" xml:space="preserve">
     <value>NhàNow - Đặt lại mật khẩu</value>
   </data>
@@ -155,6 +212,21 @@
   </data>
   <data name="Err_SendEmailFailed" xml:space="preserve">
     <value>Gửi email thất bại. Vui lòng thử lại.</value>
+  </data>
+  <data name="Footer_Address" xml:space="preserve">
+    <value>Tầng 12, NamDinh,</value>
+  </data>
+  <data name="Footer_BrandName" xml:space="preserve">
+    <value>NhaWow</value>
+  </data>
+  <data name="Footer_ContactTitle" xml:space="preserve">
+    <value>LIÊN HỆ</value>
+  </data>
+  <data name="Footer_Copyright" xml:space="preserve">
+    <value>© 2025 Công ty Cổ phần NhaNow</value>
+  </data>
+  <data name="Footer_Slogan" xml:space="preserve">
+    <value>Nhà thật – Thông tin thật – Trải nghiệm thật</value>
   </data>
   <data name="Forgot_ConfirmNewPassword" xml:space="preserve">
     <value>Nhập lại mật khẩu mới</value>
@@ -222,6 +294,9 @@
   <data name="Msg_EmailRequired" xml:space="preserve">
     <value>Vui lòng nhập email.</value>
   </data>
+  <data name="Msg_Error" xml:space="preserve">
+    <value>Có lỗi xảy ra</value>
+  </data>
   <data name="Msg_InvalidCredentials" xml:space="preserve">
     <value>Sai email/SĐT hoặc mật khẩu.</value>
   </data>
@@ -252,8 +327,23 @@
   <data name="Msg_PhoneExists" xml:space="preserve">
     <value>Số điện thoại đã tồn tại.</value>
   </data>
+  <data name="Msg_RegisterFailed" xml:space="preserve">
+    <value>Đăng ký thất bại</value>
+  </data>
+  <data name="Msg_ResendFailed" xml:space="preserve">
+    <value>Gửi lại thất bại</value>
+  </data>
+  <data name="Msg_ResetFailed" xml:space="preserve">
+    <value>Đặt lại mật khẩu thất bại</value>
+  </data>
   <data name="Msg_ResetSuccess" xml:space="preserve">
     <value>Đặt lại mật khẩu thành công.</value>
+  </data>
+  <data name="Msg_SendFailed" xml:space="preserve">
+    <value>Gửi thất bại</value>
+  </data>
+  <data name="Msg_VerifyFailed" xml:space="preserve">
+    <value>Xác minh thất bại</value>
   </data>
   <data name="Msg_VerifySuccess" xml:space="preserve">
     <value>Xác thực thành công.</value>
@@ -269,6 +359,39 @@
   </data>
   <data name="Otp_VerifyButton" xml:space="preserve">
     <value>Xác thực</value>
+  </data>
+  <data name="Profile_ContactInfo_Label" xml:space="preserve">
+    <value>Thông tin liên hệ</value>
+  </data>
+  <data name="Profile_DisplayName_Label" xml:space="preserve">
+    <value>Họ và tên</value>
+  </data>
+  <data name="Profile_DisplayName_Placeholder" xml:space="preserve">
+    <value>Nhập họ và tên</value>
+  </data>
+  <data name="Profile_Email_Label" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="Profile_Msg_LoadFailed" xml:space="preserve">
+    <value>Không lấy được thông tin user.</value>
+  </data>
+  <data name="Profile_Msg_SaveFailed" xml:space="preserve">
+    <value>Lưu thay đổi thất bại.</value>
+  </data>
+  <data name="Profile_Msg_SaveSuccess" xml:space="preserve">
+    <value>Lưu thay đổi thành công.</value>
+  </data>
+  <data name="Profile_Phone_Label" xml:space="preserve">
+    <value>Số điện thoại</value>
+  </data>
+  <data name="Profile_Phone_Placeholder" xml:space="preserve">
+    <value>Nhập số điện thoại</value>
+  </data>
+  <data name="Profile_SaveButton" xml:space="preserve">
+    <value>Lưu thay đổi</value>
+  </data>
+  <data name="Profile_Title" xml:space="preserve">
+    <value>Quản lý tài khoản</value>
   </data>
   <data name="Register_Button" xml:space="preserve">
     <value>Đăng ký</value>
@@ -290,6 +413,9 @@
   </data>
   <data name="Register_Title" xml:space="preserve">
     <value>Đăng ký</value>
+  </data>
+  <data name="Site_Name" xml:space="preserve">
+    <value>NhàWow</value>
   </data>
   <data name="Verify_Title" xml:space="preserve">
     <value> Xác thực email</value>

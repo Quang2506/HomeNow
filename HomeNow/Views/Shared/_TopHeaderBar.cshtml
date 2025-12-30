@@ -12,7 +12,6 @@
         return string.IsNullOrWhiteSpace(s) ? fallback : s;
     };
 
-    
     var vm = Model as HeaderBarViewModel;
 
     var currentLang = vm?.CurrentLang ?? System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
@@ -33,6 +32,11 @@
     var JS_FavNeedLogin = HttpUtility.JavaScriptStringEncode(HomeTexts.Favorite_NeedLogin);
     var JS_FavUpdateFail = HttpUtility.JavaScriptStringEncode(HomeTexts.Favorite_UpdateFailed);
     var JS_FeatureComingSoon = HttpUtility.JavaScriptStringEncode(R("Common_FeatureComingSoon", "Tính năng đang phát triển"));
+
+    // ✅ giống Home: đa ngôn ngữ cho popup favorites
+    var JS_CommonLoading = HttpUtility.JavaScriptStringEncode(HomeTexts.Common_Loading);
+    var JS_FavEmpty = HttpUtility.JavaScriptStringEncode(HomeTexts.Favorite_Empty);
+    var JS_FavLoadFailed = HttpUtility.JavaScriptStringEncode(HomeTexts.Favorite_LoadFailed);
 }
 
 <style>
@@ -40,18 +44,19 @@
         height: 3rem;
         width: auto;
     }
+
     .home-header-left-box {
         display: flex;
         align-items: center;
         gap: 0.2rem;
     }
-    .home-hero {
-        /*background: none !important;*/
+
+    .home-hero { /*background: none !important;*/
     }
 
     .list-hero {
         position: relative;
-        background: #8f8f8f; 
+        background: #051636;
         padding: 7px 0 3px;
     }
 
@@ -59,7 +64,6 @@
             content: "";
             position: absolute;
             inset: 0;
-            /*background: rgba(0,0,0,.12);*/
         }
 
         .list-hero .home-hero-shell {
@@ -82,7 +86,7 @@
         position: relative;
         display: inline-flex;
         align-items: center;
-        padding-bottom: 14px;
+        padding-bottom: 0px;
         z-index: 99999;
     }
 
@@ -104,7 +108,7 @@
             background: rgba(15,23,42,.55);
         }
 
-    /*  Overlay account menu  */
+    /* Overlay account menu */
     .hn-acc-overlay {
         display: none;
         position: fixed;
@@ -182,7 +186,7 @@
         position: absolute;
         top: -4px;
         right: -6px;
-        min-width: 18px;
+        min-width: 9px;
         height: 18px;
         padding: 0 5px;
         border-radius: 999px;
@@ -195,11 +199,12 @@
         justify-content: center;
         line-height: 1;
     }
+
     .home-header-left-tagline {
-        
         display: flex;
         align-items: end;
     }
+
     @@media(max-width:500px) {
         .hn-acc-panel {
             top: 39px;
@@ -208,10 +213,177 @@
         }
 
         .fav-badge {
-            top: -1px;
-            right: -4px;
-            min-width: 15px;
-            height: 15px;
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            min-width: 6px;
+            height: 12px;
+            padding: 0 3px;
+            border-radius: 999px;
+            background: #22c55e;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+    }
+
+    /*  Favorites dropdown - copy flow từ Home */
+    .hn-fav-menu {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .hn-fav-dropdown {
+        position: absolute;
+        top: calc(100% + 3px);
+        right: -312px;
+        width: 26rem;
+        max-width: 70vh;
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid rgba(15, 23, 42, .10);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, .18);
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(-8px);
+        pointer-events: none;
+        z-index: 100000;
+    }
+
+    .hn-fav-menu.open .hn-fav-dropdown {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+
+    .hn-fav-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 14px 8px;
+    }
+
+    .hn-fav-title {
+        font-size: 22px;
+        font-weight: 900;
+        color: #0f172a;
+    }
+
+    .hn-fav-body {
+        max-height: 80vh;
+        overflow: auto;
+        padding: 0 8px 8px;
+    }
+
+    .hn-fav-loading {
+        padding: 14px;
+        color: #64748b;
+        font-weight: 700;
+    }
+
+    /* style list item trong dropdown (giống Home) */
+    #hnFavDropdown .property-card {
+        border-radius: 14px;
+        overflow: hidden;
+        margin: 8px 8px;
+        border: 1px solid rgba(15,23,42,.08);
+        background: #fff;
+        position: relative;
+    }
+
+    #hnFavDropdown a.property-card-link {
+        display: grid !important;
+        grid-template-columns: 90px 1fr;
+        align-items: center;
+        padding: 2px 0 0 0;
+        height: auto !important;
+        text-decoration: none !important;
+        color: inherit !important;
+    }
+
+    #hnFavDropdown .property-card img {
+        object-fit: cover;
+        width: 100%;
+        height: 90%;
+        display: block;
+        background: #e5e7eb;
+    }
+
+    #hnFavDropdown .property-card-body {
+        padding: 0 !important;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        margin-left: 3px;
+    }
+
+    #hnFavDropdown .property-card-meta {
+        display: none !important;
+    }
+
+    #hnFavDropdown .property-card-price {
+        text-align: left;
+        margin-top: 6px;
+        font-weight: 700;
+    }
+
+    #hnFavDropdown .property-card-fav {
+        position: absolute;
+        top: 25% !important;
+        right: 20px !important;
+        transform: translateY(-50%) !important;
+        width: 30px;
+        height: 30px;
+        border-radius: 999px;
+        background: rgba(15,23,42,.65);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 5;
+    }
+
+        #hnFavDropdown .property-card-fav i {
+            font-size: 14px;
+            color: #fff;
+        }
+
+        #hnFavDropdown .property-card-fav.is-fav {
+            background: #ef4444;
+        }
+
+    @@media (max-width: 768px) {
+        .hn-fav-dropdown {
+            position: fixed;
+            top: 70px;
+            left: 12px;
+            right: 12px;
+            width: auto;
+            max-width: none;
+        }
+
+        .hn-fav-body {
+            /* max-height: calc(100vh - 180px);*/
+        }
+    }
+
+    @@media (max-width: 520px) {
+        #hnFavDropdown a.property-card-link {
+            grid-template-columns: 68px 1fr;
+            padding-right: 52px;
+        }
+
+        #hnFavDropdown .property-card img {
+            width: 68px;
+            height: 68px;
         }
     }
 </style>
@@ -220,7 +392,6 @@
     <div class="home-hero-shell">
         <div class="home-hero-header">
             <a href="@Url.Action("Index", "Home")" class="home-header-left-box">
-                @*<div class="home-logo-icon"></div>*@
                 <img class="img_logo" src="~/Assets/Cities/logo.png" />
                 <div class="home-header-left">
                     <div class="home-header-left-top"><span>NhàWow</span></div>
@@ -228,7 +399,6 @@
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
                             <path d="M12 2.5C8.96 2.5 6.5 4.96 6.5 8c0 3.74 3.39 7.47 4.96 9.15.29.31.77.31 1.06 0C14.11 15.47 17.5 11.74 17.5 8c0-3.04-2.46-5.5-5.5-5.5zm0 6.5A2 2 0 1 1 12 5a2 2 0 0 1 0 4z" />
                         </svg>
-                        @*@cityName*@
                         @HomeTexts.CityName
                     </div>
                 </div>
@@ -238,15 +408,29 @@
                 <div class="home-header-right-top">
                     @if (User.Identity.IsAuthenticated)
                     {
-                        <a href="@Url.Action("Favorites", "Property")"
-                           class="js-fav-top fav-wrap @(favCount > 0 ? "has-badge" : "")"
-                           data-return="@returnUrl">
-                            <i class="fa-solid fa-heart"></i>
-                            @if (favCount > 0)
-                            {<span id="headerFavBadge" class="fav-badge">@favCountText</span>}
-                        </a>
+                        <!-- ✅ Favorites dropdown giống Home -->
+                        <div class="hn-fav-menu" id="hnFavMenu">
+                            <a href="javascript:void(0)"
+                               class="js-fav-top fav-wrap @(favCount > 0 ? "has-badge" : "")"
+                               data-return="@Url.Action("Favorites", "Property")"
+                               aria-haspopup="dialog"
+                               aria-expanded="false">
+                                <i class="fa-solid fa-heart"></i>
+                                @if (favCount > 0)
+                                {
+                                    <span id="headerFavBadge" class="fav-badge">@favCountText</span>
+                                }
+                            </a>
 
-                        <a href="javascript:void(0)" class="js-bell"><i class="fa-solid fa-bell"></i></a>
+                            <div class="hn-fav-dropdown" id="hnFavDropdown" role="dialog" aria-label="@R("Favorite_Title","Yêu thích")">
+                                <div class="hn-fav-head">
+                                    <div class="hn-fav-title">@R("Favorite_Title", "Yêu thích")</div>
+                                </div>
+                                <div class="hn-fav-body" id="hnFavBody">
+                                    <div class="hn-fav-loading">@HomeTexts.Common_Loading</div>
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="account-hover" id="hnAccountHover">
                             <div class="account-trigger" id="hnAccountTrigger" aria-haspopup="menu" aria-expanded="false">
@@ -279,13 +463,11 @@
                     }
                     else
                     {
-                        <a href="@Url.Action("Favorites", "Property")"
+                        <a href="javascript:void(0)"
                            class="js-fav-top fav-wrap"
                            data-return="@returnUrl">
                             <i class="fa-solid fa-heart"></i>
                         </a>
-
-                        <a href="javascript:void(0)" class="js-bell"><i class="fa-solid fa-bell"></i></a>
 
                         <a href="javascript:void(0)" class="js-open-login">@HomeTexts.Login</a>
                     }
@@ -310,15 +492,24 @@
 
 <script>
 (function () {
-    //  tránh init nhiều lần nếu header render lại
-    if (window.__TopHeaderBarInited) return;
-    window.__TopHeaderBarInited = true;
+    // tránh init nhiều lần
+    if (window.__TopHeaderBarInitedV3) return;
+    window.__TopHeaderBarInitedV3 = true;
 
     var MSG_COMING = '@JS_FeatureComingSoon';
     var MSG_NEED_LOGIN = '@JS_FavNeedLogin';
     var MSG_UPDATE_FAIL = '@JS_FavUpdateFail';
 
-    // Account overlay 
+    var MSG_LOADING = '@JS_CommonLoading';
+    var MSG_FAV_EMPTY = '@JS_FavEmpty';
+    var MSG_FAV_LOAD_FAIL = '@JS_FavLoadFailed';
+
+    function waitForJQ(cb) {
+        if (window.jQuery && window.jQuery.fn) return cb(window.jQuery);
+        setTimeout(function () { waitForJQ(cb); }, 30);
+    }
+
+    // Account overlay (giữ nguyên)
     (function () {
         var trigger = document.getElementById('hnAccountTrigger');
         var overlay = document.getElementById('hnAccountMenuOverlay');
@@ -351,109 +542,155 @@
             if (e.key === 'Escape') closeMenu();
         });
 
-        document.addEventListener('click', function () {
-            closeMenu();
-        });
+        document.addEventListener('click', function () { closeMenu(); });
     })();
 
-    // ===== Bell
-    document.addEventListener('click', function(e){
-        var el = e.target.closest && e.target.closest('.js-bell');
-        if (!el) return;
-        e.preventDefault();
-        alert(MSG_COMING);
-    });
+    waitForJQ(function ($) {
 
-    // Favorites header realtime (dùng chung toàn site) 
-    window.__isAuth = @User.Identity.IsAuthenticated.ToString().ToLower();
-    window.__favIds = window.__favIds || [];
+        // ====== GLOBAL STATE ======
+        window.__isAuth = @User.Identity.IsAuthenticated.ToString().ToLower();
+        window.__favIds = window.__favIds || [];
 
-    window.updateHeaderFavBadge = window.updateHeaderFavBadge || function (count) {
-        count = parseInt(count || 0, 10);
-        var $wrap = window.jQuery ? $('.js-fav-top.fav-wrap') : null;
-        if (!$wrap || $wrap.length === 0) return;
-
-        var $badge = $('#headerFavBadge');
-
-        if (count > 0) {
-            var text = count > 99 ? '99+' : String(count);
-            $wrap.addClass('has-badge');
-            if ($badge.length === 0) $wrap.append('<span id="headerFavBadge" class="fav-badge">' + text + '</span>');
-            else $badge.text(text);
-        } else {
-            $wrap.removeClass('has-badge');
-            if ($badge.length) $badge.remove();
+        function normalizeIds(ids) {
+            ids = ids || [];
+            var map = {};
+            for (var i = 0; i < ids.length; i++) map[String(ids[i])] = true;
+            var out = [];
+            for (var k in map) out.push(parseInt(k, 10));
+            return out;
         }
-    };
 
-    window.applyFavoriteIds = window.applyFavoriteIds || function (ids, $scope) {
-        if (!window.jQuery) return;
-        ids = ids || [];
-        var set = {};
-        for (var i = 0; i < ids.length; i++) set[ids[i]] = true;
+        // ====== BADGE ======
+        window.updateHeaderFavBadge = window.updateHeaderFavBadge || function (count) {
+            count = parseInt(count || 0, 10);
+            var $wrap = $('.js-fav-top.fav-wrap');
+            if ($wrap.length === 0) return;
 
-        var $root = ($scope && $scope.length) ? $scope : $(document);
-        $root.find('.js-fav-toggle').each(function () {
-            var pid = $(this).data('id');
-            $(this).toggleClass('is-fav', !!set[pid]);
-        });
-    };
-
-    window.refreshHeaderFav = window.refreshHeaderFav || function () {
-        if (!window.jQuery) return;
-        return $.get('@Url.Action("HeaderFavoriteInfo", "Property")')
-            .done(function (res) {
-                if (!res) return;
-                window.__isAuth = !!res.isAuth;
-                window.updateHeaderFavBadge(res.favoriteCount || 0);
-                window.__favIds = res.favoriteIds || [];
-                window.applyFavoriteIds(window.__favIds);
-            });
-    };
-
-    if (window.jQuery) {
-        $(function () {
-            window.refreshHeaderFav();
-            document.addEventListener('visibilitychange', function () {
-                if (!document.hidden) window.refreshHeaderFav();
-            });
-        });
-
-        // click heart header: chưa login -> mở login modal
-        $(document).on('click', '.js-fav-top', function (e) {
-            if (window.__isAuth) return;
-
-            e.preventDefault();
-            var returnUrl = $(this).data('return') || (window.location.pathname + window.location.search);
-
-            if (window.loginModal && typeof window.loginModal.open === 'function') {
-                window.loginModal.open(returnUrl);
+            var $badge = $('#headerFavBadge');
+            if (count > 0) {
+                var text = count > 99 ? '99+' : String(count);
+                $wrap.addClass('has-badge');
+                if ($badge.length === 0) $wrap.append('<span id="headerFavBadge" class="fav-badge">' + text + '</span>');
+                else $badge.text(text);
             } else {
-                window.location.href = '@Url.Action("Login", "Account")' + '?returnUrl=' + encodeURIComponent(returnUrl);
+                $wrap.removeClass('has-badge');
+                if ($badge.length) $badge.remove();
             }
-        });
+        };
 
-        // open profile/change password
-        $(document).on('click', '.js-open-profile', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            if (window.__closeAccountMenu) window.__closeAccountMenu();
+        // ====== APPLY FAVORITES TO HEARTS ======
+        window.applyFavoriteIds = window.applyFavoriteIds || function (ids, $scope) {
+            ids = normalizeIds(ids || []);
+            var set = {};
+            for (var i = 0; i < ids.length; i++) set[String(ids[i])] = true;
 
-            if (window.profileModal && typeof window.profileModal.open === 'function') window.profileModal.open();
-            else alert(MSG_COMING);
-        });
+            var $root = ($scope && $scope.length) ? $scope : $(document);
+            $root.find('.js-fav-toggle').each(function () {
+                var pid = $(this).data('id');
+                $(this).toggleClass('is-fav', !!set[String(pid)]);
+            });
+        };
 
-        $(document).on('click', '.js-open-change-password', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            if (window.__closeAccountMenu) window.__closeAccountMenu();
+        // ====== REFRESH FROM SERVER ======
+        window.refreshHeaderFav = window.refreshHeaderFav || function () {
+            return $.get('@Url.Action("HeaderFavoriteInfo", "Property")')
+                .done(function (res) {
+                    if (!res) return;
+                    window.__isAuth = !!res.isAuth;
+                    window.__favIds = normalizeIds(res.favoriteIds || []);
+                    window.updateHeaderFavBadge(res.favoriteCount || 0);
+                    window.applyFavoriteIds(window.__favIds);
+                });
+        };
 
-            if (window.changePasswordModal && typeof window.changePasswordModal.open === 'function') window.changePasswordModal.open();
-            else alert(MSG_COMING);
-        });
+        // ====== DROPDOWN ======
+        (function () {
+            var $menu = $('#hnFavMenu');
+            var $body = $('#hnFavBody');
 
-        // Toggle favorite
-        $(document).on('click', '.js-fav-toggle', function (e) {
+            function openFavDropdown() {
+                if (!$menu.length) return;
+
+                $menu.addClass('open');
+                $menu.find('.js-fav-top').attr('aria-expanded', 'true');
+
+                if ($body.length) $body.html('<div class="hn-fav-loading">' + MSG_LOADING + '</div>');
+
+                $.ajax({
+                    url: '@Url.Action("FavoritesPopup", "Home")',
+                    type: 'GET',
+                    dataType: 'text',
+                    cache: false
+                })
+                .done(function (text) {
+                    try {
+                        var obj = JSON.parse(text);
+                        if (obj && obj.needLogin) {
+                            closeFavDropdown();
+                            if (window.loginModal && typeof window.loginModal.open === 'function') {
+                                window.loginModal.open(window.location.pathname + window.location.search);
+                            } else {
+                                alert(MSG_NEED_LOGIN);
+                            }
+                            return;
+                        }
+                    } catch (e) { }
+
+                    var html = (text || '').trim();
+                    if (!html) {
+                        $body.html('<div class="hn-fav-loading">' + MSG_FAV_EMPTY + '</div>');
+                        return;
+                    }
+
+                    $body.html(html);
+                    window.applyFavoriteIds(window.__favIds, $body);
+                })
+                .fail(function () {
+                    $body.html('<div class="hn-fav-loading" style="color:#ef4444;">' + MSG_FAV_LOAD_FAIL + '</div>');
+                });
+            }
+
+            function closeFavDropdown() {
+                if (!$menu.length) return;
+                $menu.removeClass('open');
+                $menu.find('.js-fav-top').attr('aria-expanded', 'false');
+            }
+
+            window.favDropdown = { open: openFavDropdown, close: closeFavDropdown };
+
+            $(document).off('click.hnFavTop', '.js-fav-top')
+                       .on('click.hnFavTop', '.js-fav-top', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (!window.__isAuth) {
+                    var returnUrl = $(this).data('return') || (window.location.pathname + window.location.search);
+                    if (window.loginModal && typeof window.loginModal.open === 'function') {
+                        window.loginModal.open(returnUrl);
+                    } else {
+                        window.location.href = '@Url.Action("Login", "Account")' + '?returnUrl=' + encodeURIComponent(returnUrl);
+                    }
+                    return;
+                }
+
+                if ($menu.hasClass('open')) closeFavDropdown();
+                else openFavDropdown();
+            });
+
+            $(document).off('click.hnFavInside', '#hnFavDropdown')
+                       .on('click.hnFavInside', '#hnFavDropdown', function (e) { e.stopPropagation(); });
+
+            $(document).off('click.hnFavDoc')
+                       .on('click.hnFavDoc', function () { closeFavDropdown(); });
+
+            $(document).off('keydown.hnFavEsc')
+                       .on('keydown.hnFavEsc', function (e) { if (e.key === 'Escape') closeFavDropdown(); });
+        })();
+
+        // ====== TOGGLE FAVORITE (QUAN TRỌNG: update __favIds để không bị revert) ======
+        $(document).off('click.hnFavToggle', '.js-fav-toggle')
+                   .on('click.hnFavToggle', '.js-fav-toggle', function (e) {
+
             e.preventDefault();
             e.stopPropagation();
 
@@ -477,17 +714,50 @@
                     }
 
                     if (res.success) {
-                        $btn.toggleClass('is-fav', !!res.isFavorite);
+                        // 1) update state chuẩn
+                        var isFav = !!res.isFavorite;
 
+                        // 2) update __favIds ngay (đây là chỗ fix “1s revert”)
+                        var ids = (res.favoriteIds && res.favoriteIds.length >= 0)
+                            ? res.favoriteIds
+                            : window.__favIds;
+
+                        ids = normalizeIds(ids);
+
+                        if (!res.favoriteIds) {
+                            // nếu server không trả ids (trường hợp cũ) -> tự add/remove
+                            var set = {};
+                            for (var i = 0; i < ids.length; i++) set[String(ids[i])] = true;
+                            if (isFav) set[String(propertyId)] = true;
+                            else delete set[String(propertyId)];
+                            ids = [];
+                            for (var k in set) ids.push(parseInt(k, 10));
+                        }
+
+                        window.__favIds = normalizeIds(ids);
+
+                        // 3) apply cho toàn trang + badge
+                        window.applyFavoriteIds(window.__favIds);
                         if (typeof res.favoriteCount !== 'undefined') window.updateHeaderFavBadge(res.favoriteCount);
-                        else window.refreshHeaderFav();
+                        else window.updateHeaderFavBadge(window.__favIds.length);
 
                         window.__isAuth = true;
+
+                        // 4) nếu dropdown mở -> reload list cho đúng
+                        if ($('#hnFavMenu').hasClass('open') && window.favDropdown && window.favDropdown.open) {
+                            window.favDropdown.open();
+                        }
                     }
                 },
                 error: function () { alert(MSG_UPDATE_FAIL); }
             });
         });
-    }
+
+        // init
+        $(function () { window.refreshHeaderFav(); });
+    });
+
 })();
 </script>
+
+

@@ -17,7 +17,7 @@
     var mode = string.IsNullOrWhiteSpace(Model.TransactionType) ? "rent" : Model.TransactionType;
     mode = mode.ToLower();
 
-  
+
     ViewBag.Title = (mode == "rent")
         ? R("List_Title_AllRent", "Tất cả căn cho thuê")
         : R("List_Title_AllSale", "Tất cả căn bán");

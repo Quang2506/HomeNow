@@ -23,7 +23,10 @@ namespace Data
         public DbSet<PropertyType> PropertyTypes { get; set; }
 
 
-        public DbSet<UserFavoriteProperty> UserFavoriteProperties { get; set; }
+        public DbSet<Favorite> Favorites { get; set; }
+
+        //// (Deprecated) old favorites table mapping
+        //public DbSet<UserFavoriteProperty> UserFavoriteProperties { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

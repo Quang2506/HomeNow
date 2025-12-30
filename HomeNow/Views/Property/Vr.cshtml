@@ -1,27 +1,60 @@
 ﻿@model HomeNow.ViewModels.VrViewModel
+@using HomeNow.Resources
 @using System.Globalization
 @using System.Web
+@using System.Linq
 
 @{
     Layout = null;
+
+    Func<string, string, string> R = (key, fallback) =>
+    {
+        var s = HomeTexts.ResourceManager.GetString(key, System.Threading.Thread.CurrentThread.CurrentUICulture);
+        return string.IsNullOrWhiteSpace(s) ? fallback : s;
+    };
+
     var lang = Model.Lang;
     var sceneList = Model.Scenes.ToList();
     var firstSceneKey = sceneList.FirstOrDefault(s => s.IsDefault)?.SceneKey ?? sceneList.First().SceneKey;
 
     var pid = (int)(ViewBag.PropertyId ?? 0);
     var CI = CultureInfo.InvariantCulture;
+
+    // ===== JS i18n strings (encode an toàn cho JS) =====
+    var JS_CloseVr = HttpUtility.JavaScriptStringEncode(R("Vr_Close", "Đóng VR"));
+    var JS_MinimapTitle = HttpUtility.JavaScriptStringEncode(R("Vr_MinimapTitle", "Sơ đồ phòng (click để chuyển):"));
+
+    var JS_HotspotMode = HttpUtility.JavaScriptStringEncode(R("Vr_HotspotMode", "Chế độ tạo hotspot"));
+    var JS_Autorun = HttpUtility.JavaScriptStringEncode(R("Vr_Autorun", "Tự chạy"));
+    var JS_On = HttpUtility.JavaScriptStringEncode(R("Common_On", "ON"));
+    var JS_Off = HttpUtility.JavaScriptStringEncode(R("Common_Off", "OFF"));
+
+    var JS_Scene = HttpUtility.JavaScriptStringEncode(R("Vr_Scene", "Scene"));
+    var JS_Pitch = HttpUtility.JavaScriptStringEncode(R("Vr_Pitch", "pitch"));
+    var JS_Yaw = HttpUtility.JavaScriptStringEncode(R("Vr_Yaw", "yaw"));
+    var JS_Hfov = HttpUtility.JavaScriptStringEncode(R("Vr_Hfov", "hfov"));
+    var JS_NotYet = HttpUtility.JavaScriptStringEncode(R("Vr_NotYet", "(chưa)"));
+
+    var JS_VrErrorPrefix = HttpUtility.JavaScriptStringEncode(R("Vr_ErrorPrefix", "VR gặp lỗi"));
 }
 
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>VR Demo</title>
+    <title>@R("Vr_Title", "VR Demo")</title>
+
+    <!-- KEY: mobile viewport chuẩn, tránh 100vh bị sai -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no" />
 
     <link rel="stylesheet" href="~/Content/pannellum/pannellum.css" />
     <script src="~/Content/pannellum/pannellum.js"></script>
 
     <style>
+        :root {
+            --vh: 1vh;
+        }
+
         html, body {
             margin: 0;
             padding: 0;
@@ -31,10 +64,15 @@
             background: #000;
         }
 
+        /* KEY: dùng --vh thay cho 100vh */
         #vr {
+            position: fixed;
+            inset: 0;
             width: 100%;
-            height: 100vh;
+            height: calc(var(--vh) * 100);
             background: #000;
+            touch-action: none; /* tránh mobile scroll */
+            overscroll-behavior: none;
         }
 
             #vr canvas {
@@ -52,7 +90,6 @@
             display: none !important;
         }
 
-        /* Hotspot */
         .footspot {
             width: 23px;
             height: 19px;
@@ -66,7 +103,6 @@
             display: none !important;
         }
 
-        /* Close button */
         .vr-close {
             position: fixed;
             right: 12px;
@@ -90,7 +126,6 @@
                 background: rgba(15,23,42,.90);
             }
 
-        /* UI Panel */
         #ui-panel {
             position: fixed;
             right: 10px;
@@ -168,14 +203,14 @@
 <body>
     <a class="vr-close"
        href="@Url.Action("Detail","Property", new { id = pid })"
-       title="Đóng VR"
-       aria-label="Đóng VR">✕</a>
+       title="@R("Vr_Close","Đóng VR")"
+       aria-label="@R("Vr_Close","Đóng VR")">✕</a>
 
     <div id="vr"></div>
 
     <div id="ui-panel">
         <div id="minimap">
-            <div id="minimap-title">Sơ đồ phòng (click để chuyển):</div>
+            <div id="minimap-title">@R("Vr_MinimapTitle", "Sơ đồ phòng (click để chuyển):")</div>
             @foreach (var s in sceneList)
             {
                 var title = s.Translations?.FirstOrDefault(t => t.LangCode == lang)?.Title ?? s.Title;
@@ -183,14 +218,35 @@
             }
         </div>
 
-        <button id="hotspot-mode-btn">Chế độ tạo hotspot: OFF</button>
-        <button id="autorun-btn">Tự chạy: OFF</button>
-        <div id="coords-panel">Scene: (chưa) | pitch: - | yaw: - | hfov: -</div>
+        <button id="hotspot-mode-btn">@R("Vr_HotspotMode", "Chế độ tạo hotspot"): @R("Common_Off", "OFF")</button>
+        <button id="autorun-btn">@R("Vr_Autorun", "Tự chạy"): @R("Common_Off", "OFF")</button>
+        <div id="coords-panel">
+            @R("Vr_Scene", "Scene"): @R("Vr_NotYet", "(chưa)") | @R("Vr_Pitch", "pitch"): - | @R("Vr_Yaw", "yaw"): - | @R("Vr_Hfov", "hfov"): -
+        </div>
     </div>
 
     <script>
         (function () {
             'use strict';
+
+            // ===== i18n strings from server =====
+            var I18N = {
+                closeVr: "@Html.Raw(JS_CloseVr)",
+                minimapTitle: "@Html.Raw(JS_MinimapTitle)",
+
+                hotspotMode: "@Html.Raw(JS_HotspotMode)",
+                autorun: "@Html.Raw(JS_Autorun)",
+                on: "@Html.Raw(JS_On)",
+                off: "@Html.Raw(JS_Off)",
+
+                scene: "@Html.Raw(JS_Scene)",
+                pitch: "@Html.Raw(JS_Pitch)",
+                yaw: "@Html.Raw(JS_Yaw)",
+                hfov: "@Html.Raw(JS_Hfov)",
+                notYet: "@Html.Raw(JS_NotYet)",
+
+                vrErrorPrefix: "@Html.Raw(JS_VrErrorPrefix)"
+            };
 
             var isMobile = (window.matchMedia && window.matchMedia('(pointer:coarse)').matches)
                 || /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -199,45 +255,18 @@
             var hotspotMode = false;
             var autorunOn = false;
 
-            // Lưu ý: HFOV nhỏ = zoom gần; HFOV lớn = góc rộng hơn
+            // HFOV nhỏ = zoom gần; HFOV lớn = góc rộng hơn
             var HFOV_DEFAULT = isMobile ? 95 : 110;
             var HFOV_MIN = isMobile ? 82 : 70;
-            var HFOV_MAX = 130; // cho phép rộng hơn 120 nếu bạn muốn
+            var HFOV_MAX = 130;
 
             var sceneBusy = false;
 
-            function pickDprCap() {
-                var dpr = window.devicePixelRatio || 1;
-                var mem = navigator.deviceMemory || 0;
-                var lowMem = mem > 0 && mem <= 4;
-                var cap = (isMobile || lowMem) ? 1.5 : 2.0;
-                return Math.min(dpr, cap);
+            // ===== KEY: fix 100vh mobile bằng visualViewport =====
+            function setRealVh() {
+                var h = (window.visualViewport && window.visualViewport.height) ? window.visualViewport.height : window.innerHeight;
+                document.documentElement.style.setProperty('--vh', (h * 0.01) + 'px');
             }
-
-            function upscaleCanvas() {
-                try {
-                    var vr = document.getElementById('vr');
-                    if (!vr) return;
-                    var canvas = vr.querySelector('canvas');
-                    if (!canvas) return;
-
-                    var dpr = pickDprCap();
-                    var w = Math.floor(canvas.clientWidth * dpr);
-                    var h = Math.floor(canvas.clientHeight * dpr);
-                    if (w <= 0 || h <= 0) return;
-
-                    if (canvas.width !== w || canvas.height !== h) {
-                        canvas.width = w;
-                        canvas.height = h;
-                    }
-                } catch (_) { }
-            }
-
-            var resizeTimer = null;
-            window.addEventListener('resize', function () {
-                clearTimeout(resizeTimer);
-                resizeTimer = setTimeout(upscaleCanvas, 180);
-            });
 
             function panel() { return document.getElementById('coords-panel'); }
             function show(msg) { if (panel()) panel().textContent = msg; }
@@ -245,7 +274,7 @@
             function logError(where, err) {
                 console.error('[VR ERROR] ' + where, err);
                 var msg = where + (err && err.message ? (' - ' + err.message) : '');
-                show('VR gặp lỗi: ' + msg);
+                show(I18N.vrErrorPrefix + ': ' + msg);
             }
 
             window.addEventListener('error', function (e) {
@@ -255,6 +284,38 @@
             window.addEventListener('unhandledrejection', function (e) {
                 logError('Unhandled promise rejection', e.reason || e);
             });
+
+            // ===== resize viewer đúng cách (tránh hotspot lệch) =====
+            var resizeTimer = null;
+            function requestViewerResize() {
+                setRealVh();
+                if (!viewer) return;
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function () {
+                    try { viewer.resize(); } catch (_) { }
+                }, 120);
+            }
+
+            window.addEventListener('resize', requestViewerResize);
+            window.addEventListener('orientationchange', requestViewerResize);
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', requestViewerResize);
+                window.visualViewport.addEventListener('scroll', requestViewerResize);
+            }
+
+            function clampHfov(v) {
+                if (v === null || v === undefined) return null;
+                var n = Number(v);
+                if (isNaN(n)) return null;
+                return Math.max(HFOV_MIN, Math.min(HFOV_MAX, n));
+            }
+
+            function normYaw(y) {
+                var n = Number(y);
+                if (isNaN(n)) return 0;
+                n = ((n + 180) % 360 + 360) % 360 - 180;
+                return n;
+            }
 
             // ====== Build config from DB ======
             var config = {
@@ -358,14 +419,10 @@
                 }
             };
 
-            // ===== KEY FIX: dùng pendingTargetView để apply view ĐÚNG SAU KHI scenechange/load =====
-            var pendingTargetView = null;
-
-            function clampHfov(v) {
-                if (v === null || v === undefined) return null;
-                var n = Number(v);
-                if (isNaN(n)) return null;
-                return Math.max(HFOV_MIN, Math.min(HFOV_MAX, n));
+            function updateMinimapActive(sceneId) {
+                document.querySelectorAll('.minimap-room').forEach(function (el) {
+                    el.classList.toggle('active', el.getAttribute('data-scene') === sceneId);
+                });
             }
 
             function resolveTargetView(sceneId, args) {
@@ -381,27 +438,10 @@
                     : (sc && sc.hfov !== undefined ? clampHfov(sc.hfov) : clampHfov(HFOV_DEFAULT));
 
                 if (isNaN(pitch)) pitch = 0;
-                if (isNaN(yaw)) yaw = 0;
+                yaw = normYaw(yaw);
                 if (hfov === null) hfov = clampHfov(HFOV_DEFAULT);
 
                 return { pitch: pitch, yaw: yaw, hfov: hfov };
-            }
-
-            function applyTargetNow(sceneId) {
-                if (!viewer || !pendingTargetView) return;
-                if (pendingTargetView.sceneId !== sceneId) return;
-
-                try {
-                    var v = pendingTargetView.view;
-                    // set view nhẹ nhàng
-                    viewer.setPitch(v.pitch, 220);
-                    viewer.setYaw(v.yaw, 220);
-                    viewer.setHfov(v.hfov, 220);
-                } catch (e) {
-                    logError('applyTargetNow', e);
-                } finally {
-                    pendingTargetView = null;
-                }
             }
 
             function walkToScene(hotSpot, args) {
@@ -414,21 +454,15 @@
                 setTimeout(function () { sceneBusy = false; }, 420);
 
                 try {
-                    // zoom-in nhẹ (tạo cảm giác “bước tới”)
                     var zoomIn = Math.max(HFOV_MIN, viewer.getHfov() - 12);
                     viewer.setHfov(zoomIn, 140);
 
-                    // resolve target view (DB target_* > scene default)
                     var v = resolveTargetView(args.sceneId, args);
-                    pendingTargetView = { sceneId: args.sceneId, view: v };
 
                     setTimeout(function () {
                         try {
-                            // IMPORTANT: loadScene với pitch/yaw/hfov ngay từ đầu
                             viewer.loadScene(args.sceneId, v.pitch, v.yaw, v.hfov);
-
-                            // upscale nét lại
-                            setTimeout(upscaleCanvas, 90);
+                            requestViewerResize();
                         } catch (e2) {
                             logError('loadScene ' + args.sceneId, e2);
                         }
@@ -438,17 +472,10 @@
                 }
             }
 
-            function updateMinimapActive(sceneId) {
-                document.querySelectorAll('.minimap-room').forEach(function (el) {
-                    el.classList.toggle('active', el.getAttribute('data-scene') === sceneId);
-                });
-            }
-
             function initUiEvents() {
                 document.querySelectorAll('.minimap-room').forEach(function (el) {
                     el.addEventListener('click', function () {
                         var sceneId = el.getAttribute('data-scene');
-                        // click minimap => dùng default view của scene
                         walkToScene(null, { sceneId: sceneId });
                     });
                 });
@@ -457,7 +484,7 @@
                 btn.addEventListener('click', function () {
                     hotspotMode = !hotspotMode;
                     btn.classList.toggle('on', hotspotMode);
-                    btn.textContent = hotspotMode ? 'Chế độ tạo hotspot: ON' : 'Chế độ tạo hotspot: OFF';
+                    btn.textContent = I18N.hotspotMode + ': ' + (hotspotMode ? I18N.on : I18N.off);
                 });
 
                 var autorunBtn = document.getElementById('autorun-btn');
@@ -468,11 +495,11 @@
                     if (autorunOn) {
                         viewer.startAutoRotate(isMobile ? -0.18 : -0.9);
                         autorunBtn.classList.add('on');
-                        autorunBtn.textContent = 'Tự chạy: ON';
+                        autorunBtn.textContent = I18N.autorun + ': ' + I18N.on;
                     } else {
                         viewer.stopAutoRotate();
                         autorunBtn.classList.remove('on');
-                        autorunBtn.textContent = 'Tự chạy: OFF';
+                        autorunBtn.textContent = I18N.autorun + ': ' + I18N.off;
                     }
                 });
             }
@@ -482,31 +509,24 @@
 
                 viewer.on('scenechange', function (sceneId) {
                     updateMinimapActive(sceneId);
-
-                    // KEY FIX: scenechange xong apply target lần nữa để chắc chắn không bị “quay ngược”
-                    setTimeout(function () { applyTargetNow(sceneId); }, 40);
+                    requestViewerResize();
 
                     try {
                         var p = viewer.getPitch().toFixed(2);
                         var y = viewer.getYaw().toFixed(2);
                         var h = viewer.getHfov().toFixed(2);
-                        show('Scene: ' + sceneId + ' | pitch: ' + p + ' | yaw: ' + y + ' | hfov: ' + h);
-                    } catch (_) { }
 
-                    setTimeout(upscaleCanvas, 90);
+                        show(I18N.scene + ': ' + sceneId
+                            + ' | ' + I18N.pitch + ': ' + p
+                            + ' | ' + I18N.yaw + ': ' + y
+                            + ' | ' + I18N.hfov + ': ' + h);
+                    } catch (_) { }
                 });
 
                 viewer.on('load', function () {
-                    // load xong apply target lần nữa (tránh race)
-                    try {
-                        var sid = viewer.getScene();
-                        setTimeout(function(){ applyTargetNow(sid); }, 40);
-                    } catch (_) { }
-
-                    setTimeout(upscaleCanvas, 80);
+                    requestViewerResize();
                 });
 
-                // Hotspot capture mode: click -> log pitch/yaw/hfov
                 viewer.on('mousedown', function (event) {
                     if (!hotspotMode) return;
                     try {
@@ -518,7 +538,11 @@
                         var hfov = viewer.getHfov().toFixed(2);
                         var sceneId = viewer.getScene();
 
-                        var text = 'Scene: ' + sceneId + ' | pitch: ' + pitch + ' | yaw: ' + yaw + ' | hfov: ' + hfov;
+                        var text = I18N.scene + ': ' + sceneId
+                            + ' | ' + I18N.pitch + ': ' + pitch
+                            + ' | ' + I18N.yaw + ': ' + yaw
+                            + ' | ' + I18N.hfov + ': ' + hfov;
+
                         show(text);
                         console.log(text);
                     } catch (e) {
@@ -529,11 +553,12 @@
 
             function initViewer() {
                 try {
+                    setRealVh();
                     viewer = pannellum.viewer('vr', config);
                     initUiEvents();
                     registerViewerEvents();
                     updateMinimapActive(viewer.getScene());
-                    setTimeout(upscaleCanvas, 120);
+                    requestViewerResize();
                 } catch (e) {
                     logError('initViewer', e);
                 }

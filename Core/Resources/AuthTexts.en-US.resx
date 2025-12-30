@@ -138,6 +138,63 @@
   <data name="Btn_Verify" xml:space="preserve">
     <value>Verify</value>
   </data>
+  <data name="ChangePw_ConfirmNewPassword" xml:space="preserve">
+    <value>Confirm new password</value>
+  </data>
+  <data name="ChangePw_Msg_ConfirmNotMatch" xml:space="preserve">
+    <value>Password confirmation does not match.</value>
+  </data>
+  <data name="ChangePw_Msg_Failed" xml:space="preserve">
+    <value>Failed to change password.</value>
+  </data>
+  <data name="ChangePw_Msg_RequireAll" xml:space="preserve">
+    <value>Please fill in all fields.</value>
+  </data>
+  <data name="ChangePw_Msg_Success" xml:space="preserve">
+    <value>Password changed successfully.</value>
+  </data>
+  <data name="ChangePw_NewPassword" xml:space="preserve">
+    <value>New password</value>
+  </data>
+  <data name="ChangePw_OldPassword" xml:space="preserve">
+    <value>Current password</value>
+  </data>
+  <data name="ChangePw_Title" xml:space="preserve">
+    <value>Change password</value>
+  </data>
+  <data name="ChangePw_UpdateButton" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="Common_BathroomShort" xml:space="preserve">
+    <value>BA</value>
+  </data>
+  <data name="Common_BedroomShort" xml:space="preserve">
+    <value>BR</value>
+  </data>
+  <data name="Common_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Common_Play" xml:space="preserve">
+    <value>PLAY</value>
+  </data>
+  <data name="Common_Unit_m2" xml:space="preserve">
+    <value>m²</value>
+  </data>
+  <data name="Detail_Amenities" xml:space="preserve">
+    <value>Amenities / Furnishings</value>
+  </data>
+  <data name="Detail_Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Detail_MapTitle" xml:space="preserve">
+    <value>Location on map</value>
+  </data>
+  <data name="Detail_Similar" xml:space="preserve">
+    <value>Similar listings</value>
+  </data>
+  <data name="Detail_VrBadge" xml:space="preserve">
+    <value>VR 360°</value>
+  </data>
   <data name="Email_Subject_Reset" xml:space="preserve">
     <value>NhaNow - Password reset code</value>
   </data>
@@ -155,6 +212,21 @@
   </data>
   <data name="Err_SendEmailFailed" xml:space="preserve">
     <value>Failed to send email. Please try again.</value>
+  </data>
+  <data name="Footer_Address" xml:space="preserve">
+    <value>12th Floor, Nam Dinh</value>
+  </data>
+  <data name="Footer_BrandName" xml:space="preserve">
+    <value>NhaWow</value>
+  </data>
+  <data name="Footer_ContactTitle" xml:space="preserve">
+    <value>CONTACT</value>
+  </data>
+  <data name="Footer_Copyright" xml:space="preserve">
+    <value>© 2025 NhaNow Joint Stock Company</value>
+  </data>
+  <data name="Footer_Slogan" xml:space="preserve">
+    <value>Real Homes – Real Information – Real Experience</value>
   </data>
   <data name="Forgot_ConfirmNewPassword" xml:space="preserve">
     <value>Confirm new password</value>
@@ -222,6 +294,9 @@
   <data name="Msg_EmailRequired" xml:space="preserve">
     <value>Please enter your email.</value>
   </data>
+  <data name="Msg_Error" xml:space="preserve">
+    <value>An error occurred</value>
+  </data>
   <data name="Msg_InvalidCredentials" xml:space="preserve">
     <value>Invalid email/phone or password.</value>
   </data>
@@ -252,8 +327,23 @@
   <data name="Msg_PhoneExists" xml:space="preserve">
     <value>Phone number already exists.</value>
   </data>
+  <data name="Msg_RegisterFailed" xml:space="preserve">
+    <value>Registration failed</value>
+  </data>
+  <data name="Msg_ResendFailed" xml:space="preserve">
+    <value>Resend failed</value>
+  </data>
+  <data name="Msg_ResetFailed" xml:space="preserve">
+    <value>Password reset failed</value>
+  </data>
   <data name="Msg_ResetSuccess" xml:space="preserve">
     <value>Password has been reset successfully.</value>
+  </data>
+  <data name="Msg_SendFailed" xml:space="preserve">
+    <value>Send failed</value>
+  </data>
+  <data name="Msg_VerifyFailed" xml:space="preserve">
+    <value>Verification failed</value>
   </data>
   <data name="Msg_VerifySuccess" xml:space="preserve">
     <value>Verification successful.</value>
@@ -269,6 +359,39 @@
   </data>
   <data name="Otp_VerifyButton" xml:space="preserve">
     <value>Verify</value>
+  </data>
+  <data name="Profile_ContactInfo_Label" xml:space="preserve">
+    <value>Contact information</value>
+  </data>
+  <data name="Profile_DisplayName_Label" xml:space="preserve">
+    <value>Full name</value>
+  </data>
+  <data name="Profile_DisplayName_Placeholder" xml:space="preserve">
+    <value>Enter your full name</value>
+  </data>
+  <data name="Profile_Email_Label" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="Profile_Msg_LoadFailed" xml:space="preserve">
+    <value>Unable to load user information.</value>
+  </data>
+  <data name="Profile_Msg_SaveFailed" xml:space="preserve">
+    <value>Failed to save changes.</value>
+  </data>
+  <data name="Profile_Msg_SaveSuccess" xml:space="preserve">
+    <value>Changes saved successfully.</value>
+  </data>
+  <data name="Profile_Phone_Label" xml:space="preserve">
+    <value>Phone number</value>
+  </data>
+  <data name="Profile_Phone_Placeholder" xml:space="preserve">
+    <value>Enter your phone number</value>
+  </data>
+  <data name="Profile_SaveButton" xml:space="preserve">
+    <value>Save changes</value>
+  </data>
+  <data name="Profile_Title" xml:space="preserve">
+    <value>Account settings</value>
   </data>
   <data name="Register_Button" xml:space="preserve">
     <value>Sign up</value>
@@ -290,6 +413,9 @@
   </data>
   <data name="Register_Title" xml:space="preserve">
     <value>Sign in</value>
+  </data>
+  <data name="Site_Name" xml:space="preserve">
+    <value>NhaWow</value>
   </data>
   <data name="Verify_Title" xml:space="preserve">
     <value>Email verification.</value>

@@ -162,6 +162,24 @@ namespace HomeNow.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to TẮT.
+        /// </summary>
+        public static string Common_Off {
+            get {
+                return ResourceManager.GetString("Common_Off", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BẬT.
+        /// </summary>
+        public static string Common_On {
+            get {
+                return ResourceManager.GetString("Common_On", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Khu vực Đăng ký &amp; Liên hệ
         ///.
         /// </summary>
@@ -177,6 +195,42 @@ namespace HomeNow.Resources {
         public static string Currency_VND {
             get {
                 return ResourceManager.GetString("Currency_VND", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tiện ích / Nội thất.
+        /// </summary>
+        public static string Detail_Amenities {
+            get {
+                return ResourceManager.GetString("Detail_Amenities", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mô tả.
+        /// </summary>
+        public static string Detail_Description {
+            get {
+                return ResourceManager.GetString("Detail_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Vị trí trên bản đồ.
+        /// </summary>
+        public static string Detail_MapTitle {
+            get {
+                return ResourceManager.GetString("Detail_MapTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Căn hộ tương tự.
+        /// </summary>
+        public static string Detail_Similar {
+            get {
+                return ResourceManager.GetString("Detail_Similar", resourceCulture);
             }
         }
         
@@ -712,6 +766,105 @@ namespace HomeNow.Resources {
         public static string ViewMore {
             get {
                 return ResourceManager.GetString("ViewMore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tự chạy.
+        /// </summary>
+        public static string Vr_Autorun {
+            get {
+                return ResourceManager.GetString("Vr_Autorun", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đóng VR.
+        /// </summary>
+        public static string Vr_Close {
+            get {
+                return ResourceManager.GetString("Vr_Close", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to VR gặp lỗi.
+        /// </summary>
+        public static string Vr_ErrorPrefix {
+            get {
+                return ResourceManager.GetString("Vr_ErrorPrefix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to góc nhìn.
+        /// </summary>
+        public static string Vr_Hfov {
+            get {
+                return ResourceManager.GetString("Vr_Hfov", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tạo hotspot.
+        /// </summary>
+        public static string Vr_HotspotMode {
+            get {
+                return ResourceManager.GetString("Vr_HotspotMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sơ đồ phòng (chạm để chuyển):.
+        /// </summary>
+        public static string Vr_MinimapTitle {
+            get {
+                return ResourceManager.GetString("Vr_MinimapTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (chưa).
+        /// </summary>
+        public static string Vr_NotYet {
+            get {
+                return ResourceManager.GetString("Vr_NotYet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ngẩng/cúi.
+        /// </summary>
+        public static string Vr_Pitch {
+            get {
+                return ResourceManager.GetString("Vr_Pitch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Phòng.
+        /// </summary>
+        public static string Vr_Scene {
+            get {
+                return ResourceManager.GetString("Vr_Scene", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Trải nghiệm VR.
+        /// </summary>
+        public static string Vr_Title {
+            get {
+                return ResourceManager.GetString("Vr_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to trái/phải.
+        /// </summary>
+        public static string Vr_Yaw {
+            get {
+                return ResourceManager.GetString("Vr_Yaw", resourceCulture);
             }
         }
     }

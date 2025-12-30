@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Helpers\MoneyText.cs" />
     <Compile Include="Models\City.cs" />
+    <Compile Include="Models\Favorite.cs" />
     <Compile Include="Models\HomeIndexViewModel.cs" />
     <Compile Include="Models\LandlordRequest.cs" />
     <Compile Include="Models\PriceFilter.cs" />

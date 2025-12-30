@@ -454,9 +454,9 @@
                 @if (Model.IsVrAvailable)
                 {
                     <a class="preview" href="@Url.Action("Vr","Property", new { id = Model.PropertyId })" style="text-decoration:none;">
-                        <span class="badge">VR 360°</span>
+                        <span class="badge">@R("Detail_VrBadge", "VR 360°")</span>
                         <img src="@Model.CoverImageUrl" alt="@Model.Title" loading="lazy" decoding="async" />
-                        <div class="play"><div class="btn"><span>PLAY</span></div></div>
+                        <div class="play"><div class="btn"><span>@R("Common_Play", "PLAY")</span></div></div>
                     </a>
                     <div class="hint">@R("Detail_ClickToVr", "Click ảnh để vào màn VR")</div>
                 }
@@ -488,7 +488,12 @@
                         </button>
                     </div>
 
-                    <div class="meta">@Model.Area m² · @(Model.BedroomCount ?? 0) PN · @(Model.BathroomCount ?? 0) WC</div>
+                    <div class="meta">
+                        @Model.Area @R("Common_Unit_m2", "m²")
+                        · @(Model.BedroomCount ?? 0) @R("Common_BedroomShort", "PN")
+                        · @(Model.BathroomCount ?? 0) @R("Common_BathroomShort", "WC")
+                    </div>
+
                     <div class="addr">
                         @Model.AddressLine
                         @if (!string.IsNullOrWhiteSpace(Model.CityName))
@@ -568,8 +573,11 @@
                                             <i class="fa-solid fa-location-dot"></i> @s.Address
                                         </div>
                                         <div class="property-card-meta">
-                                            <span><i class="fa-solid fa-bed"></i> @(s.Bed ?? 0) PN <i class="fa-solid fa-bath"></i> @(s.Bath ?? 0) WC</span>
-                                            <span><i class="fa-solid fa-ruler-combined"></i> @s.Area m²</span>
+                                            <span>
+                                                <i class="fa-solid fa-bed"></i> @(s.Bed ?? 0) @R("Common_BedroomShort", "PN")
+                                                <i class="fa-solid fa-bath"></i> @(s.Bath ?? 0) @R("Common_BathroomShort", "WC")
+                                            </span>
+                                            <span><i class="fa-solid fa-ruler-combined"></i> @s.Area @R("Common_Unit_m2", "m²")</span>
                                         </div>
                                         <div class="property-card-price">
                                             <!-- ✅ GIÁ GIỐNG HOME/LIST -->
@@ -601,7 +609,12 @@
                 </button>
             </div>
 
-            <div class="meta">@Model.Area m² · @(Model.BedroomCount ?? 0) PN · @(Model.BathroomCount ?? 0) WC</div>
+            <div class="meta">
+                @Model.Area @R("Common_Unit_m2", "m²")
+                · @(Model.BedroomCount ?? 0) @R("Common_BedroomShort", "PN")
+                · @(Model.BathroomCount ?? 0) @R("Common_BathroomShort", "WC")
+            </div>
+
             <div class="addr">
                 @Model.AddressLine
                 @if (!string.IsNullOrWhiteSpace(Model.CityName))
@@ -642,61 +655,6 @@
                     window.__favIds = res.favoriteIds || [];
                     applyFavIds(window.__favIds);
                 });
-        })();
-
-        // Toggle favorite (dùng chung)
-        (function () {
-            var MSG_NEED_LOGIN = '@JS_FavNeedLogin';
-            var MSG_UPDATE_FAIL = '@JS_FavUpdateFail';
-
-            function setFavState(propertyId, isFav) {
-                // Đồng bộ tất cả nút tim có cùng data-id (desktop + mobile + similar nếu trùng)
-                $('.js-fav-toggle').each(function () {
-                    var pid = $(this).data('id');
-                    if (String(pid) === String(propertyId)) {
-                        $(this).toggleClass('is-fav', !!isFav);
-                    }
-                });
-            }
-
-            $(document).on('click', '.js-fav-toggle', function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-
-                var propertyId = $(this).data('id');
-
-                $.ajax({
-                    url: '@Url.Action("ToggleFavorite", "Property")',
-                    type: 'POST',
-                    data: { propertyId: propertyId },
-                    success: function (res) {
-                        if (!res) return;
-
-                        if (res.needLogin) {
-                            if (window.loginModal && typeof window.loginModal.open === 'function') {
-                                window.loginModal.open(window.location.pathname + window.location.search);
-                            } else {
-                                alert(MSG_NEED_LOGIN);
-                            }
-                            return;
-                        }
-
-                        if (res.success) {
-                            setFavState(propertyId, !!res.isFavorite);
-
-                            // update header badge + favIds
-                            if (typeof window.refreshHeaderFav === 'function') {
-                                window.refreshHeaderFav();
-                            }
-
-                            window.__isAuth = true;
-                        }
-                    },
-                    error: function () {
-                        alert(MSG_UPDATE_FAIL);
-                    }
-                });
-            });
         })();
     </script>
 }

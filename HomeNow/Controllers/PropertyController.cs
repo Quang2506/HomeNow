@@ -67,7 +67,6 @@ namespace HomeNow.Controllers
             return (m == "sale") ? "sale" : "rent";
         }
 
-        // RedisCacheService của bạn best-effort => không check IsAvailable để tránh block
         private bool CacheEnabled => _cache != null && _cache.IsEnabled;
 
         private static string NormalizeKeyPart(string s, string fallback = "unknown")
@@ -86,7 +85,6 @@ namespace HomeNow.Controllers
 
         private static string DetailKey(string lang, int id) => $"hn:prop:detail:{lang}:{id}";
 
-        // ✅ Similar cache key theo "bucket giá" (Cách 2)
         private static string SimilarKey(
             string lang,
             int? cityId,
@@ -96,11 +94,9 @@ namespace HomeNow.Controllers
             bool relaxed)
             => $"hn:prop:similar:{lang}:{cityId}:{NormalizeKeyPart(listingType)}:{NormalizeKeyPart(propertyType)}:pb:{priceBucket}:relax:{(relaxed ? 1 : 0)}";
 
-        // ✅ Tier 2: cùng city + listingType + propertyType (KHÔNG giá)
         private static string SimilarKeyCityType(string lang, int? cityId, string listingType, string propertyType)
             => $"hn:prop:similar:ct:{lang}:{cityId}:{NormalizeKeyPart(listingType)}:{NormalizeKeyPart(propertyType)}";
 
-        // ✅ Tier 3: cùng city + listingType (giữ rent/sale, bỏ propertyType)
         private static string SimilarKeyCityListing(string lang, int? cityId, string listingType)
             => $"hn:prop:similar:cl:{lang}:{cityId}:{NormalizeKeyPart(listingType)}";
 
@@ -176,7 +172,6 @@ namespace HomeNow.Controllers
                         return empty;
                     }
 
-                    // marker > 0 => ưu tiên đọc set
                     if (markerCount > 0)
                     {
                         var ids = await _cache.GetSetMembersIntAsync(setKey);
@@ -185,11 +180,9 @@ namespace HomeNow.Controllers
                             if (HttpContext != null) HttpContext.Items[reqKey] = ids;
                             return ids;
                         }
-                        // marker nói có mà set rỗng => rơi xuống DB rebuild
                     }
                     else
                     {
-                        // marker chưa có => thử đọc set
                         var ids = await _cache.GetSetMembersIntAsync(setKey);
                         if (ids != null && ids.Length > 0)
                         {
@@ -206,11 +199,8 @@ namespace HomeNow.Controllers
             }
 
             // 2) DB fallback
-            var favList = await _favoriteService.GetFavoritesAsync(userId, lang);
-            var idsDb = (favList ?? new List<PropertyListItemViewModel>())
-                .Select(x => x.PropertyId)
-                .Distinct()
-                .ToArray();
+            var idsDb = await _favoriteService.GetFavoriteIdsAsync(userId);
+            idsDb = idsDb ?? new int[0];
 
             // write back best-effort
             if (CacheEnabled)
@@ -259,7 +249,6 @@ namespace HomeNow.Controllers
                         return 0;
                     }
 
-                    // SCARD nhanh
                     var len = await _cache.GetSetLengthAsync(setKey);
                     if (len > 0)
                     {
@@ -268,7 +257,6 @@ namespace HomeNow.Controllers
                         return n;
                     }
 
-                    // marker >0 mà len==0 => rebuild bằng ids
                     if (markerCount > 0)
                     {
                         var ids = await GetFavoriteIdsCachedAsync(uid, lang);
@@ -289,6 +277,16 @@ namespace HomeNow.Controllers
             return countDb;
         }
 
+        // ✅ (MỚI) LẤY TRẠNG THÁI FAVORITE THỰC TẾ TỪ DB (tránh Toggle trả ngược -> UI bị revert)
+        private async Task<bool> IsFavoriteDbAsync(int userId, int propertyId)
+        {
+            using (var db = new AppDbContext())
+            {
+                return await db.Favorites.AsNoTracking()
+                    .AnyAsync(f => f.UserId == userId && f.PropertyId == propertyId && f.Status == 1);
+            }
+        }
+
         // ------------------ Favorite Endpoints ------------------
         [HttpPost]
         public async Task<ActionResult> ToggleFavorite(int propertyId = 0, int id = 0)
@@ -299,11 +297,13 @@ namespace HomeNow.Controllers
             if (!userId.HasValue)
                 return Json(new { success = false, needLogin = true }, JsonRequestBehavior.DenyGet);
 
-            // 1) DB update
-            var isFav = await _favoriteService.ToggleFavoriteAsync(userId.Value, propertyId);
+            var lang = GetLang2();
 
-            // 2) Redis update best-effort
-            int favoriteCount;
+            // 1) DB toggle + lấy summary (ids/count)
+            var summary = await _favoriteService.ToggleFavoriteWithSummaryAsync(userId.Value, propertyId, lang);
+            summary = summary ?? new FavoriteToggleResult { IsFavorite = false, FavoriteIds = new int[0], FavoriteCount = 0 };
+
+            // 2) Redis update best-effort (sync theo summary để không bị lệch)
             if (CacheEnabled)
             {
                 var setKey = FavIdsKey(userId.Value);
@@ -311,24 +311,10 @@ namespace HomeNow.Controllers
 
                 try
                 {
-                    if (isFav) await _cache.AddToSetAsync(setKey, propertyId);
-                    else await _cache.RemoveFromSetAsync(setKey, propertyId);
-
-                    var len = (int)await _cache.GetSetLengthAsync(setKey);
-                    await _cache.SetStringAsync(markerKey, len.ToString(), FavMarkerTtl);
-                    favoriteCount = len;
+                    await _cache.ReplaceSetAsync(setKey, summary.FavoriteIds ?? Array.Empty<int>());
+                    await _cache.SetStringAsync(markerKey, (summary.FavoriteCount).ToString(), FavMarkerTtl);
                 }
-                catch
-                {
-                    // fallback count
-                    var lang = GetLang2();
-                    favoriteCount = await GetFavoriteCountCachedAsync(userId.Value, lang);
-                }
-            }
-            else
-            {
-                var lang = GetLang2();
-                favoriteCount = await GetFavoriteCountCachedAsync(userId.Value, lang);
+                catch { /* ignore */ }
             }
 
             // clear per-request memoize
@@ -338,10 +324,12 @@ namespace HomeNow.Controllers
             return Json(new
             {
                 success = true,
-                isFavorite = isFav,
-                favoriteCount = favoriteCount
+                isFavorite = summary.IsFavorite,
+                favoriteCount = summary.FavoriteCount,
+                favoriteIds = summary.FavoriteIds ?? new int[0]
             }, JsonRequestBehavior.DenyGet);
         }
+
 
         [HttpGet]
         [Authorize]
@@ -359,8 +347,14 @@ namespace HomeNow.Controllers
 
         [HttpGet]
         [AllowAnonymous]
+        [OutputCache(NoStore = true, Duration = 0, VaryByParam = "*")]
         public async Task<ActionResult> HeaderFavoriteInfo()
         {
+            // chặn cache ở level HTTP thêm lần nữa
+            Response.Cache.SetCacheability(HttpCacheability.NoCache);
+            Response.Cache.SetNoStore();
+            Response.Cache.SetExpires(DateTime.UtcNow.AddSeconds(-1));
+
             var userId = GetCurrentUserId();
             if (!userId.HasValue)
                 return Json(new { isAuth = false, favoriteCount = 0, favoriteIds = new int[0] }, JsonRequestBehavior.AllowGet);
@@ -381,10 +375,25 @@ namespace HomeNow.Controllers
         public Task<ActionResult> FavoriteSummary() => HeaderFavoriteInfo();
 
         // ------------------ DETAIL + VR ------------------
+        private async Task TryIncrementViewCountAsync(int propertyId)
+        {
+            if (propertyId <= 0) return;
 
-        // ✅ bucket step cho Cách 2:
-        // - rent: 1,000,000 VND
-        // - sale: 100,000,000 VND
+            try
+            {
+                using (var db = new AppDbContext())
+                {
+                    await db.Database.ExecuteSqlCommandAsync(@"
+                        UPDATE public.properties
+                        SET view_count = COALESCE(view_count, 0) + 1
+                        WHERE property_id = @p0
+                          AND status = 'published';
+                    ", propertyId);
+                }
+            }
+            catch { }
+        }
+
         private static decimal GetBucketStep(string listingType)
         {
             return string.Equals((listingType ?? "").Trim(), "rent", StringComparison.OrdinalIgnoreCase)
@@ -396,7 +405,6 @@ namespace HomeNow.Controllers
         {
             if (step <= 0m) step = 1m;
             if (price <= 0m) return 0;
-            // làm tròn về bucket gần nhất
             var k = (long)Math.Round(price / step, MidpointRounding.AwayFromZero);
             return k;
         }
@@ -408,10 +416,10 @@ namespace HomeNow.Controllers
             var lang = GetLang2();
             var userId = GetCurrentUserId();
 
-            //  để header hiển thị số tim ngay lúc render (không phải đợi ajax)
+            await TryIncrementViewCountAsync(id);
+
             ViewBag.FavoriteCount = await GetFavoriteCountCachedAsync(userId, lang);
 
-            // detail cache (user-agnostic)
             PropertyDetailViewModel vm = await CacheGetJsonAsync<PropertyDetailViewModel>(DetailKey(lang, id));
 
             if (vm == null)
@@ -435,7 +443,6 @@ namespace HomeNow.Controllers
 
                     var addr = (tr != null && !string.IsNullOrEmpty(tr.AddressLine)) ? tr.AddressLine : p.AddressLine;
 
-                    // City
                     string cityName = "";
                     if (p.CityId.HasValue)
                     {
@@ -453,12 +460,10 @@ namespace HomeNow.Controllers
                     var price = p.Price ?? 0m;
                     var priceLabel = price > 0m ? FormatPriceLabel(price, p.ListingType) : "";
 
-                    // Map
                     var mapQuery = $"{addr}, {cityName}".Trim().Trim(',');
                     var mapEmbedUrl = BuildMapEmbedUrl(mapQuery);
                     var mapClickUrl = BuildMapDirectionsUrl(mapQuery);
 
-                    // ===================== SIMILAR (đủ 3 theo 3-tier) =====================
                     var listingTypeKey = NormalizeKeyPart(p.ListingType);
                     var propertyTypeKey = NormalizeKeyPart(p.PropertyType);
 
@@ -467,7 +472,6 @@ namespace HomeNow.Controllers
 
                     var dict = new Dictionary<int, PropertyListItemViewModel>();
 
-                    // Tier 1: city + listingType + propertyType + approx price
                     if (price > 0m)
                     {
                         var k1 = SimilarKey(lang, p.CityId, listingTypeKey, propertyTypeKey, bucket, relaxed: false);
@@ -497,7 +501,6 @@ namespace HomeNow.Controllers
                         }
                     }
 
-                    // Tier 2: city + listingType + propertyType (no price)
                     if (dict.Count < SimilarTake)
                     {
                         var k2 = SimilarKeyCityType(lang, p.CityId, listingTypeKey, propertyTypeKey);
@@ -527,7 +530,6 @@ namespace HomeNow.Controllers
                         }
                     }
 
-                    // Tier 3: city + listingType (no propertyType)
                     if (dict.Count < SimilarTake)
                     {
                         var k3 = SimilarKeyCityListing(lang, p.CityId, listingTypeKey);
@@ -559,7 +561,6 @@ namespace HomeNow.Controllers
 
                     var similar = dict.Values.ToList();
 
-                    // ưu tiên “gần giá” nếu có giá, sau đó giữ thứ tự featured/created/id
                     if (price > 0m && similar.Count > 1)
                     {
                         similar = similar
@@ -573,7 +574,6 @@ namespace HomeNow.Controllers
                     {
                         similar = similar.Take(SimilarTake).ToList();
                     }
-                    // ===================== END SIMILAR =====================
 
                     vm = new PropertyDetailViewModel
                     {
@@ -608,7 +608,6 @@ namespace HomeNow.Controllers
                 }
             }
 
-            // set fav flag for similar
             if (userId.HasValue && vm?.Similar != null && vm.Similar.Count > 0)
             {
                 var favSet = await GetFavoriteSetCachedAsync(userId, lang);
@@ -622,7 +621,6 @@ namespace HomeNow.Controllers
             return View(vm);
         }
 
-        // ✅ Query theo tier (dùng chung cho tier1/2/3, không đụng logic khác)
         private async Task<List<PropertyListItemViewModel>> QuerySimilarTierAsync(
             AppDbContext db,
             string lang,
@@ -683,8 +681,6 @@ namespace HomeNow.Controllers
                 var tAddr = (tr2 != null && !string.IsNullOrEmpty(tr2.AddressLine)) ? tr2.AddressLine : pp.AddressLine;
 
                 var price = pp.Price ?? 0m;
-
-                // tránh lỗi kiểu ?? giữa int?/bool (CS0019)
                 var isFeaturedBool = (pp.IsFeatured ?? 0) > 0;
                 var createdAt = pp.CreatedAt ?? DateTime.MinValue;
 
@@ -954,7 +950,6 @@ namespace HomeNow.Controllers
             var price = x.Price ?? 0m;
             var priceLabel = price > 0m ? FormatPriceLabel(price, listingType) : "";
 
-            // map sau khi materialize -> tránh lỗi cast decimal trong EF
             var area = x.AreaSqm.HasValue ? (float)x.AreaSqm.Value : (float)(x.AreaM2 ?? 0m);
 
             return new PropertyListItemViewModel
@@ -991,7 +986,6 @@ namespace HomeNow.Controllers
             if (string.IsNullOrWhiteSpace(raw)) return new List<string>();
             raw = raw.Trim();
 
-            // support JSON ["wifi","ac"]
             try
             {
                 if (raw.StartsWith("["))
@@ -1007,9 +1001,8 @@ namespace HomeNow.Controllers
                     }
                 }
             }
-            catch { /* fallback */ }
+            catch { }
 
-            // CSV / newline
             return raw.Split(new[] { ',', ';', '\n', '\r', '\t' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => x.Trim())
                 .Where(x => x.Length > 0)
@@ -1017,14 +1010,12 @@ namespace HomeNow.Controllers
                 .ToList();
         }
 
-        // Map embed theo address_line
         private static string BuildMapEmbedUrl(string query)
         {
             var q = Uri.EscapeDataString(query ?? "");
             return $"https://www.google.com/maps?q={q}&output=embed";
         }
 
-        // Click: Google Maps chỉ đường đến địa chỉ đó
         private static string BuildMapDirectionsUrl(string query)
         {
             var q = Uri.EscapeDataString(query ?? "");

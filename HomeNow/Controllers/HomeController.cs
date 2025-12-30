@@ -1,22 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Web.Mvc;
-using System.Web.Script.Serialization;
-using Core.Models;
+﻿using Core.Models;
 using Core.ViewModels;
 using Data;
 using Services.Implementations;
 using Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;              // ✅ thêm để dùng ToArrayAsync / ToListAsync
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Script.Serialization;
 
 namespace HomeNow.Controllers
 {
     public class HomeController : BaseController
     {
         private readonly IPropertyService _propertyService;
-        private readonly IFavoriteService _favoriteService;
         private readonly IRedisCacheService _cache;
 
         private readonly JavaScriptSerializer _ser = new JavaScriptSerializer();
@@ -28,7 +29,6 @@ namespace HomeNow.Controllers
         public HomeController()
         {
             _propertyService = new PropertyService();
-            _favoriteService = new FavoriteService();
             _cache = new RedisCacheService();
         }
 
@@ -79,32 +79,80 @@ namespace HomeNow.Controllers
             catch { return Task.CompletedTask; }
         }
 
-        // Favorites: KHÔNG KeyExists -> giảm RTT
+        // ====================== FAVORITES (CHỈ SỬA PHẦN NÀY) ======================
+
+        // marker mới: lưu COUNT dạng số (0, 1, 2...) để tránh bị hiểu nhầm như logic cũ ("1" => coi như empty)
+        private static int ParseMarkerCount(string marker)
+        {
+            if (string.IsNullOrWhiteSpace(marker)) return -1; // chưa có marker
+            return int.TryParse(marker, out var n) ? n : -1;
+        }
+
+        // Favorites: Redis set + marker(count) (đồng bộ với PropertyController)
         private async Task<int[]> GetFavoriteIdsCachedAsync(int userId, string lang)
         {
             var setKey = FavIdsKey(userId);
             var markerKey = FavMarkerKey(userId);
 
+            // 1) Redis best-effort
             if (CacheEnabled)
             {
-                var ids = await _cache.GetSetMembersIntAsync(setKey).ConfigureAwait(false);
-                if (ids != null && ids.Length > 0) return ids;
+                try
+                {
+                    var marker = await _cache.GetStringAsync(markerKey).ConfigureAwait(false);
+                    var markerCount = ParseMarkerCount(marker);
 
-                var marker = await _cache.GetStringAsync(markerKey).ConfigureAwait(false);
-                if (!string.IsNullOrEmpty(marker)) return Array.Empty<int>();
+                    // marker = 0 => chắc chắn rỗng
+                    if (markerCount == 0) return Array.Empty<int>();
+
+                    if (markerCount > 0)
+                    {
+                        // marker nói có => ưu tiên đọc set
+                        var ids = await _cache.GetSetMembersIntAsync(setKey).ConfigureAwait(false);
+                        if (ids != null && ids.Length > 0) return ids;
+                        // marker nói có nhưng set rỗng => rơi xuống DB rebuild
+                    }
+                    else
+                    {
+                        // chưa có marker => thử đọc set trước
+                        var ids = await _cache.GetSetMembersIntAsync(setKey).ConfigureAwait(false);
+                        if (ids != null && ids.Length > 0)
+                        {
+                            await _cache.SetStringAsync(markerKey, ids.Length.ToString(), FavMarkerTtl).ConfigureAwait(false);
+                            return ids;
+                        }
+                    }
+                }
+                catch
+                {
+                    // ignore -> DB fallback
+                }
             }
 
-            var favList = await _favoriteService.GetFavoritesAsync(userId, lang).ConfigureAwait(false);
-            var idsDb = (favList ?? new List<PropertyListItemViewModel>())
-                .Select(x => x.PropertyId).Distinct().ToArray();
+            // 2) DB fallback: public.favorites (status=1)
+            int[] idsDb;
+            using (var db = new AppDbContext())
+            {
+                idsDb = await db.Favorites.AsNoTracking()
+                    .Where(f => f.UserId == userId && f.Status == 1)
+                    .Select(f => f.PropertyId)
+                    .Distinct()
+                    .ToArrayAsync()
+                    .ConfigureAwait(false);
+            }
 
+            // 3) write back cache best-effort
             if (CacheEnabled)
             {
-                await _cache.ReplaceSetAsync(setKey, idsDb).ConfigureAwait(false);
-                await _cache.SetStringAsync(markerKey, "1", FavMarkerTtl).ConfigureAwait(false);
+                try
+                {
+                    await _cache.ReplaceSetAsync(setKey, idsDb).ConfigureAwait(false);
+                    await _cache.SetStringAsync(markerKey, (idsDb?.Length ?? 0).ToString(), FavMarkerTtl).ConfigureAwait(false);
+                }
+                catch { /* ignore */ }
             }
 
-            return idsDb;
+            return idsDb ?? Array.Empty<int>();
         }
 
         private async Task<HashSet<int>> GetFavoriteSetCachedAsync(int? userId, string lang)
@@ -118,18 +166,120 @@ namespace HomeNow.Controllers
         {
             if (!userId.HasValue) return 0;
 
+            var uid = userId.Value;
+            var setKey = FavIdsKey(uid);
+            var markerKey = FavMarkerKey(uid);
+
             if (CacheEnabled)
             {
-                var len = await _cache.GetSetLengthAsync(FavIdsKey(userId.Value)).ConfigureAwait(false);
-                if (len > 0) return (int)len;
+                try
+                {
+                    var marker = await _cache.GetStringAsync(markerKey).ConfigureAwait(false);
+                    var markerCount = ParseMarkerCount(marker);
 
-                var marker = await _cache.GetStringAsync(FavMarkerKey(userId.Value)).ConfigureAwait(false);
-                if (!string.IsNullOrEmpty(marker)) return 0;
+                    if (markerCount == 0) return 0;
+
+                    // SCARD nhanh
+                    var len = await _cache.GetSetLengthAsync(setKey).ConfigureAwait(false);
+                    if (len > 0) return (int)len;
+
+                    // marker>0 mà len==0 => rebuild
+                    if (markerCount > 0)
+                    {
+                        var ids = await GetFavoriteIdsCachedAsync(uid, lang).ConfigureAwait(false);
+                        return ids.Length;
+                    }
+                }
+                catch
+                {
+                    // ignore -> DB fallback
+                }
             }
 
-            var ids = await GetFavoriteIdsCachedAsync(userId.Value, lang).ConfigureAwait(false);
-            return ids.Length;
+            var idsDb = await GetFavoriteIdsCachedAsync(uid, lang).ConfigureAwait(false);
+            return idsDb.Length;
         }
+
+        // Favorites Popup (AJAX) - giờ đọc từ bảng favorites (status=1)
+       
+
+     [HttpGet]
+    [OutputCache(NoStore = true, Duration = 0, VaryByParam = "*")]
+    public async Task<ActionResult> FavoritesPopup()
+    {
+        Response.Cache.SetCacheability(HttpCacheability.NoCache);
+        Response.Cache.SetNoStore();
+        Response.Cache.SetExpires(DateTime.UtcNow.AddSeconds(-1));
+
+        var userId = GetCurrentUserId();
+        if (!userId.HasValue)
+            return Json(new { needLogin = true }, JsonRequestBehavior.AllowGet);
+
+        var lang = GetLang2();
+        var list = await QueryFavoriteCardsAsync(userId.Value, lang).ConfigureAwait(false);
+        var result = list ?? new List<PropertyListItemViewModel>();
+
+        return PartialView("_PropertyCardList", result);
+    }
+
+
+    private async Task<List<PropertyListItemViewModel>> QueryFavoriteCardsAsync(int userId, string lang)
+        {
+            using (var db = new AppDbContext())
+            {
+                var q =
+                    from f in db.Favorites.AsNoTracking()
+                    join p in db.Properties.AsNoTracking() on f.PropertyId equals p.PropertyId
+                    join tr in db.PropertyTranslations.AsNoTracking().Where(t => t.LangCode == lang)
+                        on p.PropertyId equals tr.PropertyId into gj
+                    from tr in gj.DefaultIfEmpty()
+                    where f.UserId == userId
+                       && f.Status == 1
+                       && p.Status == "published"
+                    orderby f.CreatedAt descending
+                    select new { p, tr };
+
+                // dropdown/popup không nên quá nặng
+                var rows = await q.Take(200).ToListAsync().ConfigureAwait(false);
+
+                return rows.Select(x =>
+                {
+                    var p = x.p;
+                    var tr = x.tr;
+
+                    var title = (tr != null && !string.IsNullOrEmpty(tr.DisplayTitle)) ? tr.DisplayTitle
+                              : (tr != null && !string.IsNullOrEmpty(tr.Title)) ? tr.Title
+                              : p.Title;
+
+                    var addr = (tr != null && !string.IsNullOrEmpty(tr.AddressLine)) ? tr.AddressLine : p.AddressLine;
+
+                    var price = p.Price ?? 0m;
+                    var priceLabel = price > 0m ? FormatPriceLabel(price, p.ListingType) : "";
+
+                    return new PropertyListItemViewModel
+                    {
+                        PropertyId = p.PropertyId,
+                        Title = title,
+                        Address = addr,
+                        ThumbnailUrl = p.CoverImageUrl,
+
+                        Bed = p.BedroomCount,
+                        Bath = p.BathroomCount,
+                        Area = p.AreaSqm ?? 0f,
+
+                        Price = price,
+                        PriceLabel = priceLabel,
+
+                        ListingType = p.ListingType,
+                        PropertyType = p.PropertyType,
+
+                        IsFavorite = true
+                    };
+                }).ToList();
+            }
+        }
+
+        // ====================== HẾT FAVORITES (PHẦN KHÁC GIỮ NGUYÊN) ======================
 
         private async Task FillDropDownAndHeroCachedAsync(HomeIndexViewModel vm, string lang)
         {
@@ -202,7 +352,7 @@ namespace HomeNow.Controllers
                          : t.NameVi
                 }).ToList();
 
-                // 
+                //
                 if (vm.CityId.HasValue)
                 {
                     var cityForBg = cityEntities.FirstOrDefault(c => c.CityId == vm.CityId.Value);
@@ -385,27 +535,6 @@ namespace HomeNow.Controllers
 
                 IsFavorite = favoriteIds != null && favoriteIds.Contains(x.Id)
             };
-        }
-
-        // Favorites Popup (AJAX)
-        [HttpGet]
-        public async Task<ActionResult> FavoritesPopup()
-        {
-            var userId = GetCurrentUserId();
-            if (!userId.HasValue)
-            {
-                // JS phía client sẽ thấy needLogin và mở modal login (giữ logic cũ)
-                return Json(new { needLogin = true }, JsonRequestBehavior.AllowGet);
-            }
-
-            var lang = GetLang2();
-
-            // Lấy list favorites để render popup
-            var list = await _favoriteService.GetFavoritesAsync(userId.Value, lang).ConfigureAwait(false);
-            var result = list ?? new List<PropertyListItemViewModel>();
-
-            // Dùng luôn partial card list sẵn có (không tạo view mới, không ảnh hưởng logic khác)
-            return PartialView("_PropertyCardList", result);
         }
 
         private string FormatPriceLabel(decimal price, string listingType)

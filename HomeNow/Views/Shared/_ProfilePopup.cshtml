@@ -111,23 +111,24 @@
 <div id="profileOverlay">
     <div id="profileBox">
         <span id="profileClose">&times;</span>
-        <h3>Quản lý tài khoản</h3>
+        <h3>@AuthTexts.Profile_Title</h3>
 
         <div id="profileMsg"></div>
 
-        <label>Họ và tên</label>
-        <input type="text" id="pfDisplayName" placeholder="Nhập họ và tên" />
+        <label>@AuthTexts.Profile_DisplayName_Label</label>
+        <input type="text" id="pfDisplayName" placeholder="@AuthTexts.Profile_DisplayName_Placeholder" />
 
-        <label>Thông tin liên hệ</label>
-        <label style="margin-top:6px; font-weight:700;">Số điện thoại</label>
-        <input type="text" id="pfPhone" placeholder="Nhập số điện thoại" />
+        <label>@AuthTexts.Profile_ContactInfo_Label</label>
 
-        <label>Email</label>
+        <label style="margin-top:6px; font-weight:700;">@AuthTexts.Profile_Phone_Label</label>
+        <input type="text" id="pfPhone" placeholder="@AuthTexts.Profile_Phone_Placeholder" />
+
+        <label>@AuthTexts.Profile_Email_Label</label>
         <input type="text" id="pfEmail" disabled />
 
         <div class="pf-actions">
-            <button type="button" id="btnProfileCancel" class="pf-cancel">Hủy</button>
-            <button type="button" id="btnProfileSave" class="pf-save">Lưu thay đổi</button>
+            <button type="button" id="btnProfileCancel" class="pf-cancel">@AuthTexts.Common_Cancel</button>
+            <button type="button" id="btnProfileSave" class="pf-save">@AuthTexts.Profile_SaveButton</button>
         </div>
     </div>
 </div>
@@ -151,7 +152,7 @@
                     $("#pfEmail").val(res.email || "");
                     return;
                 }
-                showPfMsg((res && res.message) ? res.message : "Không lấy được thông tin user.", false);
+                showPfMsg((res && res.message) ? res.message : "@AuthTexts.Profile_Msg_LoadFailed", false);
             });
         }
 
@@ -176,7 +177,7 @@
                 phoneNumber: phone
             }, function (res) {
                 if (res && res.success) {
-                    showPfMsg(res.message || "Lưu thay đổi thành công.", true);
+                    showPfMsg(res.message || "@AuthTexts.Profile_Msg_SaveSuccess", true);
 
                     // update tên trên header (không reload) - giữ logic cũ
                     var newName = (name || "").trim();
@@ -187,7 +188,7 @@
                     setTimeout(closeProfile, 400);
                     return;
                 }
-                showPfMsg((res && res.message) ? res.message : "Lưu thay đổi thất bại.", false);
+                showPfMsg((res && res.message) ? res.message : "@AuthTexts.Profile_Msg_SaveFailed", false);
             });
         });
     })();
